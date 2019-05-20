@@ -1,0 +1,14 @@
+"0","```r
+DataSubset95to99 <- filter(DataRaw, GYEAR>=1995) # subset data
+DataSubset95to99 <- as_tibble(DataSubset95to99) # convert data frame to tibble
+ObsCRECEIVE95to99 <- filter(DataSubset95to99, CRECEIVE>0)
+ObsCLAIMS95to99 <- filter(DataSubset95to99, CLAIMS>0)
+DataSubset95to99 %>%
+  filter(CLAIMS>0) %>%
+  filter(CRECEIVE>0) -> ObsDataSubset95to99
+set.seed(1972)
+Sample95to99 <- sample(1:nrow(ObsDataSubset95to99), 2000, replace = TRUE, prob = NULL)
+ObsDataSubset95to99Sample <- ObsDataSubset95to99[Sample95to99, ]
+ggplot() +
+  geom_histogram(ObsDataSubset95to99Sample, mapping = aes(CRECEIVE))
+```"

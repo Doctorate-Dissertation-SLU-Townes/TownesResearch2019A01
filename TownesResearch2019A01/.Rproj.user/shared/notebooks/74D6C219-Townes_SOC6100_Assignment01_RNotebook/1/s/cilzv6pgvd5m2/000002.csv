@@ -1,0 +1,9 @@
+"0","```r
+library(tidyverse) # loads the basic R packages
+library(here) # enables file portability
+library(readr) # functions for reading data
+library(dplyr) # functions for data wrangling
+library(janitor) # functions for data cleaning
+library(naniar) # functions for analyzing missing data
+library(ggplot2) # functions for data visualizations
+```"

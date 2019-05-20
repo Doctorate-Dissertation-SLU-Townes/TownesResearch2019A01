@@ -1,0 +1,98 @@
+---
+title: "R Notebook: Improving Construct Validity in Studies of Technology Transfer"
+author: "Malcolm S. Townes"
+date: '(`r format(Sys.time(), "%B %d, %Y")`)'
+output: 
+    github_document: default
+    html_notebook: default
+    always_allow_html: yes
+---
+
+## Introduction
+This is an R Notebook for an investigation on improving construct validity in studies of technology transfer.
+
+## Project Set Up
+The following code chunk enables the R Notebook to integrate seemlessly with the project organization format. This is normally included in the R Notebook to simplify file calls and enable file portability but it has been causing an error. Per Dr. Christopher Prener of Saint Louis University, the error is generated because the `here::here()` function has not been tested with certain combinations of functions. To work around this problem, I've embedded the `here()` function where I enter a file path when necessary.
+
+```{r setup-project}
+knitr::opts_knit$set(root.dir = here::here())
+```
+
+## Load Dependencies
+The following code chunk loads package dependencies required to perform the necessary tasks. Basic tasks include importing, reading, wrangling, and cleaning data; selecting a subset of the data; checking for unique observations, and analyzing missing data. 
+```{r load-dependencies}
+library(tidyverse) # loads the basic R packages
+library(here) # enables file portability
+library(readr) # functions for reading data
+library(dplyr) # functions for data wrangling
+library(janitor) # functions for data cleaning
+library(naniar) # functions for analyzing missing data
+library(ggplot2) # functions for data visualizations
+```
+
+## Load Raw Data
+The following code chunk imports the raw data from the `XLS` file.
+```{r import-data}
+setwd("D:/TownesResearch2019A01")
+DataRaw <- read.table("DataRaw/pat76_06_classification_06.xls", sep = ",", header = TRUE, fill = TRUE, dec = ".") # import raw data
+setwd("D:/TownesResearch2019A01")
+```
+
+## Subset Data
+The following code chunk creates a subset of the data for the year 1999.
+```{r subset-data-1999}
+DataSubset99 <- filter(DataRaw, GYEAR>=1999) # subset data
+DataSubset99 <- as_tibble(DataSubset99) # convert data frame to tibble
+```
+
+The following code chunk creates a subset of the data for the period 1995 through 1999.
+```{r subset-data-95-99}
+DataSubset95to99 <- filter(DataRaw, GYEAR>=1995) # subset data
+DataSubset95to99 <- as_tibble(DataSubset95to99) # convert data frame to tibble
+ObsCRECEIVE95to99 <- filter(DataSubset95to99, CRECEIVE>0)
+ObsCLAIMS95to99 <- filter(DataSubset95to99, CLAIMS>0)
+DataSubset95to99 %>%
+  filter(CLAIMS>0) %>%
+  filter(CRECEIVE>0) -> ObsDataSubset95to99
+set.seed(1972)
+Sample95to99 <- sample(1:nrow(ObsDataSubset95to99), 2000, replace = TRUE, prob = NULL)
+ObsDataSubset95to99Sample <- ObsDataSubset95to99[Sample95to99, ]
+ggplot() +
+  geom_histogram(ObsDataSubset95to99Sample, mapping = aes(CRECEIVE))
+```
+
+
+## Inspect Data
+The following code chunk evaluates the various subsetted data.  For each subset, it first checks for missing data for each variable.  It then checks for missing data for each variable in each observation.  Then it checks for duplicate observations with the `PATENT` variable to determine if that variable can be used as a unique identifier for each observation.  Finally, it checks for duplicate observations across all variables to ensure that each observation is unique.
+```{r inspect-data-99}
+miss_var_summary(DataSubset99, order = TRUE)
+miss_case_summary(DataSubset99, order = TRUE)
+get_dupes(DataSubset99, PATENT)
+get_dupes(DataSubset99)
+```
+
+```{r inspect-data-95-99}
+miss_var_summary(ObsDataSubset95to99, order = TRUE)
+miss_case_summary(ObsDataSubset95to99, order = TRUE)
+get_dupes(ObsDataSubset95to99, PATENT)
+get_dupes(ObsDataSubset95to99)
+```
+
+
+
+## Clean Data
+I did not perform any additional cleaning of the subsetted data.
+```{r view-data}
+View(DataSubset99, "Cleaned Data 1999")
+View(ObsDataSubset95to99, "Cleaned Data 1995 to 1999")
+```
+
+## Save Data
+The following code chunk saves the cleaned data.
+```{r save-data}
+write.csv(DataSubset99, here("Data/DataClean/NBERPatCit1999.csv"), append = FALSE)
+write.csv(ObsDataSubset95to99, here("Data/DataClean/NBERPatCit95to99.csv"), append = FALSE)
+write.csv(ObsDataSubset95to99Sample, here("Data/DataClean/NBERPatCit95to99Sample.csv"), append = FALSE)
+```
+
+
