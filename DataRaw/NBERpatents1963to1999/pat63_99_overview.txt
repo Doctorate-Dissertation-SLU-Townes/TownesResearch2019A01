@@ -1,0 +1,20 @@
+Overview of the NBER Patent Citations Data
+These data are described in detail in NBER Working Paper No. XXXX, "The NBER Patent Citations Data File:  Lessons, Insights and Methodological Tools," by Bronwyn H. Hall, Adam B. Jaffe and Manuel Trajtenberg.
+
+ALL USERS OF THESE DATA SHOULD READ THIS PAPER, AND SHOULD CITE IT AS THE SOURCE OF THE DATA
+
+The data are in 5 zipped SAS "transport format" files as follows:
+
+Cite75_99.zip contains the pairwise citations data.
+Pat63_99.zip contains the patent data, including the constructed variables
+Coname.zip contains the assignee names.
+Match.zip contains the match to CUSIP numbers
+Inventor.zip contains the individual inventor records
+
+Each of these files has a corresponding "txt" file that contains the variable names and other documentation.
+
+The files "List of classes.txt" and "List of countries.txt" contain, respectively, the patent class codes with corresponding class names, and the country codes with corresponding country names.
+
+
+
+
