@@ -31,7 +31,7 @@ library(ggplot2) # functions for data visualizations
 ```
 
 ## Load Raw Data
-The following code chunk imports the raw data from the `XLS` file.
+The following code chunk imports the raw data from the `txt` file.
 ```{r import-data}
 DataRaw <- read.table("DataRaw/NBERpatents1963to1999/apat63_99.txt", sep = ",", header = TRUE, fill = TRUE, dec = ".") # import raw data
 ```
@@ -39,19 +39,18 @@ DataRaw <- read.table("DataRaw/NBERpatents1963to1999/apat63_99.txt", sep = ",", 
 ## Subset Data
 The following code chunk creates a subset of the data for the period 1990 through 1995.
 ```{r subset-data-90-95}
-DataRaw %>%
+DataRaw %>% # subset data
   filter(GYEAR>=1990) %>%
-  filter(GYEAR<=1995) -> DataSubset90to95 # subset data
-DataSubset90to95 <- as_tibble(DataSubset90to95) # convert data frame to tibble
-DataSubset90to95 %>%
+  filter(GYEAR<=1995) %>%
   filter(CLAIMS>0) %>%
-  filter(CRECEIVE>0) -> DataSubset90to95
+  filter(CRECEIVE>=0) -> DataSubset90to95
+DataSubset90to95 <- as_tibble(DataSubset90to95) # convert data frame to tibble
 set.seed(1972)
 Sample90to95 <- sample(1:nrow(DataSubset90to95), size = 2000, replace = TRUE, prob = NULL)
 ```
 
 ## Inspect Data
-The following code chunk evaluates the sample data.  It first checks for missing data for each variable.  It then checks for missing data for each variable in each observation.  Then it checks for duplicate observations with the `PATENT` variable to determine if that variable can be used as a unique identifier for each observation.  Finally, it checks for duplicate observations across all variables to ensure that each observation is unique.
+The following code chunk evaluates the data sample to determine if additional data cleaning is necessary.  It first checks for missing data for each variable.  It then checks for missing data for each variable in each observation.  Then it checks for duplicate observations with the `PATENT` variable to determine if that variable can be used as a unique identifier for each observation.  Finally, it checks for duplicate observations across all variables to ensure that each observation is unique.
 ```{r inspect-data-90-95}
 miss_var_summary(Sample90to95, order = TRUE)
 miss_case_summary(Sample90to95, order = TRUE)
@@ -60,19 +59,13 @@ get_dupes(Sample90to95)
 ```
 
 ## Clean Data
-I did not perform any additional cleaning of the sample data.
+Based on the results of the previous code chunck, I did not perform any additional cleaning of the data sample.
 ```{r view-data}
 View(Sample90to95, "Cleaned Sample Data 1990 to 1995")
 ```
 
-## Save Data
-The following code chunk saves the cleaned data.
-```{r save-data}
-write.csv(Sample90to95, here("Data/DataClean/NBERpatents1963to1999/NBERPatCit90to95Sample.csv"), append = FALSE)
-```
-
 ## Histograms
-The following code chunk displays histograms for the variables to visually inspect for normal distribution of the data.
+The following code chunk displays histograms for the variables of primary interest to enable visual inspection of the data for normal distributions.
 ```{r histograms}
 histogramCRECEIVE <- ggplot() +
   geom_histogram(Sample90to95, mapping = aes(CRECEIVE))
@@ -88,11 +81,42 @@ histogramRATIOCIT <- ggplot() +
   geom_histogram(Sample90to95, mapping = aes(RATIOCIT))
 ```
 
+## Q-Q Plots
+The following code chunk displays Quantile-Quantile (Q-Q) plots to check for normal distribution in the data sample for each variable of primary interest.
+```{r q-q-plots}
+Sample90to95 %>%
+  qqnorm(CRECEIVE) +
+  qqline(CRECEIVE) +
+  qqnorm(CMADE) +
+  qqline(CMADE) +
+  qqnorm(CLAIMS) +
+  qqline(CLAIMS) +
+  qqnorm(ORIGINAL) +
+  qqline(ORIGINAL) +
+  qqnorm(GENERAL) +
+  qqline(GENERAL) +
+  qqnorm(RATIOCIT) +
+  qqline(RATIOCIT)
+```
+
+## Central Tendency
+The following code chunk calculates measures of central tendency in the sample data for each of the variables of primary interest.
+```{r central-tendency}
+DescriptiveStats <- summary(Sample90to95)
+```
+
+## Pairwise Correlation Coefficients
+The following code chunk calculates the pairwise correlation coefficients for a variables in the sample data using the Pearson product-moment correlation function.
+```{r cor-matrix}
+correlationMatrix <- cor(Sample90to95, method = "pearson")
+correlationVisual <- pairs(Sample90to95, method = "pearson")
+```
+
 ## Scatter Plots
-The following code chunk displays scatter plots with `CRECEIVE` as the dependent variable against each of the the primary independent variables of interest to visually inspect for linear relationships between the dependent variable and each of the independent variables.
+The following code chunk displays scatter plots with `CRECEIVE` as the dependent variable against each of the the primary independent variables of interest to visually inspect for linear relationships between the dependent variable and each of the independent variables of primary interest.
 ```{r scatter-plots}
 scatterCMADE <- ggplot() +
-  geom_point(Sample90to95, mapping = aes(x = CMADE, y = CRECEIVE))
+  geom_point(Sample90to95, mapping = aes(x = CMADE, y = CRECEIVE)) 
 scatterCLAIMS <- ggplot() +
   geom_point(Sample90to95, mapping = aes(x = CLAIMS, y = CRECEIVE))
 scatterORIGINAL <- ggplot() +
@@ -101,4 +125,21 @@ scatterGENERAL <- ggplot() +
   geom_point(Sample90to95, mapping = aes(x = GENERAL, y = CRECEIVE))
 scatterRATIOCIT <- ggplot() +
   geom_point(Sample90to95, mapping = aes(x = RATIOCIT, y = CRECEIVE))
+```
+
+## Regression Analysis
+The following code chunk performs a binary logistic regression analysis on the data sample. It first creates a new variable called `CRECbinomial` that converts the `CRECEIVE` variable into a dichotomous variable. It then uses the new dichotomous variable as the dependent variable in the binary logistic regression.
+```{r binary-regression}
+Sample90to95 <- mutate(Sample90to95, if (CRECEIVE = 0){
+  CRECbinomial = 0} else  {
+    CRECbinomial = 1
+  } )
+logitCRECEIVE <- glm(CRECbinomial ~ CMADE + CLAIMS + ORIGINAL + GENERAL + RATIOCIT, data = Sample90to95, family = binomial)
+summary(logitCRECEIVE)
+```
+
+## Save Data
+The following code chunk saves the final cleaned data.
+```{r save-data}
+write.csv(Sample90to95, here("Data/DataClean/NBERpatents1963to1999/NBERPatCit90to95Sample.csv"), append = FALSE)
 ```
