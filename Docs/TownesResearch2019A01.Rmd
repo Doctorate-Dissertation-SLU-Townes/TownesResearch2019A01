@@ -41,21 +41,24 @@ The following code chunk creates a subset of the data for the period 1990 throug
 ```{r subset-data-90-95}
 DataRaw %>% # subset data
   filter(GYEAR>=1990) %>%
-  filter(GYEAR<=1995) %>%
-  filter(CLAIMS>0) %>%
-  filter(CRECEIVE>=0) -> DataSubset90to95
+  filter(GYEAR<=1995) -> DataSubset90to95
 DataSubset90to95 <- as_tibble(DataSubset90to95) # convert data frame to tibble
-set.seed(1972)
-Sample90to95 <- sample(1:nrow(DataSubset90to95), size = 2000, replace = TRUE, prob = NULL)
 ```
 
 ## Inspect Data
 The following code chunk evaluates the data sample to determine if additional data cleaning is necessary.  It first checks for missing data for each variable.  It then checks for missing data for each variable in each observation.  Then it checks for duplicate observations with the `PATENT` variable to determine if that variable can be used as a unique identifier for each observation.  Finally, it checks for duplicate observations across all variables to ensure that each observation is unique.
 ```{r inspect-data-90-95}
-miss_var_summary(Sample90to95, order = TRUE)
-miss_case_summary(Sample90to95, order = TRUE)
-get_dupes(Sample90to95, PATENT)
-get_dupes(Sample90to95)
+miss_var_summary(DataSubset90to95, order = TRUE)
+miss_case_summary(DataSubset90to95, order = TRUE)
+get_dupes(DataSubset90to95, PATENT)
+get_dupes(DataSubset90to95)
+```
+
+## Sample Data
+The following code chunk takes a sample of 2,000 cases from the data subset for the period 1990 through 1995.
+``` {r sample-90-95}
+set.seed(1972)
+Sample90to95 <- sample(1:nrow(DataSubset90to95), size = 2000, replace = TRUE, prob = NULL)
 ```
 
 ## Clean Data
@@ -67,18 +70,29 @@ View(Sample90to95, "Cleaned Sample Data 1990 to 1995")
 ## Histograms
 The following code chunk displays histograms for the variables of primary interest to enable visual inspection of the data for normal distributions.
 ```{r histograms}
-histogramCRECEIVE <- ggplot() +
+ggplot() +
   geom_histogram(Sample90to95, mapping = aes(CRECEIVE))
-histogramCMADE <- ggplot() +
+ggsave(here("results", "histogramCRECEIVE.png"), dpi = 300)
+
+ggplot() +
   geom_histogram(Sample90to95, mapping = aes(CMADE))
-histogramCLAIMS <- ggplot() +
+ggsave(here("results", "histogramCMADE.png"), dpi = 300)
+
+ggplot() +
   geom_histogram(Sample90to95, mapping = aes(CLAIMS))
-histogramORIGINAL <- ggplot() +
+ggsave(here("results", "histogramCLAIMS.png"), dpi = 300)
+
+ggplot() +
   geom_histogram(Sample90to95, mapping = aes(ORIGINAL))
-histogramGENERAL <- ggplot() +
+ggsave(here("results", "histogramORIGINAL.png"), dpi = 300)
+
+ggplot() +
   geom_histogram(Sample90to95, mapping = aes(GENERAL))
-histogramRATIOCIT <- ggplot() +
+ggsave(here("results", "histogramGENERAL.png"), dpi = 300)
+
+ggplot() +
   geom_histogram(Sample90to95, mapping = aes(RATIOCIT))
+ggsave(here("results", "histogramRATIOCIT.png"), dpi = 300)
 ```
 
 ## Q-Q Plots
@@ -87,14 +101,19 @@ The following code chunk displays Quantile-Quantile (Q-Q) plots to check for nor
 Sample90to95 %>%
   qqnorm(CRECEIVE) +
   qqline(CRECEIVE) +
+  
   qqnorm(CMADE) +
   qqline(CMADE) +
+  
   qqnorm(CLAIMS) +
   qqline(CLAIMS) +
+  
   qqnorm(ORIGINAL) +
   qqline(ORIGINAL) +
+  
   qqnorm(GENERAL) +
   qqline(GENERAL) +
+  
   qqnorm(RATIOCIT) +
   qqline(RATIOCIT)
 ```
@@ -106,7 +125,7 @@ DescriptiveStats <- summary(Sample90to95)
 ```
 
 ## Pairwise Correlation Coefficients
-The following code chunk calculates the pairwise correlation coefficients for a variables in the sample data using the Pearson product-moment correlation function.
+The following code chunk calculates the pairwise correlation coefficients for all variables in the sample data using the Pearson product-moment correlation function.
 ```{r cor-matrix}
 correlationMatrix <- cor(Sample90to95, method = "pearson")
 correlationVisual <- pairs(Sample90to95, method = "pearson")
@@ -115,16 +134,25 @@ correlationVisual <- pairs(Sample90to95, method = "pearson")
 ## Scatter Plots
 The following code chunk displays scatter plots with `CRECEIVE` as the dependent variable against each of the the primary independent variables of interest to visually inspect for linear relationships between the dependent variable and each of the independent variables of primary interest.
 ```{r scatter-plots}
-scatterCMADE <- ggplot() +
-  geom_point(Sample90to95, mapping = aes(x = CMADE, y = CRECEIVE)) 
-scatterCLAIMS <- ggplot() +
+ggplot() +
+  geom_point(Sample90to95, mapping = aes(x = CMADE, y = CRECEIVE))
+ggsave(here("results", "scatterCMADEbyCRECEIVE.png"), dpi = 300)
+
+ggplot() +
   geom_point(Sample90to95, mapping = aes(x = CLAIMS, y = CRECEIVE))
-scatterORIGINAL <- ggplot() +
+ggsave(here("results", "scatterCLAIMSbyCRECEIVE.png"), dpi = 300)
+
+ggplot() +
   geom_point(Sample90to95, mapping = aes(x = ORIGINAL, y = CRECEIVE))
-scatterGENERAL <- ggplot() +
+ggsave(here("results", "scatterORIGINALbyCRECEIVE.png"), dpi = 300)
+
+ggplot() +
   geom_point(Sample90to95, mapping = aes(x = GENERAL, y = CRECEIVE))
-scatterRATIOCIT <- ggplot() +
+ggsave(here("results", "scatterGENERALbyCRECEIVE.png"), dpi = 300)
+
+ggplot() +
   geom_point(Sample90to95, mapping = aes(x = RATIOCIT, y = CRECEIVE))
+ggsave(here("results", "scatterRATIOCITbyCRECEIVE.png"), dpi = 300)
 ```
 
 ## Regression Analysis
@@ -139,7 +167,7 @@ summary(logitCRECEIVE)
 ```
 
 ## Save Data
-The following code chunk saves the final cleaned data.
+The following code chunk saves the final cleaned data that was used in the analysis.
 ```{r save-data}
 write.csv(Sample90to95, here("Data/DataClean/NBERpatents1963to1999/NBERPatCit90to95Sample.csv"), append = FALSE)
 ```
