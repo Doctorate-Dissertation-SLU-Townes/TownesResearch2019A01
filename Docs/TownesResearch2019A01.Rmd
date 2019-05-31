@@ -179,15 +179,16 @@ Sample90to95 <- mutate(Sample90to95, if (CRECEIVE = 0){
   CRECbinomial = 0} else  {
     CRECbinomial = 1
   } )
-logitCRECEIVE <- glm(CRECbinomial ~ CMADE + CLAIMS + ORIGINAL + GENERAL + RATIOCIT, data = Sample90to95, family = binomial)
+logitCRECEIVE <- glm(CRECbinomial ~ APPYEAR + CAT + CMADE + CLAIMS + ORIGINAL + GENERAL + RATIOCIT, 
+                     data = Sample90to95, family = binomial)
 summary(logitCRECEIVE)
 ```
 
 ## Ordinal Logistic Regression Analysis
 The following code chunk performs an ordinal logistic regression analysis on the data sample using `CRECEIVE` as the dependent variable.
 ```{r ordinal-regression}
-ordinalCRECEIVE <- polr(CRECEIVE ~ CMADE + CLAIMS + ORIGINAL + GENERAL + RATIOCIT, data = Sample90to95, Hess = TRUE,
-                        model = TRUE, method = "logistic")
+ordinalCRECEIVE <- polr(CRECEIVE ~ APPYEAR + CAT + CMADE + CLAIMS + ORIGINAL + GENERAL + RATIOCIT, 
+                        data = Sample90to95, Hess = TRUE, model = TRUE, method = "logistic")
 summary(ordinalCRECEIVE)
 ```
 
