@@ -67,11 +67,45 @@ Based on the results of the previous code chunck, I did not perform any addition
 View(Sample90to95, "Cleaned Sample Data 1990 to 1995")
 ```
 
+## Observation Counts
+The following code chunk determines the number of observations for each outcome of each independent variable to determine if the sample size is large enough for logistic regression analysis, which requires at least 10 observations for the least frequent outcome for each independent variable.
+```{r sample-size}
+Sample90to95 %>%
+  group_by(APPYEAR) %>%
+  summarise(obsAPPYEAR = length(APPYEAR)) %>%
+  
+  group_by(CAT) %>%
+  summarise(obsCAT = length(CAT)) %>%
+  
+  group_by(CMADE) %>%
+  summarise(obsCMADE = length(CMADE)) %>%
+  
+  group_by(CLAIMS) %>%
+  summarise(obsCLAIMS = length(CLAIMS)) %>%
+  
+  group_by(ORIGINAL) %>%
+  summarise(obsORIGINAL = length(ORIGINAL)) %>%
+  
+  group_by(GENERAL) %>%
+  summarise(obsGENERAL = length(GENERAL)) %>%
+  
+  group_by(RATIOCIT) %>%
+  summarise(obsRATIOCIT = length(RATIOCIT)) %>%
+```
+
 ## Histograms
 The following code chunk displays histograms for the variables of primary interest to enable visual inspection of the data for normal distributions.
 ```{r histograms}
 histoCRECEIVE <- ggplot() +
   geom_histogram(Sample90to95, mapping = aes(CRECEIVE))
+ggsave(here("results", "histogramCRECEIVE.png"), dpi = 300)
+
+histoAPPYEAR <- ggplot() +
+  geom_histogram(Sample90to95, mapping = aes(APPYEAR))
+ggsave(here("results", "histogramCRECEIVE.png"), dpi = 300)
+
+histoCAT <- ggplot() +
+  geom_histogram(Sample90to95, mapping = aes(CAT))
 ggsave(here("results", "histogramCRECEIVE.png"), dpi = 300)
 
 histoCMADE <- ggplot() +
@@ -105,6 +139,16 @@ QQplotCRECEIVE <- qqnorm(Sample90to95$CRECEIVE, pch = 1, frame = FALSE,
        main = "Normal Q-Q Plot for CRECEIVE", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
 qqline(Sample90to95$CRECEIVE, col = "green", lwd = 2)
 ggsave(here("results", "QQplotCRECEIVE"), dpi = 300)
+
+QQplotAPPYEAR <- qqnorm(Sample90to95$APPYEAR, pch = 1, frame = FALSE, 
+       main = "Normal Q-Q Plot for APPYEAR", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
+qqline(Sample90to95$CRECEIVE, col = "green", lwd = 2)
+ggsave(here("results", "QQplotAPPYEAR"), dpi = 300)
+
+QQplotCAT <- qqnorm(Sample90to95$CAT, pch = 1, frame = FALSE, 
+       main = "Normal Q-Q Plot for CAT", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
+qqline(Sample90to95$CRECEIVE, col = "green", lwd = 2)
+ggsave(here("results", "QQplotCAT"), dpi = 300)
 
 QQplotCMADE <- qqnorm(Sample90to95$CMADE, pch = 1, frame = FALSE, 
        main = "Normal Q-Q Plot for CMADE", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
@@ -151,6 +195,14 @@ correlationVisual <- pairs(Sample90to95, method = "pearson")
 ## Scatter Plots
 The following code chunk displays scatter plots with `CRECEIVE` as the dependent variable against each of the the primary independent variables of interest to visually inspect for linear relationships between the dependent variable and each of the independent variables of primary interest.
 ```{r scatter-plots}
+ggplot() +
+  geom_point(Sample90to95, mapping = aes(x = APPYEAR, y = CRECEIVE))
+ggsave(here("results", "scatterCRECEIVEbyAPPYEAR.png"), dpi = 300)
+
+ggplot() +
+  geom_point(Sample90to95, mapping = aes(x = CAT, y = CRECEIVE))
+ggsave(here("results", "scatterCRECEIVEbyCAT.png"), dpi = 300)
+
 ggplot() +
   geom_point(Sample90to95, mapping = aes(x = CMADE, y = CRECEIVE))
 ggsave(here("results", "scatterCRECEIVEbyCMADE.png"), dpi = 300)
