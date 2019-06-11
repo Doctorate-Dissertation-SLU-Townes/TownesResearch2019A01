@@ -1,0 +1,33 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1560283236761.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "5B4BCA80",
+    "lastKnownWriteTime" : 2606811896104,
+    "last_content_update" : 1560283236761,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "44735EA2",
+        "caption" : "Cleaned Sample Data 1990 to 1995",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=Sample90to95&cache_key=44735EA2",
+        "displayedObservations" : "2000",
+        "environment" : "",
+        "expression" : "Sample90to95",
+        "object" : "Sample90to95",
+        "preview" : "0",
+        "totalObservations" : "2000",
+        "variables" : "23"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

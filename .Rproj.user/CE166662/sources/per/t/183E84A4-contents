@@ -29,6 +29,8 @@ library(janitor) # functions for data cleaning
 library(naniar) # functions for analyzing missing data
 library(ggplot2) # functions for data visualizations
 library(boot) # functions for regression analysis
+library(MASS) # functions for ordered logistic or probit regression
+library(broom) # functions for tidying ordinal logistic regression models
 ```
 
 ## Load Raw Data
@@ -75,26 +77,36 @@ View(Sample90to95, "Cleaned Sample Data 1990 to 1995")
 The following code chunk determines the number of observations for each outcome of each independent variable to determine if the sample size is large enough for logistic regression analysis, which requires at least 10 observations for the least frequent outcome for each independent variable.
 ```{r sample-size}
 Sample90to95 %>%
+  group_by(CRECEIVE) %>%
+  summarize(n())
+
+Sample90to95 %>%
   group_by(APPYEAR) %>%
-  summarise(obsAPPYEAR = length(APPYEAR)) %>%
-  
+  summarize(n())
+
+Sample90to95 %>%  
   group_by(CAT) %>%
-  summarise(obsCAT = length(CAT)) %>%
-  
+  summarize(n())
+
+Sample90to95 %>%    
   group_by(CMADE) %>%
-  summarise(obsCMADE = length(CMADE)) %>%
-  
+  summarize(n())
+
+Sample90to95 %>%  
   group_by(CLAIMS) %>%
-  summarise(obsCLAIMS = length(CLAIMS)) %>%
-  
+  summarize(n())
+
+Sample90to95 %>%  
   group_by(ORIGINAL) %>%
-  summarise(obsORIGINAL = length(ORIGINAL)) %>%
-  
+  summarize(n())
+
+Sample90to95 %>%  
   group_by(GENERAL) %>%
-  summarise(obsGENERAL = length(GENERAL)) %>%
-  
+  summarize(n())
+
+Sample90to95 %>%  
   group_by(RATIOCIT) %>%
-  summarise(obsRATIOCIT = length(RATIOCIT)) %>%
+  summarize(n())
 ```
 
 ## Histograms
@@ -136,58 +148,71 @@ ggsave(here("results", "histogramRATIOCIT.png"), dpi = 300)
 ## Q-Q Plots
 The following code chunk displays Quantile-Quantile (Q-Q) plots to check for normal distribution in the data sample for each variable of primary interest.
 ```{r qq-plots}
-QQplotCRECEIVE <- qqnorm(Sample90to95$CRECEIVE, pch = 1, frame = FALSE, 
+setwd("D:/TownesResearch2019A01")
+
+png(filename = "Results/QQplotCReceive.png")
+qqnorm(Sample90to95$CRECEIVE, pch = 1, frame = FALSE, 
        main = "Normal Q-Q Plot for CRECEIVE", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles", plot.it = TRUE)
 qqline(Sample90to95$CRECEIVE, col = "green", lwd = 2, plot.it = TRUE)
-ggsave(here("Results", "QQplotCRECEIVE.png"), dpi = 300)
+dev.off()
 
-QQplotAPPYEAR <- qqnorm(Sample90to95$APPYEAR, pch = 1, frame = FALSE, 
+png(filename = "Results/QQplotAPPYEAR.png")
+qqnorm(Sample90to95$APPYEAR, pch = 1, frame = FALSE, 
        main = "Normal Q-Q Plot for APPYEAR", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
-qqline(Sample90to95$CRECEIVE, col = "green", lwd = 2)
-ggsave(here("results", "QQplotAPPYEAR.png"), dpi = 300)
+qqline(Sample90to95$APPYEAR, col = "green", lwd = 2)
+dev.off()
 
-QQplotCAT <- qqnorm(Sample90to95$CAT, pch = 1, frame = FALSE, 
+png(filename = "Results/QQplotCAT.png")
+qqnorm(Sample90to95$CAT, pch = 1, frame = FALSE, 
        main = "Normal Q-Q Plot for CAT", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
-qqline(Sample90to95$CRECEIVE, col = "green", lwd = 2)
-ggsave(here("results", "QQplotCAT.png"), dpi = 300)
+qqline(Sample90to95$CAT, col = "green", lwd = 2)
+dev.off()
 
-QQplotCMADE <- qqnorm(Sample90to95$CMADE, pch = 1, frame = FALSE, 
+png(filename = "Results/QQplotCMADE.png")
+qqnorm(Sample90to95$CMADE, pch = 1, frame = FALSE, 
        main = "Normal Q-Q Plot for CMADE", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
-qqline(Sample90to95$CRECEIVE, col = "green", lwd = 2)
-ggsave(here("results", "QQplotCMADE.png"), dpi = 300)
+qqline(Sample90to95$CMADE, col = "green", lwd = 2)
+dev.off()
 
-QQplotCLAIMS <- qqnorm(Sample90to95$CLAIMS, pch = 1, frame = FALSE, 
+png(filename = "Results/QQplotCLAIMS.png")
+qqnorm(Sample90to95$CLAIMS, pch = 1, frame = FALSE, 
        main = "Normal Q-Q Plot for CLAIMS", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
-qqline(Sample90to95$CRECEIVE, col = "green", lwd = 2)
-ggsave(here("results", "QQplotCLAIMS.png"), dpi = 300)
+qqline(Sample90to95$CLAIMS, col = "green", lwd = 2)
+dev.off()
 
-QQplotORIGINAL <- qqnorm(Sample90to95$ORIGINAL, pch = 1, frame = FALSE, 
+png(filename = "Results/QQplotORIGINAL.png")
+qqnorm(Sample90to95$ORIGINAL, pch = 1, frame = FALSE, 
        main = "Normal Q-Q Plot for ORIGINAL", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
-qqline(Sample90to95$CRECEIVE, col = "green", lwd = 2)
-ggsave(here("results", "QQplotORIGINAL.png"), dpi = 300)
+qqline(Sample90to95$ORIGINAL, col = "green", lwd = 2)
+dev.off()
 
-QQplotGENERAL <- qqnorm(Sample90to95$GENERAL, pch = 1, frame = FALSE, 
+png(filename = "Results/QQplotGENERAL.png")
+qqnorm(Sample90to95$GENERAL, pch = 1, frame = FALSE, 
        main = "Normal Q-Q Plot for GENERAL", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
-qqline(Sample90to95$CRECEIVE, col = "green", lwd = 2)
-ggsave(here("results", "QQplotGENERAL.png"), dpi = 300)
+qqline(Sample90to95$GENERAL, col = "green", lwd = 2)
+dev.off()
 
-QQplotRATIOCIT <- qqnorm(Sample90to95$RATIOCIT, pch = 1, frame = FALSE, 
+png(filename = "Results/QQplotRATIOCIT.png")
+qqnorm(Sample90to95$RATIOCIT, pch = 1, frame = FALSE, 
        main = "Normal Q-Q Plot for RATIOCIT", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
-qqline(Sample90to95$CRECEIVE, col = "green", lwd = 2)
-ggsave(here("results", "QQplotRATIOCIT.png"), dpi = 300)
+qqline(Sample90to95$RATIOCIT, col = "green", lwd = 2)
+dev.off()
 ```
 
 ## Central Tendency
 The following code chunk calculates measures of central tendency in the sample data for each of the variables of primary interest.
 ```{r central-tendency}
-DescriptiveStats <- summary(Sample90to95)
+summary(Sample90to95)
 ```
 
 ## Pairwise Correlation Coefficients
 The following code chunk calculates the pairwise correlation coefficients for all variables in the sample data using the Pearson product-moment correlation function.
 ```{r cor-matrix}
-correlationMatrix <- cor(Sample90to95, y= NULL, method = "pearson")
-correlationVisual <- pairs(Sample90to95, method = "pearson")
+Sample90to95 %>%
+  dplyr::select(-c(PATENT, GDATE, COUNTRY, POSTATE, ASSIGNEE, ASSCODE)) %>%
+  as_tibble() -> Sample90to95cor
+cor(Sample90to95cor)
+pairs(Sample90to95cor)
 ```
 
 ## Scatter Plots
@@ -225,11 +250,9 @@ ggsave(here("results", "scatterCRECEIVEbyRATIOCIT.png"), dpi = 300)
 ## Binary Logistic Regression Analysis
 The following code chunk performs a binary logistic regression analysis on the data sample. It first creates a new variable called `CRECbinomial` that converts the `CRECEIVE` variable into a dichotomous variable. It then uses the new dichotomous variable as the dependent variable in the binary logistic regression.
 ```{r binary-regression}
-Sample90t95 <- mutate(Sample90to95, CRECbinomial == 0)
-Sample90to95 <- mutate(Sample90to95, 
-                       if (CRECEIVE == 0){
-                         CRECbinomial == 0} else  {
-                           CRECbinomial == 1})
+Sample90to95 %>%
+  mutate(CRECbinomial = if(CRECEIVE == 0) {
+    CRECbinomial = 0} else {CRECbinomial = 1}) -> Sample90to95
 logitCRECEIVE <- glm(CRECbinomial ~ APPYEAR + CAT + CMADE + CLAIMS + ORIGINAL + GENERAL + RATIOCIT, data = Sample90to95, family = binomial)
 summary(logitCRECEIVE)
 ```
@@ -237,8 +260,8 @@ summary(logitCRECEIVE)
 ## Ordinal Logistic Regression Analysis
 The following code chunk performs an ordinal logistic regression analysis on the data sample using `CRECEIVE` as the dependent variable.
 ```{r ordinal-regression}
-ordinalCRECEIVE <- polr(CRECEIVE ~ APPYEAR + CAT + CMADE + CLAIMS + ORIGINAL + GENERAL + RATIOCIT, data = Sample90to95, Hess = TRUE, model = TRUE, method = "logistic")
-summary(ordinalCRECEIVE)
+CRECordinal <- polr(as.factor(CRECEIVE) ~ APPYEAR + CAT + CMADE + CLAIMS + ORIGINAL + GENERAL + RATIOCIT, data = Sample90to95, Hess = TRUE, model = TRUE, method = "logistic")
+summary(CRECordinal)
 ```
 
 ## Save Data

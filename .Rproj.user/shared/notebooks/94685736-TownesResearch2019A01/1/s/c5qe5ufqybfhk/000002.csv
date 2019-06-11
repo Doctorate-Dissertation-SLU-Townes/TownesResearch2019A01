@@ -6,3 +6,14 @@
 "0","library(naniar) # functions for analyzing missing data"
 "0","library(ggplot2) # functions for data visualizations"
 "0","library(boot) # functions for regression analysis"
+"0","library(MASS) # functions for ordered logistic or probit regression"
+"2","
+Attaching package: ‘MASS’
+
+"
+"2","The following object is masked from ‘package:dplyr’:
+
+    select
+
+"
+"0","library(broom) # functions for tidying ordinal logistic regression models"
