@@ -1,0 +1,8 @@
+"0","```r
+DataSubset99 <- filter(DataRaw, GYEAR>=1999) # subset data
+```"
+"1","package ã¤¼ã¸±bindrcppã¤¼ã¸² was built under R version 3.4.4
+"
+"0","```r
+DataSubset99 <- as_tibble(DataSubset99) # convert data frame to tibble
+```"
