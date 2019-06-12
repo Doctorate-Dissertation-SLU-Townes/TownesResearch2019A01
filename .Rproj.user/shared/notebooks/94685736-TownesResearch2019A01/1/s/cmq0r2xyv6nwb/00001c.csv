@@ -1,2 +1,0 @@
-"0","qqnorm(Sample90to95$GENERAL, pch = 1, frame = FALSE, "
-"0","       main = ""Normal Q-Q Plot for GENERAL"", xlab = ""Theoretical Quantiles"", ylab = ""Sample Quantiles"")"

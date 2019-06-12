@@ -1,3 +1,0 @@
-"0","setwd(""D:/TownesResearch2019A01"")"
-"2","The working directory was changed to D:/TownesResearch2019A01 inside a notebook chunk. The working directory will be reset when the chunk is finished running. Use the knitr root.dir option in the setup chunk to change the working directory for notebook chunks."
-"0","DataRaw <- read.table(""DataRaw/NBERpatents1963to1999/apat63_99.txt"", sep = "","", header = TRUE, fill = TRUE, dec = ""."")"

@@ -1,7 +1,0 @@
-"0","```r
-get_dupes(DataSubset99)
-```"
-"1","No variable names specified - using all columns.
-
-No duplicate combinations found of: PATENT, GYEAR, GDATE, APPYEAR, COUNTRY, POSTATE, ASSIGNEE, ASSCODE, CLAIMS, ... and 14 other variables
-"
