@@ -36,8 +36,7 @@ library(broom) # functions for tidying ordinal logistic regression models
 ## Load Raw Data
 The following code chunk imports the raw data from the `txt` file for the NBER data set for the period 1963 to 1999.
 ```{r import-data}
-setwd("D:/TownesResearch2019A01")
-DataRaw <- read.table("DataRaw/NBERpatents1963to1999/apat63_99.txt", sep = ",", header = TRUE, fill = TRUE, dec = ".")
+DataRaw <- read.table(here("DataRaw","NBERpatents1963to1999/apat63_99.txt"), sep = ",", header = TRUE, fill = TRUE, dec = ".")
 ```
 
 ## Subset Data
@@ -49,15 +48,6 @@ DataRaw %>% # subset data
 DataSubset90to95 <- as_tibble(DataSubset90to95) # convert data frame to tibble
 ```
 
-## Inspect Data
-The following code chunk evaluates the data sample to determine if additional data cleaning is necessary.  It first checks for missing data for each variable.  It then checks for missing data for each variable in each observation.  Then it checks for duplicate observations with the `PATENT` variable to determine if that variable can be used as a unique identifier for each observation.  Finally, it checks for duplicate observations across all variables to ensure that each observation is unique.
-```{r inspect-data-90-95}
-miss_var_summary(DataSubset90to95, order = TRUE)
-miss_case_summary(DataSubset90to95, order = TRUE)
-get_dupes(DataSubset90to95, PATENT)
-get_dupes(DataSubset90to95)
-```
-
 ## Sample Data
 The following code chunk takes a sample of 2,000 cases from the data subset for the period 1990 through 1995.
 ``` {r sample-90-95}
@@ -67,205 +57,384 @@ Sample90to95 <- DataSubset90to95[Sample90to95,]
 Sample90to95 <- as_tibble(Sample90to95)
 ```
 
-## Clean Data
-Based on the results of the previous code chunck, I did not perform any additional cleaning of the data sample.
+## Clean Data Phase 1
+The following code chunk reorganizes the variables and eliminates variables not used in the analysis.
 ```{r view-data}
-View(Sample90to95, "Cleaned Sample Data 1990 to 1995")
+Sample90to95 %>%
+  dplyr::select(PATENT, APPYEAR, GYEAR, CRECEIVE, NCLASS, CAT, SUBCAT, CLAIMS, CMADE, RATIOCIT, GENERAL, ORIGINAL, FWDAPLAG, BCKGTLAG, SELFCTUB, SELFCTLB, SECDUPBD, SECDLWBD) -> Sample90to95A
 ```
 
 ## Observation Counts
 The following code chunk determines the number of observations for each outcome of each independent variable to determine if the sample size is large enough for logistic regression analysis, which requires at least 10 observations for the least frequent outcome for each independent variable.
 ```{r sample-size}
-Sample90to95 %>%
-  group_by(CRECEIVE) %>%
-  summarize(n())
-
-Sample90to95 %>%
+Sample90to95A %>%
   group_by(APPYEAR) %>%
   summarize(n())
 
-Sample90to95 %>%  
+Sample90to95A %>%
+  group_by(GYEAR) %>%
+  summarize(n())
+
+Sample90to95A %>%
+  group_by(CRECEIVE) %>%
+  summarize(n())
+
+Sample90to95A %>%  
+  group_by(NCLASS) %>%
+  summarize(n())
+
+Sample90to95A %>%  
   group_by(CAT) %>%
   summarize(n())
 
-Sample90to95 %>%    
-  group_by(CMADE) %>%
+Sample90to95A %>%  
+  group_by(SUBCAT) %>%
   summarize(n())
 
-Sample90to95 %>%  
+Sample90to95A %>%  
   group_by(CLAIMS) %>%
   summarize(n())
 
-Sample90to95 %>%  
-  group_by(ORIGINAL) %>%
+Sample90to95A %>%    
+  group_by(CMADE) %>%
   summarize(n())
 
-Sample90to95 %>%  
+Sample90to95A %>%  
+  group_by(RATIOCIT) %>%
+  summarize(n())
+
+Sample90to95A %>%  
   group_by(GENERAL) %>%
   summarize(n())
 
-Sample90to95 %>%  
-  group_by(RATIOCIT) %>%
+Sample90to95A %>%  
+  group_by(ORIGINAL) %>%
+  summarize(n())
+
+Sample90to95A %>%  
+  group_by(FWDAPLAG) %>%
+  summarize(n())
+
+Sample90to95A %>%  
+  group_by(BCKGTLAG) %>%
+  summarize(n())
+
+Sample90to95A %>%  
+  group_by(SELFCTUB) %>%
+  summarize(n())
+
+Sample90to95A %>%  
+  group_by(SELFCTLB) %>%
+  summarize(n())
+
+Sample90to95A %>%  
+  group_by(SECDUPBD) %>%
+  summarize(n())
+
+Sample90to95A %>%  
+  group_by(SECDLWBD) %>%
   summarize(n())
 ```
 
-## Histograms
-The following code chunk displays histograms for the variables of primary interest to enable visual inspection of the data for normal distributions.
-```{r histograms}
-histoCRECEIVE <- ggplot() +
-  geom_histogram(Sample90to95, mapping = aes(CRECEIVE))
-ggsave(here("results", "histogramCRECEIVE.png"), dpi = 300)
+## Central Tendency
+The following code chunk calculates measures of central tendency in the sample data for each of the variables.
+```{r central-tendency}
+summary(Sample90to95A)
+```
 
+## Histograms
+The following code chunk displays histograms for the variables of primary interest to enable visual inspection of the data to evaluate whether or not they fit normal distributions.
+```{r histograms}
 histoAPPYEAR <- ggplot() +
-  geom_histogram(Sample90to95, mapping = aes(APPYEAR))
+  geom_histogram(Sample90to95A, mapping = aes(APPYEAR))
 ggsave(here("results", "histogramAPPYEAR.png"), dpi = 300)
 
-histoCAT <- ggplot() +
-  geom_histogram(Sample90to95, mapping = aes(CAT))
-ggsave(here("results", "histogramCAT.png"), dpi = 300)
+histoGYEAR <- ggplot() +
+  geom_histogram(Sample90to95A, mapping = aes(GYEAR))
+ggsave(here("results", "histogramGYEAR.png"), dpi = 300)
 
-histoCMADE <- ggplot() +
-  geom_histogram(Sample90to95, mapping = aes(CMADE))
-ggsave(here("results", "histogramCMADE.png"), dpi = 300)
+histoCRECEIVE <- ggplot() +
+  geom_histogram(Sample90to95A, mapping = aes(CRECEIVE))
+ggsave(here("Results", "histogramCRECEIVE.png"), dpi = 300)
+
+histoNCLASS <- ggplot() +
+  geom_histogram(Sample90to95A, mapping = aes(NCLASS))
+ggsave(here("Results", "histogramCLASS.png"), dpi = 300)
+
+histoCAT <- ggplot() +
+  geom_histogram(Sample90to95A, mapping = aes(CAT))
+ggsave(here("Results", "histogramCAT.png"), dpi = 300)
+
+histoSUBCAT <- ggplot() +
+  geom_histogram(Sample90to95A, mapping = aes(SUBCAT))
+ggsave(here("Results", "histogramSUBCAT.png"), dpi = 300)
 
 histoCLAIMS <- ggplot() +
-  geom_histogram(Sample90to95, mapping = aes(CLAIMS))
-ggsave(here("results", "histogramCLAIMS.png"), dpi = 300)
+  geom_histogram(Sample90to95A, mapping = aes(CLAIMS))
+ggsave(here("Results", "histogramCLAIMS.png"), dpi = 300)
 
-histoORIGINAL <- ggplot() +
-  geom_histogram(Sample90to95, mapping = aes(ORIGINAL))
-ggsave(here("results", "histogramORIGINAL.png"), dpi = 300)
-
-histoGENERAL <- ggplot() +
-  geom_histogram(Sample90to95, mapping = aes(GENERAL))
-ggsave(here("results", "histogramGENERAL.png"), dpi = 300)
+histoCMADE <- ggplot() +
+  geom_histogram(Sample90to95A, mapping = aes(CMADE))
+ggsave(here("Results", "histogramCMADE.png"), dpi = 300)
 
 histoRATIOCIT <- ggplot() +
-  geom_histogram(Sample90to95, mapping = aes(RATIOCIT))
-ggsave(here("results", "histogramRATIOCIT.png"), dpi = 300)
+  geom_histogram(Sample90to95A, mapping = aes(RATIOCIT))
+ggsave(here("Results", "histogramRATIOCIT.png"), dpi = 300)
+
+histoGENERAL <- ggplot() +
+  geom_histogram(Sample90to95A, mapping = aes(GENERAL))
+ggsave(here("Results", "histogramGENERAL.png"), dpi = 300)
+
+histoORIGINAL <- ggplot() +
+  geom_histogram(Sample90to95A, mapping = aes(ORIGINAL))
+ggsave(here("Results", "histogramORIGINAL.png"), dpi = 300)
+
+histoFWDAPLAG <- ggplot() +
+  geom_histogram(Sample90to95A, mapping = aes(FWDAPLAG))
+ggsave(here("Results", "histogramFWDAPLAGL.png"), dpi = 300)
+
+histoBCKGTLAG <- ggplot() +
+  geom_histogram(Sample90to95A, mapping = aes(BCKGTLAG))
+ggsave(here("Results", "histogramBCKGTLAG.png"), dpi = 300)
+
+histoSELFCTUB <- ggplot() +
+  geom_histogram(Sample90to95A, mapping = aes(SELFCTUB))
+ggsave(here("Results", "histogramSELFCTUB.png"), dpi = 300)
+
+histoSELFCTLB <- ggplot() +
+  geom_histogram(Sample90to95A, mapping = aes(SELFCTLB))
+ggsave(here("Results", "histogramSELFCTLB.png"), dpi = 300)
+
+histoSECDUPBD <- ggplot() +
+  geom_histogram(Sample90to95A, mapping = aes(SECDUPBD))
+ggsave(here("Results", "histogramSECDUPBD.png"), dpi = 300)
+
+histoSECDLWBD <- ggplot() +
+  geom_histogram(Sample90to95A, mapping = aes(SECDLWBD))
+ggsave(here("Results", "histogramSECDLWBD.png"), dpi = 300)
 ```
 
 ## Q-Q Plots
 The following code chunk displays Quantile-Quantile (Q-Q) plots to check for normal distribution in the data sample for each variable of primary interest.
 ```{r qq-plots}
-setwd("D:/TownesResearch2019A01")
-
-png(filename = "Results/QQplotCReceive.png")
-qqnorm(Sample90to95$CRECEIVE, pch = 1, frame = FALSE, 
-       main = "Normal Q-Q Plot for CRECEIVE", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles", plot.it = TRUE)
-qqline(Sample90to95$CRECEIVE, col = "green", lwd = 2, plot.it = TRUE)
-dev.off()
-
-png(filename = "Results/QQplotAPPYEAR.png")
-qqnorm(Sample90to95$APPYEAR, pch = 1, frame = FALSE, 
+png(filename = here("Results", "QQplotAPPYEAR.png"))
+qqnorm(Sample90to95A$APPYEAR, pch = 1, frame = FALSE, 
        main = "Normal Q-Q Plot for APPYEAR", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
-qqline(Sample90to95$APPYEAR, col = "green", lwd = 2)
+qqline(Sample90to95A$APPYEAR, col = "green", lwd = 2)
 dev.off()
 
-png(filename = "Results/QQplotCAT.png")
-qqnorm(Sample90to95$CAT, pch = 1, frame = FALSE, 
-       main = "Normal Q-Q Plot for CAT", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
-qqline(Sample90to95$CAT, col = "green", lwd = 2)
+png(filename = here("Results", "QQplotGYEAR.png"))
+qqnorm(Sample90to95A$GYEAR, pch = 1, frame = FALSE, 
+       main = "Normal Q-Q Plot for GYEAR", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
+qqline(Sample90to95A$GYEAR, col = "green", lwd = 2)
 dev.off()
 
-png(filename = "Results/QQplotCMADE.png")
-qqnorm(Sample90to95$CMADE, pch = 1, frame = FALSE, 
-       main = "Normal Q-Q Plot for CMADE", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
-qqline(Sample90to95$CMADE, col = "green", lwd = 2)
+png(filename = here("Results", "QQplotCReceive.png"))
+qqnorm(Sample90to95A$CRECEIVE, pch = 1, frame = FALSE, 
+       main = "Normal Q-Q Plot for CRECEIVE", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles", plot.it = TRUE)
+qqline(Sample90to95A$CRECEIVE, col = "green", lwd = 2, plot.it = TRUE)
 dev.off()
 
-png(filename = "Results/QQplotCLAIMS.png")
-qqnorm(Sample90to95$CLAIMS, pch = 1, frame = FALSE, 
+png(filename = here("Results", "QQplotCLAIMS.png"))
+qqnorm(Sample90to95A$CLAIMS, pch = 1, frame = FALSE, 
        main = "Normal Q-Q Plot for CLAIMS", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
-qqline(Sample90to95$CLAIMS, col = "green", lwd = 2)
+qqline(Sample90to95A$CLAIMS, col = "green", lwd = 2)
 dev.off()
 
-png(filename = "Results/QQplotORIGINAL.png")
-qqnorm(Sample90to95$ORIGINAL, pch = 1, frame = FALSE, 
-       main = "Normal Q-Q Plot for ORIGINAL", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
-qqline(Sample90to95$ORIGINAL, col = "green", lwd = 2)
+png(filename = here("Results", "QQplotCMADE.png"))
+qqnorm(Sample90to95A$CMADE, pch = 1, frame = FALSE, 
+       main = "Normal Q-Q Plot for CMADE", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
+qqline(Sample90to95A$CMADE, col = "green", lwd = 2)
 dev.off()
 
-png(filename = "Results/QQplotGENERAL.png")
-qqnorm(Sample90to95$GENERAL, pch = 1, frame = FALSE, 
-       main = "Normal Q-Q Plot for GENERAL", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
-qqline(Sample90to95$GENERAL, col = "green", lwd = 2)
-dev.off()
-
-png(filename = "Results/QQplotRATIOCIT.png")
-qqnorm(Sample90to95$RATIOCIT, pch = 1, frame = FALSE, 
+png(filename = here("Results", "QQplotRATIOCIT.png"))
+qqnorm(Sample90to95A$RATIOCIT, pch = 1, frame = FALSE, 
        main = "Normal Q-Q Plot for RATIOCIT", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
-qqline(Sample90to95$RATIOCIT, col = "green", lwd = 2)
+qqline(Sample90to95A$RATIOCIT, col = "green", lwd = 2)
 dev.off()
-```
 
-## Central Tendency
-The following code chunk calculates measures of central tendency in the sample data for each of the variables of primary interest.
-```{r central-tendency}
-summary(Sample90to95)
+png(filename = here("Results", "QQplotGENERAL.png"))
+qqnorm(Sample90to95A$GENERAL, pch = 1, frame = FALSE, 
+       main = "Normal Q-Q Plot for GENERAL", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
+qqline(Sample90to95A$GENERAL, col = "green", lwd = 2)
+dev.off()
+
+png(filename = here("Results", "QQplotORIGINAL.png"))
+qqnorm(Sample90to95A$ORIGINAL, pch = 1, frame = FALSE, 
+       main = "Normal Q-Q Plot for ORIGINAL", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
+qqline(Sample90to95A$ORIGINAL, col = "green", lwd = 2)
+dev.off()
+
+png(filename = here("Results", "QQplotFWDAPLAG.png"))
+qqnorm(Sample90to95A$FWDAPLAG, pch = 1, frame = FALSE, 
+       main = "Normal Q-Q Plot for FWDAPLAG", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
+qqline(Sample90to95A$FWDAPLAG, col = "green", lwd = 2)
+dev.off()
+
+png(filename = here("Results", "QQplotBCKGTLAG.png"))
+qqnorm(Sample90to95A$BCKGTLAG, pch = 1, frame = FALSE, 
+       main = "Normal Q-Q Plot for BCKGTALG", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
+qqline(Sample90to95A$BCKGTLAG, col = "green", lwd = 2)
+dev.off()
+
+png(filename = here("Results", "QQplotSELFCTUB.png"))
+qqnorm(Sample90to95A$SELFCTUB, pch = 1, frame = FALSE, 
+       main = "Normal Q-Q Plot for SELFCTUB", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
+qqline(Sample90to95A$SELFCTUB, col = "green", lwd = 2)
+dev.off()
+
+png(filename = here("Results", "QQplotSELFCTLB.png"))
+qqnorm(Sample90to95A$SELFCTLB, pch = 1, frame = FALSE, 
+       main = "Normal Q-Q Plot for SELFCTLB", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
+qqline(Sample90to95A$SELFCTLB, col = "green", lwd = 2)
+dev.off()
+
+png(filename = here("Results", "QQplotSECDUPBD.png"))
+qqnorm(Sample90to95A$SECDUPBD, pch = 1, frame = FALSE, 
+       main = "Normal Q-Q Plot for SECDUPBD", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
+qqline(Sample90to95A$SECDUPBD, col = "green", lwd = 2)
+dev.off()
+
+png(filename = here("Results", "QQplotSECDLWBD.png"))
+qqnorm(Sample90to95A$SECDLWBD, pch = 1, frame = FALSE, 
+       main = "Normal Q-Q Plot for SECDLWBD", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
+qqline(Sample90to95A$SECDLWBD, col = "green", lwd = 2)
+dev.off()
 ```
 
 ## Pairwise Correlation Coefficients
 The following code chunk calculates the pairwise correlation coefficients for all variables in the sample data using the Pearson product-moment correlation function.
 ```{r cor-matrix}
-Sample90to95 %>%
-  dplyr::select(-c(PATENT, GDATE, COUNTRY, POSTATE, ASSIGNEE, ASSCODE)) %>%
-  as_tibble() -> Sample90to95cor
-cor(Sample90to95cor)
-pairs(Sample90to95cor)
+Sample90to95A %>%
+  cor()
 ```
 
 ## Scatter Plots
-The following code chunk displays scatter plots with `CRECEIVE` as the dependent variable against each of the the primary independent variables of interest to visually inspect for linear relationships between the dependent variable and each of the independent variables of primary interest.
+The following code chunk displays scatter plots with `CRECEIVE` as the dependent variable against each of the the primary independent variables of interest to visually inspect for linear relationships between the dependent variable and each of the independent variables.
 ```{r scatter-plots}
 ggplot() +
-  geom_point(Sample90to95, mapping = aes(x = APPYEAR, y = CRECEIVE))
+  geom_point(Sample90to95A, mapping = aes(x = APPYEAR, y = CRECEIVE))
 ggsave(here("results", "scatterCRECEIVEbyAPPYEAR.png"), dpi = 300)
 
 ggplot() +
-  geom_point(Sample90to95, mapping = aes(x = CAT, y = CRECEIVE))
+  geom_point(Sample90to95A, mapping = aes(x = GYEAR, y = CRECEIVE))
+ggsave(here("results", "scatterCRECEIVEbyGYEAR.png"), dpi = 300)
+
+ggplot() +
+  geom_point(Sample90to95A, mapping = aes(x = NCLASS, y = CRECEIVE))
+ggsave(here("results", "scatterCRECEIVEbyNCLASS.png"), dpi = 300)
+
+ggplot() +
+  geom_point(Sample90to95A, mapping = aes(x = CAT, y = CRECEIVE))
 ggsave(here("results", "scatterCRECEIVEbyCAT.png"), dpi = 300)
 
 ggplot() +
-  geom_point(Sample90to95, mapping = aes(x = CMADE, y = CRECEIVE))
-ggsave(here("results", "scatterCRECEIVEbyCMADE.png"), dpi = 300)
+  geom_point(Sample90to95A, mapping = aes(x = SUBCAT, y = CRECEIVE))
+ggsave(here("results", "scatterCRECEIVEbySUBCAT.png"), dpi = 300)
 
 ggplot() +
-  geom_point(Sample90to95, mapping = aes(x = CLAIMS, y = CRECEIVE))
+  geom_point(Sample90to95A, mapping = aes(x = CLAIMS, y = CRECEIVE))
 ggsave(here("results", "scatterCRECEIVEbyCLAIMS.png"), dpi = 300)
 
 ggplot() +
-  geom_point(Sample90to95, mapping = aes(x = ORIGINAL, y = CRECEIVE))
-ggsave(here("results", "scatterCRECEIVEbyORIGINAL.png"), dpi = 300)
+  geom_point(Sample90to95A, mapping = aes(x = CMADE, y = CRECEIVE))
+ggsave(here("results", "scatterCRECEIVEbyCMADE.png"), dpi = 300)
 
 ggplot() +
-  geom_point(Sample90to95, mapping = aes(x = GENERAL, y = CRECEIVE))
+  geom_point(Sample90to95A, mapping = aes(x = RATIOCIT, y = CRECEIVE))
+ggsave(here("results", "scatterCRECEIVEbyRATIOCIT.png"), dpi = 300)
+
+ggplot() +
+  geom_point(Sample90to95A, mapping = aes(x = GENERAL, y = CRECEIVE))
 ggsave(here("results", "scatterCRECEIVEbyGENERAL.png"), dpi = 300)
 
 ggplot() +
-  geom_point(Sample90to95, mapping = aes(x = RATIOCIT, y = CRECEIVE))
-ggsave(here("results", "scatterCRECEIVEbyRATIOCIT.png"), dpi = 300)
+  geom_point(Sample90to95A, mapping = aes(x = ORIGINAL, y = CRECEIVE))
+ggsave(here("results", "scatterCRECEIVEbyORIGINAL.png"), dpi = 300)
+
+ggplot() +
+  geom_point(Sample90to95A, mapping = aes(x = FWDAPLAG, y = CRECEIVE))
+ggsave(here("results", "scatterCRECEIVEbyFWDAPLAG.png"), dpi = 300)
+
+ggplot() +
+  geom_point(Sample90to95A, mapping = aes(x = BCKGTLAG, y = CRECEIVE))
+ggsave(here("results", "scatterCRECEIVEbyBCKGTLAG.png"), dpi = 300)
+
+ggplot() +
+  geom_point(Sample90to95A, mapping = aes(x = SELFCTUB, y = CRECEIVE))
+ggsave(here("results", "scatterCRECEIVEbySELFCTUB.png"), dpi = 300)
+
+ggplot() +
+  geom_point(Sample90to95A, mapping = aes(x = SELFCTLB, y = CRECEIVE))
+ggsave(here("results", "scatterCRECEIVEbySELFCTLB.png"), dpi = 300)
+
+ggplot() +
+  geom_point(Sample90to95A, mapping = aes(x = SECDUPBD, y = CRECEIVE))
+ggsave(here("results", "scatterCRECEIVEbySECDUPBD.png"), dpi = 300)
+
+ggplot() +
+  geom_point(Sample90to95A, mapping = aes(x = SECDLWBD, y = CRECEIVE))
+ggsave(here("results", "scatterCRECEIVEbySECDLWBD.png"), dpi = 300)
+```
+
+## Clean Data Phase 2
+The following code chunk creates additional variables needed for the binary logistic regression, ordinal logistic regression, and multiple regression analyses and removes variables that will not be used.  It first creates a new variable called `CRECbinomial` that converts the `CRECEIVE` variable into a dichotomous variable. It then creates a series of dummy variables for the nominal `CAT` variable. Finally, it creates a series of new variables by applying a natural log transformation to the original interval and ratio variables.
+```{clean-data}
+Sample90to95A %>%
+  mutate(CRECbinomial = if(CRECEIVE == 0) {
+    CRECbinomial = 0} else {CRECbinomial = 1}) %>%
+  mutate(CAT01 = if(CAT == 1) {CAT01 = 1} else {CAT01 = 0}) %>%
+  mutate(CAT01 = if(CAT == 1) {CAT02 = 1} else {CAT02 = 0}) %>%
+  mutate(CAT01 = if(CAT == 1) {CAT03 = 1} else {CAT03 = 0}) %>%
+  mutate(CAT01 = if(CAT == 1) {CAT04 = 1} else {CAT04 = 0}) %>%
+  mutate(CAT01 = if(CAT == 1) {CAT05 = 1} else {CAT05 = 0}) %>%
+  mutate(CAT01 = if(CAT == 1) {CAT06 = 1} else {CAT06 = 0}) %>%
+  mutate(lnCLAIMS = log(CLAIMS)) %>%
+  mutate(lnCMADE = log(CMADE)) %>%
+  mutate(lnCRECEIVE = log(CRECEIVE)) %>%
+  mutate(lnRATIOCIT - log(RATIOCIT)) %>%
+  mutate(lnGENERAL = log(GENERAL)) %>%
+  mutate(lnORIGINAL = log(ORIGINAL)) %>%
+  mutate(lnFWDAPLAG = log(FWDAPLAG)) %>%
+  mutate(lnBCKGTLAG = log(BCKGTLAG)) %>%
+  mutate(lnSELFCTUB = log(SELFCTUB)) %>%
+  mutate(lnSELFCTLB = log(SELFCTLB)) %>%
+  mutate(lnSECDUPBD = log(SECDUPBD)) %>%
+  mutate(lnSECDLWBD = log(SECDLWBD)) -> Sample90to95A
+```
+
+## Inspect Sample Data
+The following code chunk evaluates the data sample to determine if additional data cleaning is necessary.  It first checks for missing data for each variable.  It then checks for missing data for each variable in each observation.  Then it checks for duplicate observations with the `PATENT` variable to determine if that variable can be used as a unique identifier for each observation.  Finally, it checks for duplicate observations across all variables to ensure that each observation is unique.
+```{r inspect-data-90-95}
+miss_var_summary(Sample90to95A, order = TRUE)
+miss_case_summary(Sample90to95A, order = TRUE)
+get_dupes(Sample90to95A, PATENT)
+get_dupes(Sample90to95A)
 ```
 
 ## Binary Logistic Regression Analysis
-The following code chunk performs a binary logistic regression analysis on the data sample. It first creates a new variable called `CRECbinomial` that converts the `CRECEIVE` variable into a dichotomous variable. It then uses the new dichotomous variable as the dependent variable in the binary logistic regression.
+The following code chunk uses the new dichotomous variable `CRECbinomial` as the dependent variable in the binary logistic regression. It then displays the results.
 ```{r binary-regression}
-Sample90to95 %>%
-  mutate(CRECbinomial = if(CRECEIVE == 0) {
-    CRECbinomial = 0} else {CRECbinomial = 1}) -> Sample90to95
-logitCRECEIVE <- glm(CRECbinomial ~ APPYEAR + CAT + CMADE + CLAIMS + ORIGINAL + GENERAL + RATIOCIT, data = Sample90to95, family = binomial)
+logitCRECEIVE <- glm(CRECbinomial ~ APPYEAR + CAT + CMADE + CLAIMS + ORIGINAL + GENERAL + RATIOCIT, data = Sample90to95A, family = binomial)
 summary(logitCRECEIVE)
 ```
 
 ## Ordinal Logistic Regression Analysis
-The following code chunk performs an ordinal logistic regression analysis on the data sample using `CRECEIVE` as the dependent variable.
+The following code chunk performs an ordinal logistic regression analysis on the data sample using `CRECEIVE` as the dependent variable. It then displays the results.
 ```{r ordinal-regression}
-CRECordinal <- polr(as.factor(CRECEIVE) ~ APPYEAR + CAT + CMADE + CLAIMS + ORIGINAL + GENERAL + RATIOCIT, data = Sample90to95, Hess = TRUE, model = TRUE, method = "logistic")
+CRECordinal <- polr(as.factor(CRECEIVE) ~ APPYEAR + CAT + CMADE + CLAIMS + ORIGINAL + GENERAL + RATIOCIT, data = Sample90to95A, Hess = TRUE, model = TRUE, method = "logistic")
 summary(CRECordinal)
+```
+
+## Multiple Logistic Regressin Analysis
+The following code chunk performs a multiple logistic regression analysis on the data sample using the transformed variables with `lnCRECEIVE` as the dependent variable. It then displays the results.
+```{r multiple-regression}
+CRECEIVEregression <- lm(lnCRECEIVE ~ APPYEAR + CAT01 + CAT02 + CAT03 + CAT04 + CAT05 + CAT06 + lnCMADE + lnCLAIMS + lnORIGINAL + lnGENERAL + lnRATIOCIT, data = Sample90to95A)
+summary(CRECEIVEregression)
 ```
 
 ## Save Data
 The following code chunk saves the final cleaned data that was used in the analysis.
 ```{r save-data}
-write.csv(Sample90to95, here("Data/DataClean/NBERpatents1963to1999/NBERPatCit90to95Sample.csv"), append = FALSE)
+write.csv(Sample90to95A, here("Data/DataClean/NBERpatents1963to1999/NBERPatCit90to95Sample.csv"), append = FALSE)
 ```
