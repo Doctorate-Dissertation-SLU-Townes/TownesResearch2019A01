@@ -87,78 +87,6 @@ get_dupes(Sample90to95B, PATENT)
 get_dupes(Sample90to95B)
 ```
 
-## Observation Counts
-The following code chunk determines the number of observations for each outcome of each independent variable to determine if the sample size is large enough for logistic regression analysis, which requires at least 10 observations for the least frequent outcome for each independent variable.
-```{r sample-size}
-Sample90to95B %>%
-  group_by(APPYEAR) %>%
-  summarize(n())
-
-Sample90to95B %>%
-  group_by(GYEAR) %>%
-  summarize(n())
-
-Sample90to95B %>%
-  group_by(CRECEIVE) %>%
-  summarize(n())
-
-Sample90to95B %>%  
-  group_by(NCLASS) %>%
-  summarize(n())
-
-Sample90to95B %>%  
-  group_by(CAT) %>%
-  summarize(n())
-
-Sample90to95B %>%  
-  group_by(SUBCAT) %>%
-  summarize(n())
-
-Sample90to95B %>%  
-  group_by(CLAIMS) %>%
-  summarize(n())
-
-Sample90to95B %>%    
-  group_by(CMADE) %>%
-  summarize(n())
-
-Sample90to95B %>%  
-  group_by(RATIOCIT) %>%
-  summarize(n())
-
-Sample90to95B %>%  
-  group_by(GENERAL) %>%
-  summarize(n())
-
-Sample90to95B %>%  
-  group_by(ORIGINAL) %>%
-  summarize(n())
-
-Sample90to95B %>%  
-  group_by(FWDAPLAG) %>%
-  summarize(n())
-
-Sample90to95B %>%  
-  group_by(BCKGTLAG) %>%
-  summarize(n())
-
-Sample90to95B %>%  
-  group_by(SELFCTUB) %>%
-  summarize(n())
-
-Sample90to95B %>%  
-  group_by(SELFCTLB) %>%
-  summarize(n())
-
-Sample90to95B %>%  
-  group_by(SECDUPBD) %>%
-  summarize(n())
-
-Sample90to95B %>%  
-  group_by(SECDLWBD) %>%
-  summarize(n())
-```
-
 ## Central Tendency
 The following code chunk calculates measures of central tendency in the sample data for each of the variables.
 ```{r central-tendency}
@@ -405,7 +333,7 @@ The following code chunk creates additional variables needed for the binary logi
 ```{r clean-data-02}
 Sample90to95B %>% 
   mutate(CRECbinomial = if(CRECEIVE == 0) {
-    CRECbinomial = 0} else {CRECbinomial = 1}) %>%
+    CRECbinomial == 0} else {CRECbinomial == 1}) %>%
 # Dummy variables not being created properly
   mutate(CAT01 = if(CAT == 1) {CAT01 == 1} else {CAT01 == 0}) %>%
   mutate(CAT02 = if(CAT == 2) {CAT02 == 1} else {CAT02 == 0}) %>%
@@ -428,6 +356,106 @@ Sample90to95B %>%
   mutate(SELFCTLBtrfm = log(SELFCTLB)) %>%
   mutate(SECDUPBDtrfm = log(SECDUPBD)) %>%
   mutate(SECDLWBDtrfm = log(SECDLWBD)) -> Sample90to95C
+```
+
+## Observation Counts
+The following code chunk determines the number of observations for each outcome of each independent variable to determine if the sample size is large enough for logistic regression analysis, which requires at least 10 observations for the least frequent outcome for each independent variable.
+```{r sample-size}
+Sample90to95C %>%
+  group_by(APPYEAR) %>%
+  summarize(n())
+
+Sample90to95C %>%
+  group_by(GYEAR) %>%
+  summarize(n())
+
+Sample90to95C %>%
+  group_by(CRECEIVE) %>%
+  summarize(n())
+
+Sample90to95C %>%
+  group_by(CRECEIVEbinomial) %>%
+  summarize(n())
+
+Sample90to95C %>%  
+  group_by(NCLASS) %>%
+  summarize(n())
+
+Sample90to95C %>%  
+  group_by(CAT) %>%
+  summarize(n())
+
+Sample90to95C %>%  
+  group_by(CAT01) %>%
+  summarize(n())
+
+Sample90to95C %>%  
+  group_by(CAT02) %>%
+  summarize(n())
+
+Sample90to95C %>%  
+  group_by(CAT03) %>%
+  summarize(n())
+
+Sample90to95C %>%  
+  group_by(CAT04) %>%
+  summarize(n())
+
+Sample90to95C %>%  
+  group_by(CAT05) %>%
+  summarize(n())
+
+Sample90to95C %>%  
+  group_by(CAT06) %>%
+  summarize(n())
+
+Sample90to95C %>%  
+  group_by(SUBCAT) %>%
+  summarize(n())
+
+Sample90to95C %>%  
+  group_by(CLAIMS) %>%
+  summarize(n())
+
+Sample90to95C %>%    
+  group_by(CMADE) %>%
+  summarize(n())
+
+Sample90to95C %>%  
+  group_by(RATIOCIT) %>%
+  summarize(n())
+
+Sample90to95C %>%  
+  group_by(GENERAL) %>%
+  summarize(n())
+
+Sample90to95C %>%  
+  group_by(ORIGINAL) %>%
+  summarize(n())
+
+Sample90to95C %>%  
+  group_by(FWDAPLAG) %>%
+  summarize(n())
+
+Sample90to95C %>%  
+  group_by(BCKGTLAG) %>%
+  summarize(n())
+
+Sample90to95C %>%  
+  group_by(SELFCTUB) %>%
+  summarize(n())
+
+Sample90to95C %>%  
+  group_by(SELFCTLB) %>%
+  summarize(n())
+
+Sample90to95C %>%  
+  group_by(SECDUPBD) %>%
+  summarize(n())
+
+Sample90to95C %>%  
+  group_by(SECDLWBD) %>%
+  summarize(n())
 ```
 
 ## Q-Q Plots
