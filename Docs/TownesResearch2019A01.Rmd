@@ -68,7 +68,6 @@ view(Sample90to95A)
 ## Inspect Sample Data
 The following code chunk evaluates the data sample to determine if additional data cleaning is necessary.  It first checks for missing data for each variable.  It then checks for missing data for each variable in each case.  Then it checks for duplicate cases with the `PATENT` variable to determine if that variable can be used as a unique identifier for each case.  Finally, it checks for duplicate cases across all variables to ensure that each case is unique.
 ```{r inspect-data-90-95}
-# The following functions not working when part of a pipe
 miss_var_summary(Sample90to95A, order = TRUE)
 miss_case_summary(Sample90to95A, order = TRUE)
 get_dupes(Sample90to95A, PATENT)
@@ -334,28 +333,26 @@ The following code chunk creates additional variables needed for the binary logi
 Sample90to95B %>% 
   mutate(CRECbinomial = if(CRECEIVE == 0) {
     CRECbinomial == 0} else {CRECbinomial == 1}) %>%
-# Dummy variables not being created properly
   mutate(CAT01 = if(CAT == 1) {CAT01 == 1} else {CAT01 == 0}) %>%
   mutate(CAT02 = if(CAT == 2) {CAT02 == 1} else {CAT02 == 0}) %>%
   mutate(CAT03 = if(CAT == 3) {CAT03 == 1} else {CAT03 == 0}) %>%
   mutate(CAT04 = if(CAT == 4) {CAT04 == 1} else {CAT04 == 0}) %>%
   mutate(CAT05 = if(CAT == 5) {CAT05 == 1} else {CAT05 == 0}) %>%
   mutate(CAT06 = if(CAT == 6) {CAT06 == 1} else {CAT06 == 0}) %>%
-# Different transformation required because of data contains 0 and 1 values
-  mutate(APPYEARtrfm = log(APPYEAR)) %>%
-  mutate(GYEARtrfm = log(GYEAR)) %>%
-  mutate(CLAIMStrfm = log(CLAIMS)) %>%
-  mutate(CMADEtrfm = log(CMADE)) %>%
-  mutate(CRECEIVEtrfm = log(CRECEIVE)) %>%
-  mutate(RATIOCITtrfm = log(RATIOCIT)) %>%
-  mutate(GENERALtrfm = log(GENERAL)) %>%
-  mutate(ORIGINALtrfm = log(ORIGINAL)) %>%
-  mutate(FWDAPLAGtrfm = log(FWDAPLAG)) %>%
-  mutate(BCKGTLAGtrfm = log(BCKGTLAG)) %>%
-  mutate(SELFCTUBtrfm = log(SELFCTUB)) %>%
-  mutate(SELFCTLBtrfm = log(SELFCTLB)) %>%
-  mutate(SECDUPBDtrfm = log(SECDUPBD)) %>%
-  mutate(SECDLWBDtrfm = log(SECDLWBD)) -> Sample90to95C
+  mutate(APPYEARtrfm = sqrt(APPYEAR)) %>%
+  mutate(GYEARtrfm = sqrt(GYEAR)) %>%
+  mutate(CLAIMStrfm = sqrt(CLAIMS)) %>%
+  mutate(CMADEtrfm = sqrt(CMADE)) %>%
+  mutate(CRECEIVEtrfm = sqrt(CRECEIVE)) %>%
+  mutate(RATIOCITtrfm = sqrt(RATIOCIT)) %>%
+  mutate(GENERALtrfm = sqrt(GENERAL)) %>%
+  mutate(ORIGINALtrfm = sqrt(ORIGINAL)) %>%
+  mutate(FWDAPLAGtrfm = sqrt(FWDAPLAG)) %>%
+  mutate(BCKGTLAGtrfm = sqrt(BCKGTLAG)) %>%
+  mutate(SELFCTUBtrfm = sqrt(SELFCTUB)) %>%
+  mutate(SELFCTLBtrfm = sqrt(SELFCTLB)) %>%
+  mutate(SECDUPBDtrfm = sqrt(SECDUPBD)) %>%
+  mutate(SECDLWBDtrfm = sqrt(SECDLWBD)) -> Sample90to95C
 ```
 
 ## Observation Counts
