@@ -66,7 +66,7 @@ view(Sample90to95A)
 ```
 
 ## Inspect Sample Data
-The following code chunk evaluates the data sample to determine if additional data cleaning is necessary.  It first checks for missing data for each variable.  It then checks for missing data for each variable in each observation.  Then it checks for duplicate observations with the `PATENT` variable to determine if that variable can be used as a unique identifier for each observation.  Finally, it checks for duplicate observations across all variables to ensure that each observation is unique.
+The following code chunk evaluates the data sample to determine if additional data cleaning is necessary.  It first checks for missing data for each variable.  It then checks for missing data for each variable in each case.  Then it checks for duplicate cases with the `PATENT` variable to determine if that variable can be used as a unique identifier for each case.  Finally, it checks for duplicate cases across all variables to ensure that each case is unique.
 ```{r inspect-data-90-95}
 # The following functions not working when part of a pipe
 miss_var_summary(Sample90to95A, order = TRUE)
@@ -75,11 +75,11 @@ get_dupes(Sample90to95A, PATENT)
 get_dupes(Sample90to95A)
 ```
 
-## Remove Cases with Missing Data
-The following code chunk removes cases with missing data, removes duplicate cases, and then evaluates the data sample to determin if additional cleaning is necessary. It first checks for missing data for each variable.  It then checks for missing data for each variable in each observation.  Then it checks for duplicate observations with the `PATENT` variable to determine if that variable can be used as a unique identifier for each observation.  Finally, it checks for duplicate observations across all variables to ensure that each observation is unique.
+## Adjust for Missing Data
+The following code chunk modifies cases with missing data, removes duplicate cases, and then evaluates the data sample to determine if additional cleaning is necessary. It first assigns a value of `0` to instances of `NA` in the data. Then it removes duplicate cases. It then checks for missing data for each variable in each case and missing data for each case. Then it checks for duplicate cases with the `PATENT` variable to determine if that variable can be used as a unique identifier for each observation.  Finally, it checks for duplicate observations across all variables to ensure that each case is unique.
 ```{r remove-cases}
-Sample90to95A %>%
-  na.omit() %>%
+Sample90to95B[is.na(x=Sample90to95A)] <- 0
+Sample90to95B %>%
   distinct() -> Sample90to95B
 miss_var_summary(Sample90to95B, order = TRUE)
 miss_case_summary(Sample90to95B, order = TRUE)
@@ -329,7 +329,7 @@ dev.off()
 The following code chunk calculates the pairwise correlation coefficients for all variables in the sample data using the Pearson product-moment correlation function.
 ```{r cor-matrix}
 Sample90to95corrmatrix <- cor(Sample90to95B)
-view(Sample90to95corrmatrix, main = "Correlation Matrix")
+view(Sample90to95corrmatrix, title = "Correlation Matrix")
 ```
 
 ## Scatter Plots
@@ -407,114 +407,114 @@ Sample90to95B %>%
   mutate(CRECbinomial = if(CRECEIVE == 0) {
     CRECbinomial = 0} else {CRECbinomial = 1}) %>%
 # Dummy variables not being created properly
-  mutate(CAT01 = if(CAT == 1) {CAT01 = 1} else {CAT01 = 0}) %>%
-  mutate(CAT02 = if(CAT == 2) {CAT02 = 1} else {CAT02 = 0}) %>%
-  mutate(CAT03 = if(CAT == 3) {CAT03 = 1} else {CAT03 = 0}) %>%
-  mutate(CAT04 = if(CAT == 4) {CAT04 = 1} else {CAT04 = 0}) %>%
-  mutate(CAT05 = if(CAT == 5) {CAT05 = 1} else {CAT05 = 0}) %>%
-  mutate(CAT06 = if(CAT == 6) {CAT06 = 1} else {CAT06 = 0}) %>%
+  mutate(CAT01 = if(CAT == 1) {CAT01 == 1} else {CAT01 == 0}) %>%
+  mutate(CAT02 = if(CAT == 2) {CAT02 == 1} else {CAT02 == 0}) %>%
+  mutate(CAT03 = if(CAT == 3) {CAT03 == 1} else {CAT03 == 0}) %>%
+  mutate(CAT04 = if(CAT == 4) {CAT04 == 1} else {CAT04 == 0}) %>%
+  mutate(CAT05 = if(CAT == 5) {CAT05 == 1} else {CAT05 == 0}) %>%
+  mutate(CAT06 = if(CAT == 6) {CAT06 == 1} else {CAT06 == 0}) %>%
 # Different transformation required because of data contains 0 and 1 values
-  mutate(lnAPPYEAR = log(APPYEAR)) %>%
-  mutate(lnGYEAR = log(GYEAR)) %>%
-  mutate(lnCLAIMS = log(CLAIMS)) %>%
-  mutate(lnCMADE = log(CMADE)) %>%
-  mutate(lnCRECEIVE = log(CRECEIVE)) %>%
-  mutate(lnRATIOCIT = log(RATIOCIT)) %>%
-  mutate(lnGENERAL = log(GENERAL)) %>%
-  mutate(lnORIGINAL = log(ORIGINAL)) %>%
-  mutate(lnFWDAPLAG = log(FWDAPLAG)) %>%
-  mutate(lnBCKGTLAG = log(BCKGTLAG)) %>%
-  mutate(lnSELFCTUB = log(SELFCTUB)) %>%
-  mutate(lnSELFCTLB = log(SELFCTLB)) %>%
-  mutate(lnSECDUPBD = log(SECDUPBD)) %>%
-  mutate(lnSECDLWBD = log(SECDLWBD)) -> Sample90to95C
+  mutate(APPYEARtrfm = log(APPYEAR)) %>%
+  mutate(GYEARtrfm = log(GYEAR)) %>%
+  mutate(CLAIMStrfm = log(CLAIMS)) %>%
+  mutate(CMADEtrfm = log(CMADE)) %>%
+  mutate(CRECEIVEtrfm = log(CRECEIVE)) %>%
+  mutate(RATIOCITtrfm = log(RATIOCIT)) %>%
+  mutate(GENERALtrfm = log(GENERAL)) %>%
+  mutate(ORIGINALtrfm = log(ORIGINAL)) %>%
+  mutate(FWDAPLAGtrfm = log(FWDAPLAG)) %>%
+  mutate(BCKGTLAGtrfm = log(BCKGTLAG)) %>%
+  mutate(SELFCTUBtrfm = log(SELFCTUB)) %>%
+  mutate(SELFCTLBtrfm = log(SELFCTLB)) %>%
+  mutate(SECDUPBDtrfm = log(SECDUPBD)) %>%
+  mutate(SECDLWBDtrfm = log(SECDLWBD)) -> Sample90to95C
 ```
 
 ## Q-Q Plots
 The following code chunk displays Quantile-Quantile (Q-Q) plots for the transformed variables to check for suitability to use in multiple regression analysis.
 ```{r qq-plots}
 png(filename = here("Results", "QQplotAPPYEARtransformed.png"))
-qqnorm(Sample90to95C$lnAPPYEAR, pch = 1, frame = FALSE, 
-       main = "Normal Q-Q Plot for lnAPPYEAR", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
-qqline(Sample90to95C$lnAPPYEAR, col = "green", lwd = 2)
+qqnorm(Sample90to95C$APPYEARtrfm, pch = 1, frame = FALSE, 
+       main = "Normal Q-Q Plot for APPYEARtrfm", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
+qqline(Sample90to95C$APPYEARtrfm, col = "green", lwd = 2)
 dev.off()
 
 png(filename = here("Results", "QQplotGYEARtransformed.png"))
-qqnorm(Sample90to95C$lnGYEAR, pch = 1, frame = FALSE, 
-       main = "Normal Q-Q Plot for lnGYEAR", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
-qqline(Sample90to95C$lnGYEAR, col = "green", lwd = 2)
+qqnorm(Sample90to95C$GYEARtrfm, pch = 1, frame = FALSE, 
+       main = "Normal Q-Q Plot for GYEARtrfm", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
+qqline(Sample90to95C$GYEARtrfm, col = "green", lwd = 2)
 dev.off()
 
 png(filename = here("Results", "QQplotCRECEIVEtransformed.png"))
-qqnorm(Sample90to95C$lnCRECEIVE, pch = 1, frame = FALSE, 
-       main = "Normal Q-Q Plot for lnCRECEIVE", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles", plot.it = TRUE)
-qqline(Sample90to95C$lnCRECEIVE, col = "green", lwd = 2, plot.it = TRUE)
+qqnorm(Sample90to95C$CRECEIVEtrfm, pch = 1, frame = FALSE, 
+       main = "Normal Q-Q Plot for CRECEIVEtrfm", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles", plot.it = TRUE)
+qqline(Sample90to95C$CRECEIVEtrfm, col = "green", lwd = 2, plot.it = TRUE)
 dev.off()
 
 png(filename = here("Results", "QQplotCLAIMStransformed.png"))
-qqnorm(Sample90to95C$lnCLAIMS, pch = 1, frame = FALSE, 
-       main = "Normal Q-Q Plot for lnCLAIMS", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
-qqline(Sample90to95C$lnCLAIMS, col = "green", lwd = 2)
+qqnorm(Sample90to95C$CLAIMStrfm, pch = 1, frame = FALSE, 
+       main = "Normal Q-Q Plot for CLAIMStrfm", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
+qqline(Sample90to95C$CLAIMStrfm, col = "green", lwd = 2)
 dev.off()
 
 png(filename = here("Results", "QQplotCMADEtransformed.png"))
-qqnorm(Sample90to95C$lnCMADE, pch = 1, frame = FALSE, 
-       main = "Normal Q-Q Plot for lnCMADE", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
-qqline(Sample90to95C$lnCMADE, col = "green", lwd = 2)
+qqnorm(Sample90to95C$CMADEtrfm, pch = 1, frame = FALSE, 
+       main = "Normal Q-Q Plot for CMADEtrfm", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
+qqline(Sample90to95C$CMADEtrfm, col = "green", lwd = 2)
 dev.off()
 
 png(filename = here("Results", "QQplotRATIOCITtransformed.png"))
-qqnorm(Sample90to95C$lnRATIOCIT, pch = 1, frame = FALSE, 
-       main = "Normal Q-Q Plot for lnRATIOCIT", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
-qqline(Sample90to95C$lnRATIOCIT, col = "green", lwd = 2)
+qqnorm(Sample90to95C$RATIOCITtrfm, pch = 1, frame = FALSE, 
+       main = "Normal Q-Q Plot for RATIOCITtrfm", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
+qqline(Sample90to95C$RATIOCITtrfm, col = "green", lwd = 2)
 dev.off()
 
 png(filename = here("Results", "QQplotGENERALtransformed.png"))
-qqnorm(Sample90to95C$lnGENERAL, pch = 1, frame = FALSE, 
-       main = "Normal Q-Q Plot for lnGENERAL", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
-qqline(Sample90to95C$lnGENERAL, col = "green", lwd = 2)
+qqnorm(Sample90to95C$GENERALtrfm, pch = 1, frame = FALSE, 
+       main = "Normal Q-Q Plot for GENERALtrfm", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
+qqline(Sample90to95C$GENERALtrfm, col = "green", lwd = 2)
 dev.off()
 
 png(filename = here("Results", "QQplotORIGINALtransformed.png"))
-qqnorm(Sample90to95C$lnORIGINAL, pch = 1, frame = FALSE, 
-       main = "Normal Q-Q Plot for lnORIGINAL", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
-qqline(Sample90to95C$lnORIGINAL, col = "green", lwd = 2)
+qqnorm(Sample90to95C$ORIGINALtrfm, pch = 1, frame = FALSE, 
+       main = "Normal Q-Q Plot for ORIGINALtrfm", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
+qqline(Sample90to95C$ORIGINALtrfm, col = "green", lwd = 2)
 dev.off()
 
 png(filename = here("Results", "QQplotFWDAPLAGtransformed.png"))
-qqnorm(Sample90to95C$lnFWDAPLAG, pch = 1, frame = FALSE, 
+qqnorm(Sample90to95C$FWDAPLAGtrfm, pch = 1, frame = FALSE, 
        main = "Normal Q-Q Plot for lnFWDAPLAG", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
-qqline(Sample90to95C$lnFWDAPLAG, col = "green", lwd = 2)
+qqline(Sample90to95C$FWDAPLAGtrfm, col = "green", lwd = 2)
 dev.off()
 
 png(filename = here("Results", "QQplotBCKGTLAGtransformed.png"))
-qqnorm(Sample90to95C$lnBCKGTLAG, pch = 1, frame = FALSE, 
+qqnorm(Sample90to95C$BCKGTLAGtrfm, pch = 1, frame = FALSE, 
        main = "Normal Q-Q Plot for lnBCKGTALG", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
-qqline(Sample90to95C$lnBCKGTLAG, col = "green", lwd = 2)
+qqline(Sample90to95C$BCKGTLAGtrfm, col = "green", lwd = 2)
 dev.off()
 
 png(filename = here("Results", "QQplotSELFCTUBtransformed.png"))
-qqnorm(Sample90to95C$lnSELFCTUB, pch = 1, frame = FALSE, 
-       main = "Normal Q-Q Plot for lnSELFCTUB", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
-qqline(Sample90to95C$lnSELFCTUB, col = "green", lwd = 2)
+qqnorm(Sample90to95C$SELFCTUBtrfm, pch = 1, frame = FALSE, 
+       main = "Normal Q-Q Plot for SELFCTUBtrfm", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
+qqline(Sample90to95C$SELFCTUBtrfm, col = "green", lwd = 2)
 dev.off()
 
 png(filename = here("Results", "QQplotSELFCTLBtransformed.png"))
-qqnorm(Sample90to95C$lnSELFCTLB, pch = 1, frame = FALSE, 
-       main = "Normal Q-Q Plot for lnSELFCTLB", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
-qqline(Sample90to95C$lnSELFCTLB, col = "green", lwd = 2)
+qqnorm(Sample90to95C$trfmSELFCTLB, pch = 1, frame = FALSE, 
+       main = "Normal Q-Q Plot for SELFCTLBtrfm", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
+qqline(Sample90to95C$trfmSELFCTLB, col = "green", lwd = 2)
 dev.off()
 
 png(filename = here("Results", "QQplotSECDUPBDtransformed.png"))
-qqnorm(Sample90to95C$lnSECDUPBD, pch = 1, frame = FALSE, 
-       main = "Normal Q-Q Plot for lnSECDUPBD", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
-qqline(Sample90to95B$SECDUPBD, col = "green", lwd = 2)
+qqnorm(Sample90to95C$SECDUPBDtrfm, pch = 1, frame = FALSE, 
+       main = "Normal Q-Q Plot for SECDUPBDtrfm", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
+qqline(Sample90to95B$SECDUPBDtrfm, col = "green", lwd = 2)
 dev.off()
 
 png(filename = here("Results", "QQplotSECDLWBDtransformed.png"))
-qqnorm(Sample90to95C$lnSECDLWBD, pch = 1, frame = FALSE, 
-       main = "Normal Q-Q Plot for lnSECDLWBD", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
-qqline(Sample90to95C$lnSECDLWBD, col = "green", lwd = 2)
+qqnorm(Sample90to95C$SECDLWBDtrfm, pch = 1, frame = FALSE, 
+       main = "Normal Q-Q Plot for SECDLWBDtrfm", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
+qqline(Sample90to95C$SECDLWBDtrfm, col = "green", lwd = 2)
 dev.off()
 ```
 
@@ -535,7 +535,7 @@ summary(CRECordinal)
 ## Multiple Logistic Regressin Analysis
 The following code chunk performs a multiple logistic regression analysis on the data sample using the transformed variables with `lnCRECEIVE` as the dependent variable. It then displays the results.
 ```{r multiple-regression}
-CRECEIVEregression <- lm(lnCRECEIVE ~ lnAPPYEAR + CAT01 + CAT02 + CAT03 + CAT04 + CAT05 + CAT06 + lnCMADE + lnCLAIMS + lnORIGINAL + lnGENERAL + lnRATIOCIT + lnBCKTGLAG + lnSELFCTLB + lnSECDLWBD, data = Sample90to95C)
+CRECEIVEregression <- lm(CRECEIVEtrfm ~ APPYEARtrfm + CAT01 + CAT02 + CAT03 + CAT04 + CAT05 + CAT06 + CMADEtrfm + CLAIMStrfm + ORIGINALtrfm + GENERALtrfm + RATIOCITtrfm + BCKTGLAGtrfm + SELFCTLBtrfm + SECDLWBDtrfm, data = Sample90to95C)
 summary(CRECEIVEregression)
 ```
 
