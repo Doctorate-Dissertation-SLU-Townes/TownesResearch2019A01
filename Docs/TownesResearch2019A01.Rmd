@@ -164,6 +164,74 @@ histoSECDLWBD <- ggplot() +
 ggsave(here("Results", "histogramSECDLWBD.png"), dpi = 300)
 ```
 
+## Scatter Plots
+The following code chunk displays scatter plots with `CRECEIVE` as the dependent variable against each of the the primary independent variables of interest to visually inspect for linear relationships between the dependent variable and each of the independent variables.
+```{r scatter-plots}
+ggplot() +
+  geom_point(Sample90to95B, mapping = aes(x = APPYEAR, y = CRECEIVE))
+ggsave(here("results", "scatterCRECEIVEbyAPPYEAR.png"), dpi = 300)
+
+ggplot() +
+  geom_point(Sample90to95B, mapping = aes(x = GYEAR, y = CRECEIVE))
+ggsave(here("results", "scatterCRECEIVEbyGYEAR.png"), dpi = 300)
+
+ggplot() +
+  geom_point(Sample90to95B, mapping = aes(x = NCLASS, y = CRECEIVE))
+ggsave(here("results", "scatterCRECEIVEbyNCLASS.png"), dpi = 300)
+
+ggplot() +
+  geom_point(Sample90to95B, mapping = aes(x = CAT, y = CRECEIVE))
+ggsave(here("results", "scatterCRECEIVEbyCAT.png"), dpi = 300)
+
+ggplot() +
+  geom_point(Sample90to95B, mapping = aes(x = SUBCAT, y = CRECEIVE))
+ggsave(here("results", "scatterCRECEIVEbySUBCAT.png"), dpi = 300)
+
+ggplot() +
+  geom_point(Sample90to95B, mapping = aes(x = CLAIMS, y = CRECEIVE))
+ggsave(here("results", "scatterCRECEIVEbyCLAIMS.png"), dpi = 300)
+
+ggplot() +
+  geom_point(Sample90to95B, mapping = aes(x = CMADE, y = CRECEIVE))
+ggsave(here("results", "scatterCRECEIVEbyCMADE.png"), dpi = 300)
+
+ggplot() +
+  geom_point(Sample90to95B, mapping = aes(x = RATIOCIT, y = CRECEIVE))
+ggsave(here("results", "scatterCRECEIVEbyRATIOCIT.png"), dpi = 300)
+
+ggplot() +
+  geom_point(Sample90to95B, mapping = aes(x = GENERAL, y = CRECEIVE))
+ggsave(here("results", "scatterCRECEIVEbyGENERAL.png"), dpi = 300)
+
+ggplot() +
+  geom_point(Sample90to95B, mapping = aes(x = ORIGINAL, y = CRECEIVE))
+ggsave(here("results", "scatterCRECEIVEbyORIGINAL.png"), dpi = 300)
+
+ggplot() +
+  geom_point(Sample90to95B, mapping = aes(x = FWDAPLAG, y = CRECEIVE))
+ggsave(here("results", "scatterCRECEIVEbyFWDAPLAG.png"), dpi = 300)
+
+ggplot() +
+  geom_point(Sample90to95B, mapping = aes(x = BCKGTLAG, y = CRECEIVE))
+ggsave(here("results", "scatterCRECEIVEbyBCKGTLAG.png"), dpi = 300)
+
+ggplot() +
+  geom_point(Sample90to95B, mapping = aes(x = SELFCTUB, y = CRECEIVE))
+ggsave(here("results", "scatterCRECEIVEbySELFCTUB.png"), dpi = 300)
+
+ggplot() +
+  geom_point(Sample90to95B, mapping = aes(x = SELFCTLB, y = CRECEIVE))
+ggsave(here("results", "scatterCRECEIVEbySELFCTLB.png"), dpi = 300)
+
+ggplot() +
+  geom_point(Sample90to95B, mapping = aes(x = SECDUPBD, y = CRECEIVE))
+ggsave(here("results", "scatterCRECEIVEbySECDUPBD.png"), dpi = 300)
+
+ggplot() +
+  geom_point(Sample90to95B, mapping = aes(x = SECDLWBD, y = CRECEIVE))
+ggsave(here("results", "scatterCRECEIVEbySECDLWBD.png"), dpi = 300)
+```
+
 ## Q-Q Plots
 The following code chunk displays Quantile-Quantile (Q-Q) plots to check for normal distribution in the data sample for each variable of primary interest.
 ```{r qq-plots}
@@ -259,76 +327,8 @@ Sample90to95corrmatrix <- cor(Sample90to95B)
 view(Sample90to95corrmatrix, title = "Correlation Matrix")
 ```
 
-## Scatter Plots
-The following code chunk displays scatter plots with `CRECEIVE` as the dependent variable against each of the the primary independent variables of interest to visually inspect for linear relationships between the dependent variable and each of the independent variables.
-```{r scatter-plots}
-ggplot() +
-  geom_point(Sample90to95B, mapping = aes(x = APPYEAR, y = CRECEIVE))
-ggsave(here("results", "scatterCRECEIVEbyAPPYEAR.png"), dpi = 300)
-
-ggplot() +
-  geom_point(Sample90to95B, mapping = aes(x = GYEAR, y = CRECEIVE))
-ggsave(here("results", "scatterCRECEIVEbyGYEAR.png"), dpi = 300)
-
-ggplot() +
-  geom_point(Sample90to95B, mapping = aes(x = NCLASS, y = CRECEIVE))
-ggsave(here("results", "scatterCRECEIVEbyNCLASS.png"), dpi = 300)
-
-ggplot() +
-  geom_point(Sample90to95B, mapping = aes(x = CAT, y = CRECEIVE))
-ggsave(here("results", "scatterCRECEIVEbyCAT.png"), dpi = 300)
-
-ggplot() +
-  geom_point(Sample90to95B, mapping = aes(x = SUBCAT, y = CRECEIVE))
-ggsave(here("results", "scatterCRECEIVEbySUBCAT.png"), dpi = 300)
-
-ggplot() +
-  geom_point(Sample90to95B, mapping = aes(x = CLAIMS, y = CRECEIVE))
-ggsave(here("results", "scatterCRECEIVEbyCLAIMS.png"), dpi = 300)
-
-ggplot() +
-  geom_point(Sample90to95B, mapping = aes(x = CMADE, y = CRECEIVE))
-ggsave(here("results", "scatterCRECEIVEbyCMADE.png"), dpi = 300)
-
-ggplot() +
-  geom_point(Sample90to95B, mapping = aes(x = RATIOCIT, y = CRECEIVE))
-ggsave(here("results", "scatterCRECEIVEbyRATIOCIT.png"), dpi = 300)
-
-ggplot() +
-  geom_point(Sample90to95B, mapping = aes(x = GENERAL, y = CRECEIVE))
-ggsave(here("results", "scatterCRECEIVEbyGENERAL.png"), dpi = 300)
-
-ggplot() +
-  geom_point(Sample90to95B, mapping = aes(x = ORIGINAL, y = CRECEIVE))
-ggsave(here("results", "scatterCRECEIVEbyORIGINAL.png"), dpi = 300)
-
-ggplot() +
-  geom_point(Sample90to95B, mapping = aes(x = FWDAPLAG, y = CRECEIVE))
-ggsave(here("results", "scatterCRECEIVEbyFWDAPLAG.png"), dpi = 300)
-
-ggplot() +
-  geom_point(Sample90to95B, mapping = aes(x = BCKGTLAG, y = CRECEIVE))
-ggsave(here("results", "scatterCRECEIVEbyBCKGTLAG.png"), dpi = 300)
-
-ggplot() +
-  geom_point(Sample90to95B, mapping = aes(x = SELFCTUB, y = CRECEIVE))
-ggsave(here("results", "scatterCRECEIVEbySELFCTUB.png"), dpi = 300)
-
-ggplot() +
-  geom_point(Sample90to95B, mapping = aes(x = SELFCTLB, y = CRECEIVE))
-ggsave(here("results", "scatterCRECEIVEbySELFCTLB.png"), dpi = 300)
-
-ggplot() +
-  geom_point(Sample90to95B, mapping = aes(x = SECDUPBD, y = CRECEIVE))
-ggsave(here("results", "scatterCRECEIVEbySECDUPBD.png"), dpi = 300)
-
-ggplot() +
-  geom_point(Sample90to95B, mapping = aes(x = SECDLWBD, y = CRECEIVE))
-ggsave(here("results", "scatterCRECEIVEbySECDLWBD.png"), dpi = 300)
-```
-
 ## Clean Data Phase 2
-The following code chunk creates additional variables needed for the binary logistic regression, ordinal logistic regression, and multiple regression analyses and removes variables that will not be used.  It first creates a new variable called `CRECbinomial` that converts the `CRECEIVE` variable into a dichotomous variable. It then creates a series of dummy variables for the nominal `CAT` variable. Finally, it creates a series of new variables by applying a natural log transformation to the original interval and ratio variables.
+The following code chunk creates additional variables needed for the binary logistic regression, ordinal logistic regression, and multiple regression analyses and removes variables that will not be used.  It first creates a new variable called `CRECbinomial` that converts the `CRECEIVE` variable into a dichotomous variable. It then creates a series of dummy variables for the nominal `CAT` variable to use in multiple regression analysis. Finally, it creates a series of new variables by applying a transformation to the original interval and ratio variables.
 ```{r clean-data-02}
 Sample90to95B %>% 
   mutate(CRECbinomial = if(CRECEIVE == 0) {
@@ -558,7 +558,7 @@ summary(CRECordinal)
 ```
 
 ## Multiple Logistic Regression Analysis
-The following code chunk performs a multiple logistic regression analysis on the data sample using the untransformed variables with `CRECEIVE` as the dependent variable to establish a baseline. It then displays the results. Next it plots the residuals and creates a `png` file of the residuals plot.
+The following code chunk performs a multiple logistic regression analysis on the data sample using variables with `CRECEIVE` as the dependent variable to establish a baseline. It then displays the results. Next it plots the residuals and creates a `png` file of the residuals plot.
 ```{r multiple-regression}
 # Regression
 CRECEIVEregression <- lm(CRECEIVE ~ APPYEAR + CAT01 + CAT02 + CAT03 + CAT04 + CAT05 + CAT06 + CMADE + CLAIMS + ORIGINAL + GENERAL + RATIOCIT + BCKTGLAG + SELFCTLB + SECDLWBD, data = Sample90to95C)
@@ -566,6 +566,7 @@ summary(CRECEIVEregression)
 
 # Residuals
 CRECEIVEresid <- residuals(CRECEIVEregression)
+summary(CRECEIVEresid)
 
 # Q-Q Plot of Model Residuals
 png(filename = here("Results", "MultRegresQQplotModelBase.png"))
@@ -579,6 +580,34 @@ png(filename = here("Results","ResidualsBaseOrginal.png"))
 plot(ORIGINAL, CRECEIVEresid, ylab = "Residuals", xlab = "ORIGINAL", main = "Residuals by ORIGINAL")
 abline(0,0)
 dev.off()
+
+# Check for homoscedasticity of residuals or equal variance
+par(mfrow=c(2,2))
+plot(CRECEIVEregression)
+
+# Check for autocorrelation of residuals using Durbin-Watson test
+lmtest::dwtest(CRECEIVEregression)
+
+# Check that the independent variables and the residuals are uncorrelated
+cor.test(Sample90to95C)
+
+# Check that the variability in independent variable values is positive
+var(Sample90to95C)
+
+# Check that there is no perfect multicollinearity among the variables
+vif(CRECEIVEregression)
+
+# Check for normality of residuals
+par(mfrow=c(2,2))
+plot(CRECEIVEregression)
+qqnorm(CRECEIVEregression, pch = 1, frame = FALSE, 
+       main = "Normal Q-Q Plot for RATIOCIT", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
+qqline(CRECEIVEregression, col = "green", lwd = 2)
+
+# Secondary Check of Assumptions
+par(mfrow=c(2,2))
+gvlma::gvlma(CRECEIVEregression)
+plot(CRECEIVEregression)
 ```
 
 ## Save Data
