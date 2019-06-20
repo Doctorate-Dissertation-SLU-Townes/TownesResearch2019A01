@@ -564,9 +564,9 @@ The following code chunk performs a multiple logistic regression analysis on the
 CRECEIVEregression <- lm(CRECEIVE ~ APPYEAR + CAT01 + CAT02 + CAT03 + CAT04 + CAT05 + CAT06 + CMADE + CLAIMS + ORIGINAL + GENERAL + RATIOCIT + BCKTGLAG + SELFCTLB + SECDLWBD, data = Sample90to95C)
 summary(CRECEIVEregression)
 # Residuals
-CRECEIVEresid <- resid(CRECEIVEregression)
+CRECEIVEresid <- residuals(CRECEIVEregression)
 png(filename = here("Results","ResidualsBase.png"))
-plot(Sample90to95C$ORIGINAL,CRECEIVEresid, ylab = "Residuals", xlab = ORIGINAL, main = "Citations Received - Regression with Untransformed Variables")
+plot(ORIGINAL,CRECEIVEresid, ylab = "Residuals", xlab = "ORIGINAL", main = "Residuals by ORIGINAL")
 abline(0,0)
 dev.off()
 ```
