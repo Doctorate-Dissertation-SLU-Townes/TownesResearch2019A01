@@ -455,9 +455,9 @@ Sample90to95C %>%
   summarize(n())
 ```
 
-## Q-Q Plots
+## Q-Q Plots for Transformed Variables
 The following code chunk displays Quantile-Quantile (Q-Q) plots for the transformed variables to check for suitability to use in multiple regression analysis.
-```{r qq-plots}
+```{r qq-plots-transformed}
 png(filename = here("Results", "QQplotAPPYEARtransformed.png"))
 qqnorm(Sample90to95C$APPYEARtrfm, pch = 1, frame = FALSE, 
        main = "Normal Q-Q Plot for APPYEARtrfm", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
@@ -568,15 +568,15 @@ summary(CRECEIVEregression)
 CRECEIVEresid <- residuals(CRECEIVEregression)
 
 # Q-Q Plot of Model Residuals
-png(filename = here("Results", "QQplot.png"))
+png(filename = here("Results", "MultRegresQQplotModelBase.png"))
 qqnorm(CRECEIVEresid, pch = 1, frame = FALSE, 
-       main = "Normal Q-Q Plot for Base Level Regression", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
+       main = "Normal Q-Q Plot for Base Level Regression Model", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
 qqline(CRECEIVEresid, col = "green", lwd = 2)
 dev.off()
 
-# Plots of Residuals by Independent Variables
-png(filename = here("Results","ResidualsBase.png"))
-plot(ORIGINAL,CRECEIVEresid, ylab = "Residuals", xlab = "ORIGINAL", main = "Residuals by ORIGINAL")
+# Plots of Residuals by Independent variables
+png(filename = here("Results","ResidualsBaseOrginal.png"))
+plot(ORIGINAL, CRECEIVEresid, ylab = "Residuals", xlab = "ORIGINAL", main = "Residuals by ORIGINAL")
 abline(0,0)
 dev.off()
 ```
