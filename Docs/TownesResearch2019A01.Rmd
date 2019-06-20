@@ -557,11 +557,18 @@ CRECordinal <- polr(as.factor(CRECEIVE) ~ APPYEAR + CAT + CMADE + CLAIMS + ORIGI
 summary(CRECordinal)
 ```
 
-## Multiple Logistic Regressin Analysis
-The following code chunk performs a multiple logistic regression analysis on the data sample using the transformed variables with `lnCRECEIVE` as the dependent variable. It then displays the results.
+## Multiple Logistic Regression Analysis
+The following code chunk performs a multiple logistic regression analysis on the data sample using the untransformed variables with `CRECEIVE` as the dependent variable to establish a baseline. It then displays the results. Next it plots the residuals and creates a `png` file of the residuals plot.
 ```{r multiple-regression}
-CRECEIVEregression <- lm(CRECEIVEtrfm ~ APPYEARtrfm + CAT01 + CAT02 + CAT03 + CAT04 + CAT05 + CAT06 + CMADEtrfm + CLAIMStrfm + ORIGINALtrfm + GENERALtrfm + RATIOCITtrfm + BCKTGLAGtrfm + SELFCTLBtrfm + SECDLWBDtrfm, data = Sample90to95C)
+# Regression
+CRECEIVEregression <- lm(CRECEIVE ~ APPYEAR + CAT01 + CAT02 + CAT03 + CAT04 + CAT05 + CAT06 + CMADE + CLAIMS + ORIGINAL + GENERAL + RATIOCIT + BCKTGLAG + SELFCTLB + SECDLWBD, data = Sample90to95C)
 summary(CRECEIVEregression)
+# Residuals
+CRECEIVEresid <- resid(CRECEIVEregression)
+png(filename = here("Results","ResidualsBase.png"))
+plot(Sample90to95C$ORIGINAL,CRECEIVEresid, ylab = "Residuals", xlab = ORIGINAL, main = "Citations Received - Regression with Untransformed Variables")
+abline(0,0)
+dev.off()
 ```
 
 ## Save Data
