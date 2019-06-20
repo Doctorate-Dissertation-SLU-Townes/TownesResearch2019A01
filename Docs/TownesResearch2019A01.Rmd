@@ -563,8 +563,18 @@ The following code chunk performs a multiple logistic regression analysis on the
 # Regression
 CRECEIVEregression <- lm(CRECEIVE ~ APPYEAR + CAT01 + CAT02 + CAT03 + CAT04 + CAT05 + CAT06 + CMADE + CLAIMS + ORIGINAL + GENERAL + RATIOCIT + BCKTGLAG + SELFCTLB + SECDLWBD, data = Sample90to95C)
 summary(CRECEIVEregression)
+
 # Residuals
 CRECEIVEresid <- residuals(CRECEIVEregression)
+
+# Q-Q Plot of Model Residuals
+png(filename = here("Results", "QQplot.png"))
+qqnorm(CRECEIVEresid, pch = 1, frame = FALSE, 
+       main = "Normal Q-Q Plot for Base Level Regression", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
+qqline(CRECEIVEresid, col = "green", lwd = 2)
+dev.off()
+
+# Plots of Residuals by Independent Variables
 png(filename = here("Results","ResidualsBase.png"))
 plot(ORIGINAL,CRECEIVEresid, ylab = "Residuals", xlab = "ORIGINAL", main = "Residuals by ORIGINAL")
 abline(0,0)
