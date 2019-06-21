@@ -31,6 +31,8 @@ library(ggplot2) # functions for data visualizations
 library(boot) # functions for regression analysis
 library(MASS) # functions for ordered logistic or probit regression
 library(broom) # functions for tidying ordinal logistic regression models
+library(gvlma) # functions for global validation of linear model assumptions
+library(lmtest) # functions for testing linear regression models
 ```
 
 ## Load Raw Data
@@ -328,7 +330,7 @@ view(Sample90to95corrmatrix, title = "Correlation Matrix")
 ```
 
 ## Clean Data Phase 2
-The following code chunk creates additional variables needed for the binary logistic regression, ordinal logistic regression, and multiple regression analyses and removes variables that will not be used.  It first creates a new variable called `CRECbinomial` that converts the `CRECEIVE` variable into a dichotomous variable. It then creates a series of dummy variables for the nominal `CAT` variable to use in multiple regression analysis. Finally, it creates a series of new variables by applying a transformation to the original interval and ratio variables.
+The following code chunk creates additional variables needed for the binary logistic regression, ordinal logistic regression, and multiple regression analyses and removes variables that will not be used.  It first creates a new variable called `CRECbinomial` that converts the `CRECEIVE` variable into a dichotomous variable. It then creates a series of dummy variables for the nominal `CAT` variable to use in multiple regression analysis.
 ```{r clean-data-02}
 Sample90to95B %>% 
   mutate(CRECbinomial = if(CRECEIVE == 0) {
@@ -338,21 +340,7 @@ Sample90to95B %>%
   mutate(CAT03 = if(CAT == 3) {CAT03 == 1} else {CAT03 == 0}) %>%
   mutate(CAT04 = if(CAT == 4) {CAT04 == 1} else {CAT04 == 0}) %>%
   mutate(CAT05 = if(CAT == 5) {CAT05 == 1} else {CAT05 == 0}) %>%
-  mutate(CAT06 = if(CAT == 6) {CAT06 == 1} else {CAT06 == 0}) %>%
-  mutate(APPYEARtrfm = sqrt(APPYEAR)) %>%
-  mutate(GYEARtrfm = sqrt(GYEAR)) %>%
-  mutate(CLAIMStrfm = sqrt(CLAIMS)) %>%
-  mutate(CMADEtrfm = sqrt(CMADE)) %>%
-  mutate(CRECEIVEtrfm = sqrt(CRECEIVE)) %>%
-  mutate(RATIOCITtrfm = sqrt(RATIOCIT)) %>%
-  mutate(GENERALtrfm = sqrt(GENERAL)) %>%
-  mutate(ORIGINALtrfm = sqrt(ORIGINAL)) %>%
-  mutate(FWDAPLAGtrfm = sqrt(FWDAPLAG)) %>%
-  mutate(BCKGTLAGtrfm = sqrt(BCKGTLAG)) %>%
-  mutate(SELFCTUBtrfm = sqrt(SELFCTUB)) %>%
-  mutate(SELFCTLBtrfm = sqrt(SELFCTLB)) %>%
-  mutate(SECDUPBDtrfm = sqrt(SECDUPBD)) %>%
-  mutate(SECDLWBDtrfm = sqrt(SECDLWBD)) -> Sample90to95C
+  mutate(CAT06 = if(CAT == 6) {CAT06 == 1} else {CAT06 == 0}) -> Sample90to95C
 ```
 
 ## Observation Counts
@@ -455,6 +443,91 @@ Sample90to95C %>%
   summarize(n())
 ```
 
+## Binary Logistic Regression Analysis
+The following code chunk uses the new dichotomous variable `CRECbinomial` as the dependent variable in the binary logistic regression. It then displays the results.
+```{r binary-regression}
+logitCRECEIVE <- glm(CRECbinomial ~ APPYEAR + CAT + CMADE + CLAIMS + ORIGINAL + GENERAL + RATIOCIT + BCKTGLAG + SELFCTLB + SECDLWBD, data = Sample90to95C, family = binomial)
+summary(logitCRECEIVE)
+```
+
+## Ordinal Logistic Regression Analysis
+The following code chunk performs an ordinal logistic regression analysis on the data sample using `CRECEIVE` as the dependent variable. It then displays the results.
+```{r ordinal-regression}
+CRECordinal <- polr(as.factor(CRECEIVE) ~ APPYEAR + CAT + CMADE + CLAIMS + ORIGINAL + GENERAL + RATIOCIT + BCKTGLAG + SELFCTLB + SECDLWBD, data = Sample90to95C, Hess = TRUE, model = TRUE, method = "logistic")
+summary(CRECordinal)
+```
+
+## Multiple Logistic Regression Analysis
+The following code chunk performs a multiple logistic regression analysis on the data sample using variables with `CRECEIVE` as the dependent variable to establish a baseline. It then displays the results. Next it plots the residuals and creates a `png` file of the residuals plot.
+```{r multiple-regression}
+# Regression
+CRECEIVEregression <- lm(CRECEIVE ~ APPYEAR + CAT01 + CAT02 + CAT03 + CAT04 + CAT05 + CAT06 + CMADE + CLAIMS + ORIGINAL + GENERAL + RATIOCIT + BCKTGLAG + SELFCTLB + SECDLWBD, data = Sample90to95C)
+summary(CRECEIVEregression)
+```
+
+## Check Linear Regression Assumptions
+The following code chunk performs various checks to verify that the model satisfies the assumptions of linear regression.
+```{r assumptions-check-01}
+# Residuals
+CRECEIVEresid <- residuals(CRECEIVEregression)
+summary(CRECEIVEresid)
+
+# Q-Q Plot of Model Residuals
+png(filename = here("Results", "MultRegresQQplotModelBase.png"))
+qqnorm(CRECEIVEresid, pch = 1, frame = FALSE, 
+       main = "Normal Q-Q Plot for Base Level Regression Model", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
+qqline(CRECEIVEresid, col = "green", lwd = 2)
+dev.off()
+
+# Global check of linear regression assumptions
+par(mfrow=c(2,2))
+gvlma(CRECEIVEregression)
+plot(CRECEIVEregression)
+
+# Check for homoscedasticity of residuals or equal variance
+par(mfrow=c(2,2))
+plot(CRECEIVEregression)
+
+# Check for autocorrelation of residuals using Durbin-Watson test
+dwtest(CRECEIVEregression)
+
+# Check that the independent variables and the residuals are uncorrelated
+cor.test(Sample90to95C)
+
+# Check that the variability in independent variable values is positive
+var(Sample90to95C)
+
+# Check for perfect multicollinearity among the variables
+vif(CRECEIVEregression)
+
+# Check for normality of residuals
+par(mfrow=c(2,2))
+plot(CRECEIVEregression)
+qqnorm(CRECEIVEregression, pch = 1, frame = FALSE, 
+       main = "Normal Q-Q Plot for RATIOCIT", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
+qqline(CRECEIVEregression, col = "green", lwd = 2)
+```
+
+## Clean Data Phase 3
+The following code chunk applies a transformation to the data to satisfy the assumptions of linear regression.
+```{r clean-data-03}
+Sample90to95C %>% 
+  mutate(APPYEARtrfm = sqrt(APPYEAR)) %>%
+  mutate(GYEARtrfm = sqrt(GYEAR)) %>%
+  mutate(CLAIMStrfm = sqrt(CLAIMS)) %>%
+  mutate(CMADEtrfm = sqrt(CMADE)) %>%
+  mutate(CRECEIVEtrfm = sqrt(CRECEIVE)) %>%
+  mutate(RATIOCITtrfm = sqrt(RATIOCIT)) %>%
+  mutate(GENERALtrfm = sqrt(GENERAL)) %>%
+  mutate(ORIGINALtrfm = sqrt(ORIGINAL)) %>%
+  mutate(FWDAPLAGtrfm = sqrt(FWDAPLAG)) %>%
+  mutate(BCKGTLAGtrfm = sqrt(BCKGTLAG)) %>%
+  mutate(SELFCTUBtrfm = sqrt(SELFCTUB)) %>%
+  mutate(SELFCTLBtrfm = sqrt(SELFCTLB)) %>%
+  mutate(SECDUPBDtrfm = sqrt(SECDUPBD)) %>%
+  mutate(SECDLWBDtrfm = sqrt(SECDLWBD)) -> Sample90to95C
+```
+
 ## Q-Q Plots for Transformed Variables
 The following code chunk displays Quantile-Quantile (Q-Q) plots for the transformed variables to check for suitability to use in multiple regression analysis.
 ```{r qq-plots-transformed}
@@ -541,73 +614,6 @@ qqnorm(Sample90to95C$SECDLWBDtrfm, pch = 1, frame = FALSE,
        main = "Normal Q-Q Plot for SECDLWBDtrfm", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
 qqline(Sample90to95C$SECDLWBDtrfm, col = "green", lwd = 2)
 dev.off()
-```
-
-## Binary Logistic Regression Analysis
-The following code chunk uses the new dichotomous variable `CRECbinomial` as the dependent variable in the binary logistic regression. It then displays the results.
-```{r binary-regression}
-logitCRECEIVE <- glm(CRECbinomial ~ APPYEAR + CAT + CMADE + CLAIMS + ORIGINAL + GENERAL + RATIOCIT + BCKTGLAG + SELFCTLB + SECDLWBD, data = Sample90to95C, family = binomial)
-summary(logitCRECEIVE)
-```
-
-## Ordinal Logistic Regression Analysis
-The following code chunk performs an ordinal logistic regression analysis on the data sample using `CRECEIVE` as the dependent variable. It then displays the results.
-```{r ordinal-regression}
-CRECordinal <- polr(as.factor(CRECEIVE) ~ APPYEAR + CAT + CMADE + CLAIMS + ORIGINAL + GENERAL + RATIOCIT + BCKTGLAG + SELFCTLB + SECDLWBD, data = Sample90to95C, Hess = TRUE, model = TRUE, method = "logistic")
-summary(CRECordinal)
-```
-
-## Multiple Logistic Regression Analysis
-The following code chunk performs a multiple logistic regression analysis on the data sample using variables with `CRECEIVE` as the dependent variable to establish a baseline. It then displays the results. Next it plots the residuals and creates a `png` file of the residuals plot.
-```{r multiple-regression}
-# Regression
-CRECEIVEregression <- lm(CRECEIVE ~ APPYEAR + CAT01 + CAT02 + CAT03 + CAT04 + CAT05 + CAT06 + CMADE + CLAIMS + ORIGINAL + GENERAL + RATIOCIT + BCKTGLAG + SELFCTLB + SECDLWBD, data = Sample90to95C)
-summary(CRECEIVEregression)
-
-# Residuals
-CRECEIVEresid <- residuals(CRECEIVEregression)
-summary(CRECEIVEresid)
-
-# Q-Q Plot of Model Residuals
-png(filename = here("Results", "MultRegresQQplotModelBase.png"))
-qqnorm(CRECEIVEresid, pch = 1, frame = FALSE, 
-       main = "Normal Q-Q Plot for Base Level Regression Model", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
-qqline(CRECEIVEresid, col = "green", lwd = 2)
-dev.off()
-
-# Plots of Residuals by Independent variables
-png(filename = here("Results","ResidualsBaseOrginal.png"))
-plot(ORIGINAL, CRECEIVEresid, ylab = "Residuals", xlab = "ORIGINAL", main = "Residuals by ORIGINAL")
-abline(0,0)
-dev.off()
-
-# Check for homoscedasticity of residuals or equal variance
-par(mfrow=c(2,2))
-plot(CRECEIVEregression)
-
-# Check for autocorrelation of residuals using Durbin-Watson test
-lmtest::dwtest(CRECEIVEregression)
-
-# Check that the independent variables and the residuals are uncorrelated
-cor.test(Sample90to95C)
-
-# Check that the variability in independent variable values is positive
-var(Sample90to95C)
-
-# Check that there is no perfect multicollinearity among the variables
-vif(CRECEIVEregression)
-
-# Check for normality of residuals
-par(mfrow=c(2,2))
-plot(CRECEIVEregression)
-qqnorm(CRECEIVEregression, pch = 1, frame = FALSE, 
-       main = "Normal Q-Q Plot for RATIOCIT", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
-qqline(CRECEIVEregression, col = "green", lwd = 2)
-
-# Secondary Check of Assumptions
-par(mfrow=c(2,2))
-gvlma::gvlma(CRECEIVEregression)
-plot(CRECEIVEregression)
 ```
 
 ## Save Data
