@@ -510,7 +510,7 @@ qqline(CRECEIVEregression, col = "green", lwd = 2)
 
 ## Clean Data Phase 3
 The following code chunk applies a transformation to the data to satisfy the assumptions of linear regression.
-```{r clean-data-03}
+#```{r clean-data-03}
 Sample90to95C %>% 
   mutate(APPYEARtrfm = sqrt(APPYEAR)) %>%
   mutate(GYEARtrfm = sqrt(GYEAR)) %>%
@@ -526,11 +526,11 @@ Sample90to95C %>%
   mutate(SELFCTLBtrfm = sqrt(SELFCTLB)) %>%
   mutate(SECDUPBDtrfm = sqrt(SECDUPBD)) %>%
   mutate(SECDLWBDtrfm = sqrt(SECDLWBD)) -> Sample90to95C
-```
+#```
 
 ## Q-Q Plots for Transformed Variables
 The following code chunk displays Quantile-Quantile (Q-Q) plots for the transformed variables to check for suitability to use in multiple regression analysis.
-```{r qq-plots-transformed}
+#```{r qq-plots-transformed}
 png(filename = here("Results", "QQplotAPPYEARtransformed.png"))
 qqnorm(Sample90to95C$APPYEARtrfm, pch = 1, frame = FALSE, 
        main = "Normal Q-Q Plot for APPYEARtrfm", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
@@ -614,7 +614,7 @@ qqnorm(Sample90to95C$SECDLWBDtrfm, pch = 1, frame = FALSE,
        main = "Normal Q-Q Plot for SECDLWBDtrfm", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
 qqline(Sample90to95C$SECDLWBDtrfm, col = "green", lwd = 2)
 dev.off()
-```
+#```
 
 ## Save Data
 The following code chunk saves the final cleaned data that was used in the analysis.
