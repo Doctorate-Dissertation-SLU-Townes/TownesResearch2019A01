@@ -9,7 +9,7 @@ output:
 ---
 
 ## Introduction
-This is an R Notebook for an investigation on improving construct validity in studies of technology transfer.
+This is an R Notebook for an investigation of improving construct validity in studies of technology transfer.
 
 ## Project Set Up
 The following code chunk enables the R Notebook to integrate seemlessly with the project organization format. This is normally included in the R Notebook to simplify file calls and enable file portability but it has been causing an error. Per Dr. Christopher Prener of Saint Louis University, the error is generated because the `here::here()` function has not been tested with certain combinations of functions. To work around this problem, I've embedded the `here()` function where I enter a file path when necessary.
@@ -457,8 +457,15 @@ CRECordinal <- polr(as.factor(CRECEIVE) ~ APPYEAR + CAT + CMADE + CLAIMS + ORIGI
 summary(CRECordinal)
 ```
 
-## Multiple Logistic Regression Analysis
-The following code chunk performs a multiple logistic regression analysis on the data sample using variables with `CRECEIVE` as the dependent variable to establish a baseline. It then displays the results. Next it plots the residuals and creates a `png` file of the residuals plot.
+## Multiple Regression Model Selection
+The following code chunk performs regressions using the sequential replacement method with `CRECEIVE` as the dependent variable and subsets of the independent variables.  It then displays the summary statistics to enable identification of the best regression model.
+```{r regression-subsets}
+regsubsets(CRECEIVE ~ APPYEAR + CAT01 + CAT02 + CAT03 + CAT04 + CAT05 + CAT06 + CMADE + CLAIMS + ORIGINAL + GENERAL + RATIOCIT + BCKTGLAG + SELFCTLB + SECDLWBD, data = Sample90to95C, method = "seqrep")
+summary(ll,all.best=TRUE, matrix=FALSE)
+```
+
+## Multiple Regression Analysis
+The following code chunk performs a multiple regression analysis on the data sample using the selected model. It then displays the results.
 ```{r multiple-regression}
 # Regression
 CRECEIVEregression <- lm(CRECEIVE ~ APPYEAR + CAT01 + CAT02 + CAT03 + CAT04 + CAT05 + CAT06 + CMADE + CLAIMS + ORIGINAL + GENERAL + RATIOCIT + BCKTGLAG + SELFCTLB + SECDLWBD, data = Sample90to95C)
@@ -471,13 +478,6 @@ The following code chunk performs various checks to verify that the model satisf
 # Residuals
 CRECEIVEresid <- residuals(CRECEIVEregression)
 summary(CRECEIVEresid)
-
-# Q-Q Plot of Model Residuals
-png(filename = here("Results", "MultRegresQQplotModelBase.png"))
-qqnorm(CRECEIVEresid, pch = 1, frame = FALSE, 
-       main = "Normal Q-Q Plot for Base Level Regression Model", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
-qqline(CRECEIVEresid, col = "green", lwd = 2)
-dev.off()
 
 # Global check of linear regression assumptions
 par(mfrow=c(2,2))
@@ -501,11 +501,20 @@ var(Sample90to95C)
 vif(CRECEIVEregression)
 
 # Check for normality of residuals
+png(filename = here("Results", "MultRegresQQplotModelResiduals01.png"))
 par(mfrow=c(2,2))
 plot(CRECEIVEregression)
 qqnorm(CRECEIVEregression, pch = 1, frame = FALSE, 
-       main = "Normal Q-Q Plot for RATIOCIT", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
+       main = "Normal Q-Q Plot for Regression Model Residuals - Version 1", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
 qqline(CRECEIVEregression, col = "green", lwd = 2)
+dev.off()
+
+# Check for normality of residuals
+png(filename = here("Results", "MultRegresQQplotModelResiduals02.png"))
+qqnorm(CRECEIVEresid, pch = 1, frame = FALSE, 
+       main = "Normal Q-Q Plot for Regression Model Residuals - Version 2", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
+qqline(CRECEIVEresid, col = "green", lwd = 2)
+dev.off()
 ```
 
 ## Clean Data Phase 3
