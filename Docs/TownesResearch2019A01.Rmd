@@ -446,8 +446,10 @@ Sample90to95C %>%
 ## Binary Logistic Regression Analysis
 The following code chunk uses the new dichotomous variable `CRECbinomial` as the dependent variable in the binary logistic regression. It then displays the results.
 ```{r binary-regression}
-logitCRECEIVE <- glm(CRECbinary ~ APPYEAR + CAT + CMADE + CLAIMS + ORIGINAL + GENERAL + RATIOCIT + BCKGTLAG + SELFCTLB + SECDLWBD, data = Sample90to95C, family = binomial)
+logitCRECEIVE <- glm(CRECbinary ~ APPYEAR + CAT01 + CAT02 + CAT03 + CAT04 + CAT05 + CAT06 + CMADE + CLAIMS + ORIGINAL + GENERAL + RATIOCIT + BCKGTLAG + SELFCTLB + SECDLWBD, data = Sample90to95C, family = binomial)
 summary(logitCRECEIVE)
+confint(logitCRECEIVE)
+wald.test(b=coef(logitCRECEIVE), sigma = vcov(logitCRECEIVE), terms = 2:7)
 ```
 
 ## Ordinal Logistic Regression Analysis
