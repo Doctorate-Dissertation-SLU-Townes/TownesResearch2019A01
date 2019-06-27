@@ -79,6 +79,7 @@ get_dupes(Sample90to95A)
 ## Adjust for Missing Data
 The following code chunk modifies cases with missing data, removes duplicate cases, and then evaluates the data sample to determine if additional cleaning is necessary. It first assigns a value of `0` to instances of `NA` in the data. Then it removes duplicate cases. It then checks for missing data for each variable in each case and missing data for each case. Then it checks for duplicate cases with the `PATENT` variable to determine if that variable can be used as a unique identifier for each observation.  Finally, it checks for duplicate observations across all variables to ensure that each case is unique.
 ```{r remove-cases}
+Sample90to95B <- Sample90to95A
 Sample90to95B[is.na(x=Sample90to95A)] <- 0
 Sample90to95B %>%
   distinct() -> Sample90to95B
@@ -330,17 +331,16 @@ view(Sample90to95corrmatrix, title = "Correlation Matrix")
 ```
 
 ## Clean Data Phase 2
-The following code chunk creates additional variables needed for the binary logistic regression, ordinal logistic regression, and multiple regression analyses and removes variables that will not be used.  It first creates a new variable called `CRECbinomial` that converts the `CRECEIVE` variable into a dichotomous variable. It then creates a series of dummy variables for the nominal `CAT` variable to use in multiple regression analysis.
+The following code chunk creates additional variables needed for the binary logistic regression, ordinal logistic regression, and multiple regression analyses and removes variables that will not be used.  It first creates a new variable called `CRECbinary` that converts the `CRECEIVE` variable into a dichotomous variable. It then creates a series of dummy variables for the nominal `CAT` variable to use in multiple regression analysis.
 ```{r clean-data-02}
-Sample90to95B %>% 
-  mutate(CRECbinomial = if(CRECEIVE == 0) {
-    CRECbinomial == 0} else {CRECbinomial == 1}) %>%
-  mutate(CAT01 = if(CAT == 1) {CAT01 == 1} else {CAT01 == 0}) %>%
-  mutate(CAT02 = if(CAT == 2) {CAT02 == 1} else {CAT02 == 0}) %>%
-  mutate(CAT03 = if(CAT == 3) {CAT03 == 1} else {CAT03 == 0}) %>%
-  mutate(CAT04 = if(CAT == 4) {CAT04 == 1} else {CAT04 == 0}) %>%
-  mutate(CAT05 = if(CAT == 5) {CAT05 == 1} else {CAT05 == 0}) %>%
-  mutate(CAT06 = if(CAT == 6) {CAT06 == 1} else {CAT06 == 0}) -> Sample90to95C
+Sample90to95B %>%
+  mutate(CRECbinary = ifelse(CRECEIVE == 0, 0, 1)) %>%
+  mutate(CAT01 = ifelse(CAT == 1, 1, 0)) %>%
+  mutate(CAT02 = ifelse(CAT == 2, 1, 0)) %>%
+  mutate(CAT03 = ifelse(CAT == 3, 1, 0)) %>%
+  mutate(CAT04 = ifelse(CAT == 4, 1, 0)) %>%
+  mutate(CAT05 = ifelse(CAT == 5, 1, 0)) %>%
+  mutate(CAT06 = ifelse(CAT == 6, 1, 0)) -> Sample90to95C
 ```
 
 ## Observation Counts
@@ -359,7 +359,7 @@ Sample90to95C %>%
   summarize(n())
 
 Sample90to95C %>%
-  group_by(CRECEIVEbinomial) %>%
+  group_by(CRECbinary) %>%
   summarize(n())
 
 Sample90to95C %>%  
@@ -446,21 +446,21 @@ Sample90to95C %>%
 ## Binary Logistic Regression Analysis
 The following code chunk uses the new dichotomous variable `CRECbinomial` as the dependent variable in the binary logistic regression. It then displays the results.
 ```{r binary-regression}
-logitCRECEIVE <- glm(CRECbinomial ~ APPYEAR + CAT + CMADE + CLAIMS + ORIGINAL + GENERAL + RATIOCIT + BCKTGLAG + SELFCTLB + SECDLWBD, data = Sample90to95C, family = binomial)
+logitCRECEIVE <- glm(CRECbinary ~ APPYEAR + CAT + CMADE + CLAIMS + ORIGINAL + GENERAL + RATIOCIT + BCKGTLAG + SELFCTLB + SECDLWBD, data = Sample90to95C, family = binomial)
 summary(logitCRECEIVE)
 ```
 
 ## Ordinal Logistic Regression Analysis
 The following code chunk performs an ordinal logistic regression analysis on the data sample using `CRECEIVE` as the dependent variable. It then displays the results.
 ```{r ordinal-regression}
-CRECordinal <- polr(as.factor(CRECEIVE) ~ APPYEAR + CAT + CMADE + CLAIMS + ORIGINAL + GENERAL + RATIOCIT + BCKTGLAG + SELFCTLB + SECDLWBD, data = Sample90to95C, Hess = TRUE, model = TRUE, method = "logistic")
+CRECordinal <- polr(as.factor(CRECEIVE) ~ APPYEAR + CAT + CMADE + CLAIMS + ORIGINAL + GENERAL + RATIOCIT + BCKGTLAG + SELFCTLB + SECDLWBD, data = Sample90to95C, Hess = TRUE, model = TRUE, method = "logistic")
 summary(CRECordinal)
 ```
 
 ## Multiple Regression Model Selection
 The following code chunk performs regressions using the sequential replacement method with `CRECEIVE` as the dependent variable and subsets of the independent variables.  It then displays the summary statistics to enable identification of the best regression model.
 ```{r regression-subsets}
-regsubsets(CRECEIVE ~ APPYEAR + CAT01 + CAT02 + CAT03 + CAT04 + CAT05 + CAT06 + CMADE + CLAIMS + ORIGINAL + GENERAL + RATIOCIT + BCKTGLAG + SELFCTLB + SECDLWBD, data = Sample90to95C, method = "seqrep")
+regsubsets(CRECEIVE ~ APPYEAR + CAT01 + CAT02 + CAT03 + CAT04 + CAT05 + CAT06 + CMADE + CLAIMS + ORIGINAL + GENERAL + RATIOCIT + BCKGTLAG + SELFCTLB + SECDLWBD, data = Sample90to95C, method = "seqrep")
 summary(ll,all.best=TRUE, matrix=FALSE)
 ```
 
@@ -468,7 +468,7 @@ summary(ll,all.best=TRUE, matrix=FALSE)
 The following code chunk performs a multiple regression analysis on the data sample using the selected model. It then displays the results.
 ```{r multiple-regression}
 # Regression
-CRECEIVEregression <- lm(CRECEIVE ~ APPYEAR + CAT01 + CAT02 + CAT03 + CAT04 + CAT05 + CAT06 + CMADE + CLAIMS + ORIGINAL + GENERAL + RATIOCIT + BCKTGLAG + SELFCTLB + SECDLWBD, data = Sample90to95C)
+CRECEIVEregression <- lm(CRECEIVE ~ APPYEAR + CAT01 + CAT02 + CAT03 + CAT04 + CAT05 + CAT06 + CMADE + CLAIMS + ORIGINAL + GENERAL + RATIOCIT + BCKGTLAG + SELFCTLB + SECDLWBD, data = Sample90to95C)
 summary(CRECEIVEregression)
 ```
 
