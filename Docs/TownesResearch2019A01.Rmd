@@ -443,26 +443,134 @@ Sample90to95C %>%
   summarize(n())
 ```
 
+## Clean Data Phase 3
+The following code chunk eliminates cases where the outcome level for `CRECEIVE` has less than a total of 10 cases for the logistic regression analyses because those cases do not have enough observations for each outcome.
+```{r sample-data-90-95}
+Sample90to95C %>% 
+  filter(CRECEIVE %in% c(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,18,21)) -> Sample90to95D
+Sample90to95D <- as_tibble(Sample90to95D) # convert data frame to tibble
+```
+
+## Observation Counts 2
+The following code chunk re-checks the number of observations for each outcome of each independent variable to determine if the sample size is large enough for logistic regression analysis, which requires at least 10 observations for the least frequent outcome for each independent variable.
+```{r sample-size}
+Sample90to95D %>%
+  group_by(APPYEAR) %>%
+  summarize(n())
+
+Sample90to95D %>%
+  group_by(GYEAR) %>%
+  summarize(n())
+
+Sample90to95D %>%
+  group_by(CRECEIVE) %>%
+  summarize(n())
+
+Sample90to95D %>%
+  group_by(CRECbinary) %>%
+  summarize(n())
+
+Sample90to95D %>%  
+  group_by(NCLASS) %>%
+  summarize(n())
+
+Sample90to95D %>%  
+  group_by(CAT) %>%
+  summarize(n())
+
+Sample90to95D %>%  
+  group_by(CAT01) %>%
+  summarize(n())
+
+Sample90to95D %>%  
+  group_by(CAT02) %>%
+  summarize(n())
+
+Sample90to95D %>%  
+  group_by(CAT03) %>%
+  summarize(n())
+
+Sample90to95D %>%  
+  group_by(CAT04) %>%
+  summarize(n())
+
+Sample90to95D %>%  
+  group_by(CAT05) %>%
+  summarize(n())
+
+Sample90to95D %>%  
+  group_by(CAT06) %>%
+  summarize(n())
+
+Sample90to95D %>%  
+  group_by(SUBCAT) %>%
+  summarize(n())
+
+Sample90to95D %>%  
+  group_by(CLAIMS) %>%
+  summarize(n())
+
+Sample90to95D %>%    
+  group_by(CMADE) %>%
+  summarize(n())
+
+Sample90to95D %>%  
+  group_by(RATIOCIT) %>%
+  summarize(n())
+
+Sample90to95D %>%  
+  group_by(GENERAL) %>%
+  summarize(n())
+
+Sample90to95D %>%  
+  group_by(ORIGINAL) %>%
+  summarize(n())
+
+Sample90to95D %>%  
+  group_by(FWDAPLAG) %>%
+  summarize(n())
+
+Sample90to95D %>%  
+  group_by(BCKGTLAG) %>%
+  summarize(n())
+
+Sample90to95D %>%  
+  group_by(SELFCTUB) %>%
+  summarize(n())
+
+Sample90to95D %>%  
+  group_by(SELFCTLB) %>%
+  summarize(n())
+
+Sample90to95D %>%  
+  group_by(SECDUPBD) %>%
+  summarize(n())
+
+Sample90to95D %>%  
+  group_by(SECDLWBD) %>%
+  summarize(n())
+```
+
 ## Binary Logistic Regression Analysis
 The following code chunk uses the new dichotomous variable `CRECbinomial` as the dependent variable in the binary logistic regression. It then displays the results.
 ```{r binary-regression}
-logitCRECEIVE <- glm(CRECbinary ~ APPYEAR + CAT01 + CAT02 + CAT03 + CAT04 + CAT05 + CAT06 + CMADE + CLAIMS + ORIGINAL + GENERAL + RATIOCIT + BCKGTLAG + SELFCTLB + SECDLWBD, data = Sample90to95C, family = binomial)
+logitCRECEIVE <- glm(CRECbinary ~ GYEAR + as.factor(CAT) + CMADE + CLAIMS + ORIGINAL + GENERAL + RATIOCIT + BCKGTLAG + SELFCTLB + SECDLWBD, data = Sample90to95C, family = binomial)
 summary(logitCRECEIVE)
 confint(logitCRECEIVE)
-wald.test(b=coef(logitCRECEIVE), sigma = vcov(logitCRECEIVE), terms = 2:7)
+wald.test(b=coef(logitCRECEIVE), sigma = vcov(logitCRECEIVE), terms = 2:6)
 ```
 
 ## Ordinal Logistic Regression Analysis
 The following code chunk performs an ordinal logistic regression analysis on the data sample using `CRECEIVE` as the dependent variable. It then displays the results.
 ```{r ordinal-regression}
-CRECordinal <- polr(as.factor(CRECEIVE) ~ APPYEAR + CAT + CMADE + CLAIMS + ORIGINAL + GENERAL + RATIOCIT + BCKGTLAG + SELFCTLB + SECDLWBD, data = Sample90to95C, Hess = TRUE, model = TRUE, method = "logistic")
+CRECordinal <- polr(as.factor(CRECEIVE) ~ GYEAR + as.factor(CAT) + CMADE + CLAIMS + ORIGINAL + GENERAL + RATIOCIT + BCKGTLAG + SELFCTLB + SECDLWBD, data = Sample90to95C, Hess = TRUE, model = TRUE, method = "logistic")
 summary(CRECordinal)
 ```
 
 ## Multiple Regression Model Selection
 The following code chunk performs regressions using the sequential replacement method with `CRECEIVE` as the dependent variable and subsets of the independent variables.  It then displays the summary statistics to enable identification of the best regression model.
 ```{r regression-subsets}
-regsubsets(CRECEIVE ~ APPYEAR + CAT01 + CAT02 + CAT03 + CAT04 + CAT05 + CAT06 + CMADE + CLAIMS + ORIGINAL + GENERAL + RATIOCIT + BCKGTLAG + SELFCTLB + SECDLWBD, data = Sample90to95C, method = "seqrep")
+regsubsets(CRECEIVE ~ GYEAR + CAT01 + CAT02 + CAT03 + CAT04 + CAT05 + CAT06 + CMADE + CLAIMS + ORIGINAL + GENERAL + RATIOCIT + BCKGTLAG + SELFCTLB + SECDLWBD, data = Sample90to95C, method = "seqrep")
 summary(ll,all.best=TRUE, matrix=FALSE)
 ```
 
@@ -470,7 +578,7 @@ summary(ll,all.best=TRUE, matrix=FALSE)
 The following code chunk performs a multiple regression analysis on the data sample using the selected model. It then displays the results.
 ```{r multiple-regression}
 # Regression
-CRECEIVEregression <- lm(CRECEIVE ~ APPYEAR + CAT01 + CAT02 + CAT03 + CAT04 + CAT05 + CAT06 + CMADE + CLAIMS + ORIGINAL + GENERAL + RATIOCIT + BCKGTLAG + SELFCTLB + SECDLWBD, data = Sample90to95C)
+CRECEIVEregression <- lm(CRECEIVE ~ GYEAR + as.factor(CAT) + CMADE + CLAIMS + ORIGINAL + GENERAL + RATIOCIT + BCKGTLAG + SELFCTLB + SECDLWBD, data = Sample90to95C)
 summary(CRECEIVEregression)
 ```
 
