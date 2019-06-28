@@ -5,6 +5,7 @@ date: '(`r format(Sys.time(), "%B %d, %Y")`)'
 output: 
     github_document: default
     html_notebook: default
+    word_document: default
     always_allow_html: yes
 ---
 
@@ -14,7 +15,7 @@ This is an R Notebook for an investigation of improving construct validity in st
 ## Project Set Up
 The following code chunk enables the R Notebook to integrate seemlessly with the project organization format. This is normally included in the R Notebook to simplify file calls and enable file portability but it has been causing an error. Per Dr. Christopher Prener of Saint Louis University, the error is generated because the `here::here()` function has not been tested with certain combinations of functions. To work around this problem, I've embedded the `here()` function where I enter a file path when necessary.
 
-```{r setup-project}
+```{r setup-project, echo=FALSE, warning=FALSE}
 knitr::opts_knit$set(root.dir = here::here())
 ```
 
