@@ -68,7 +68,6 @@ The following code chunk reorganizes the variables and eliminates variables not 
 ```{r clean-data-01}
 Sample90to95 %>%
   dplyr::select(PATENT, APPYEAR, GYEAR, CRECEIVE, NCLASS, CAT, SUBCAT, CLAIMS, CMADE, RATIOCIT, GENERAL, ORIGINAL, FWDAPLAG, BCKGTLAG, SELFCTUB, SELFCTLB, SECDUPBD, SECDLWBD) -> Sample90to95A # Another package also has a `select()` function
-view(Sample90to95A)
 ```
 
 ## Inspect Sample Data
