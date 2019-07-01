@@ -80,13 +80,17 @@ get_dupes(Sample90to95A)
 ```
 
 ## Adjust for Missing Data
-The following code chunk modifies cases with missing data, removes duplicate cases, and then evaluates the data sample to determine if additional cleaning is necessary. It first assigns a value of `0` to instances of `NA` in the data for the `GENERAL` variable. It then assigns a value of `1` to instances of `NA` in the data for the `ORIGINAL` variable. Then it removes duplicate cases. It then checks for missing data for each variable in each case and missing data for each case. Then it checks for duplicate cases with the `PATENT` variable to determine if that variable can be used as a unique identifier for each observation.  Finally, it checks for duplicate observations across all variables to ensure that each case is unique.
-```{r remove-cases}
+The following code chunk modifies cases with missing data, removes duplicate cases, and then evaluates the data sample to determine if additional cleaning is necessary. It first assigns a value of `0` to instances of `NA` in the data for the `GENERAL` variable. It then assigns a value of `1` to instances of `NA` in the data for the `ORIGINAL` variable. For the `FWDAPLAG` and `BCKGTLAG` variables it assigns the maximum value in the data for each variable to instances of missing data. Then it the `RATIOCIT`, `SELFCTUB`, `SELFCTLB`, `SECDUPBD`, and `SECDLWBD` variables from the data since they will not be used in the analyais.  It then removes duplicate cases. The code chunk then checks for missing data for each variable in each case and missing data for each case. Then it checks for duplicate cases with the `PATENT` variable to determine if that variable can be used as a unique identifier for each observation.  Finally, it checks for duplicate observations across all variables to ensure that each case is unique.
+```{r missing-data}
 Sample90to95B <- Sample90to95A
 Sample90to95B$GENERAL[is.na(x=Sample90to95B$GENERAL)] <- 0
 Sample90to95B$ORIGINAL[is.na(x=Sample90to95B$ORIGINAL)] <- 1
+Sample90to95B$FWDAPLAG[is.na(x=Sample90to95B$FWDAPLAG)] <- max(Sample90to95B$FWDAPLAG, na.rm = TRUE)
+Sample90to95B$BCKGTLAG[is.na(x=Sample90to95B$BCKGTLAG)] <- max(Sample90to95B$BCKGTLAG, na.rm = TRUE)
 
-Sample90to95B <- distinct(Sample90to95B)
+Sample90to95B %>%
+  dplyr::select(-c(RATIOCIT, SELFCTUB, SELFCTLB, SECDUPBD, SECDLWBD)) %>%
+  distinct() -> Sample90to95B
 
 miss_var_summary(Sample90to95B, order = TRUE)
 miss_case_summary(Sample90to95B, order = TRUE)
