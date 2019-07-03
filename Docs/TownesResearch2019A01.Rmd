@@ -30,6 +30,7 @@ library(janitor) # functions for data cleaning
 library(naniar) # functions for analyzing missing data
 library(ggplot2) # functions for data visualizations
 library(boot) # functions for regression analysis
+library(ordinal) # functions for regression models for ordinal data
 library(MASS) # functions for ordered logistic or probit regression
 library(broom) # functions for tidying ordinal logistic regression models
 library(gvlma) # functions for global validation of linear model assumptions
@@ -376,17 +377,19 @@ coefs <- coef(logitCRECEIVE)
 exp(coefs)
 pR2(logitCRECEIVE)
 confint(logitCRECEIVE, level = 0.95)
-#wald.test(b=coef(logitCRECEIVE), sigma = vcov(logitCRECEIVE), terms = 2:6)
 ```
 
 ## Ordinal Logistic Regression Analysis
 The following code chunk performs an ordinal logistic regression analysis on the data sample using `CRECEIVE` as the dependent variable. It then displays the results.
 ```{r ordinal-regression}
-CRECEIVEordinal <- polr(as.factor(CRECordinal) ~ GYEAR + as.factor(CAT) + CMADE + CLAIMS + ORIGINAL + GENERAL + FWDAPLAG + BCKGTLAG, data = Sample90to95C, Hess = TRUE, model = TRUE, method = "logistic")
+CRECEIVEordinal <- clm(as.factor(CRECordinal) ~ GYEAR + as.factor(CAT) + CMADE + CLAIMS + ORIGINAL + GENERAL + FWDAPLAG + BCKGTLAG, data = Sample90to95C)
 summary(CRECEIVEordinal)
-tvalues <- summary(CRECEIVEordinal$coefficients)
-coefsOrdinal <- coef(CRECEIVEordinal)
-pt(abs(tvalues),1998-18,lower.tail = FALSE)*2
+
+#CRECEIVEordinal <- polr(as.factor(CRECordinal) ~ GYEAR + as.factor(CAT) + CMADE + CLAIMS + ORIGINAL + GENERAL + FWDAPLAG + BCKGTLAG, data = Sample90to95C, Hess = TRUE, model = TRUE, method = "logistic")
+#tvalues <- summary(CRECEIVEordinal$coefficients)
+#coefsOrdinal <- coef(summary(CRECEIVEordinal))
+#pvalues <- pt(abs(coefsOrdinal)[,"t value"],df.residuals(CRECEIVEordinal),lower.tail = FALSE)*2
+#coefsOrdinal <- cbind(coefsOrdinal, "p values" = round(pvalues, 3))
 
 # Calculate p-values for each variable
 #pGYEAR <- pt(3750.5274, 1998-18, lower.tail = FALSE)*2
