@@ -236,6 +236,7 @@ dev.off()
 ## Pairwise Correlation Coefficients
 The following code chunk calculates the pairwise correlation coefficients for all variables in the sample data using the Pearson product-moment correlation function.
 ```{r cor-matrix, echo = FALSE, warning = FALSE}
+print("Correlation Coefficients", quote = FALSE)
 Sample90to95corrmatrix <- cor(Sample90to95B)
 ```
 
@@ -255,6 +256,8 @@ Sample90to95B %>%
 ## Observation Counts 1
 The following code chunk determines the number of observations for each outcome of each nominal and ordinal independent variable to determine if the sample size is large enough for logistic regression analysis, which requires at least 10 observations for the least frequent outcome for each independent variable.
 ```{r sample-size-01, echo = FALSE, warning = FALSE}
+print("Count Observations for Each Outcome of Each Nominal and Ordinal Variable", quote = FALSE)
+
 Sample90to95C %>%
   group_by(GYEAR) %>%
   summarize(n())
@@ -315,6 +318,8 @@ Sample90to95C <- as_tibble(Sample90to95C) # convert data frame to tibble
 ## Observation Counts 2
 The following code chunk re-checks the number of observations for each outcome level of each nominal and ordinal independent variable to determine if the sample size is large enough for logistic regression analysis, which requires at least 10 observations for the least frequent outcome for each independent variable.
 ```{r sample-size-02, echo = FALSE, warning = FALSE}
+print("Count Observations for Each Outcome of Each Nominal and Ordinal Variable", quote = FALSE)
+
 Sample90to95C %>%
   group_by(GYEAR) %>%
   summarize(n())
@@ -467,78 +472,40 @@ summary(VIFregression)
 ```
 
 ## Clean Data 4
-The following code chunk applies a transformation to the data to satisfy the assumptions of linear regression.
-#```{r clean-data-04, echo = FALSE, warning = FALSE}
+The following code chunk removes cases in which `CRECEIVE` is greater than or equal to 10 as outliers and applies a transformation to the `CRECEIVE` variable to better satisfy the assumptions of linear regression.
+```{r clean-data-04, echo = FALSE, warning = FALSE}
 Sample90to95C %>% 
-  mutate(GYEARtrfm = sqrt(GYEAR)) %>%
-  mutate(CLAIMStrfm = sqrt(CLAIMS)) %>%
-  mutate(CRECEIVEtrfm = sqrt(CRECEIVE)) %>%
-  mutate(GENERALtrfm = sqrt(GENERAL)) %>%
-  mutate(ORIGINALtrfm = sqrt(ORIGINAL)) %>%
-  mutate(FWDAPLAGtrfm = sqrt(FWDAPLAG)) -> Sample90to95C
-#```
+  filter(CRECEIVE >= 10) %>%
+  mutate(CRECEIVEsqrt = sqrt(CRECEIVE)) -> Sample90to95D
+```
 
 ## Q-Q Plots for Transformed Variables
 The following code chunk displays Quantile-Quantile (Q-Q) plots for the transformed variables to check for suitability to use in multiple regression analysis.
-#```{r qq-plots-transformed, echo = FALSE, warning = FALSE}
-png(filename = here("Results", "QQplotGYEARtransformed.png"))
-qqnorm(Sample90to95C$GYEARtrfm, pch = 1, frame = FALSE, 
-       main = "Normal Q-Q Plot for GYEARtrfm", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
-qqline(Sample90to95C$GYEARtrfm, col = "green", lwd = 2)
+```{r qq-plots-transformed, echo = FALSE, warning = FALSE}
+png(filename = here("Results", "QQplotCRECEIVEsqrt.png"))
+qqnorm(Sample90to95D$CRECEIVEsqrt, pch = 1, frame = FALSE, 
+       main = "Normal Q-Q Plot for CRECEIVEsqrt", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
+qqline(Sample90to95D$CRECEIVEsqrt, col = "green", lwd = 2)
 dev.off()
-
-png(filename = here("Results", "QQplotCRECEIVEtransformed.png"))
-qqnorm(Sample90to95C$CRECEIVEtrfm, pch = 1, frame = FALSE, 
-       main = "Normal Q-Q Plot for CRECEIVEtrfm", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles", plot.it = TRUE)
-qqline(Sample90to95C$CRECEIVEtrfm, col = "green", lwd = 2, plot.it = TRUE)
-dev.off()
-
-png(filename = here("Results", "QQplotCLAIMStransformed.png"))
-qqnorm(Sample90to95C$CLAIMStrfm, pch = 1, frame = FALSE, 
-       main = "Normal Q-Q Plot for CLAIMStrfm", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
-qqline(Sample90to95C$CLAIMStrfm, col = "green", lwd = 2)
-dev.off()
-
-png(filename = here("Results", "QQplotGENERALtransformed.png"))
-qqnorm(Sample90to95C$GENERALtrfm, pch = 1, frame = FALSE, 
-       main = "Normal Q-Q Plot for GENERALtrfm", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
-qqline(Sample90to95C$GENERALtrfm, col = "green", lwd = 2)
-dev.off()
-
-png(filename = here("Results", "QQplotORIGINALtransformed.png"))
-qqnorm(Sample90to95C$ORIGINALtrfm, pch = 1, frame = FALSE, 
-       main = "Normal Q-Q Plot for ORIGINALtrfm", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
-qqline(Sample90to95C$ORIGINALtrfm, col = "green", lwd = 2)
-dev.off()
-
-png(filename = here("Results", "QQplotFWDAPLAGtransformed.png"))
-qqnorm(Sample90to95C$FWDAPLAGtrfm, pch = 1, frame = FALSE, 
-       main = "Normal Q-Q Plot for lnFWDAPLAG", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
-qqline(Sample90to95C$FWDAPLAGtrfm, col = "green", lwd = 2)
-dev.off()
-
-png(filename = here("Results", "QQplotBCKGTLAGtransformed.png"))
-qqnorm(Sample90to95C$BCKGTLAGtrfm, pch = 1, frame = FALSE, 
-       main = "Normal Q-Q Plot for lnBCKGTALG", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
-qqline(Sample90to95C$BCKGTLAGtrfm, col = "green", lwd = 2)
-dev.off()
-#```
+```
 
 ## Multiple Regression Using Transformed Variables 
-#```{r multiple-regression-trfm, echo = FALSE, warning = FALSE}
+```{r multiple-regression-trfm, echo = FALSE, warning = FALSE}
 # Regression
-CRECEIVEregressionTrfm <- lm(CRECEIVEtrfm ~ GYEAR + CAT02 + CAT03 + CAT04 + CLAIMS + ORIGINAL + GENERAL + FWDAPLAG, data = Sample90to95C, na.action = na.omit)
+CRECEIVEregressionTrfm <- lm(CRECEIVEsqrt ~ GYEAR + CAT02 + CAT03 + CAT04 + CLAIMS + ORIGINAL + GENERAL + FWDAPLAG, data = Sample90to95D, na.action = na.omit)
 summary(CRECEIVEregressionTrfm)
-#```
+```
 
 ## Check Linear Regression Assumptions for Transformed Variables
 The following code chunk performs various checks to verify that the model satisfies the assumptions of linear regression.
-#```{r assumptions-check-trfm, echo = FALSE, warning = FALSE}
+```{r assumptions-check-trfm, echo = FALSE, warning = FALSE}
 # Global check of linear regression assumptions
+print("Perform Global Check of Linear Regression Assumptions")
 par(mfrow=c(2,2))
 gvlma(CRECEIVEregressionTrfm)
 
 # Residuals
+print("Regression Residuals", quote = FALSE)
 CRECEIVEresidTrfm <- residuals(CRECEIVEregressionTrfm)
 summary(CRECEIVEresidTrfm)
 
@@ -550,36 +517,40 @@ plot(CRECEIVEregressionTrfm)
 dev.off()
 
 # Check for autocorrelation of residuals using Durbin-Watson test
+print("Check for Autocorrelation of Residuals", quote = FALSE)
 AutoCorr <- dwtest(CRECEIVEregressionTrfm)
 summary(AutoCorr)
 
 # Check that the independent variables and the residuals are uncorrelated
-CorrGYEAR <- cor.test(Sample90to95C$GYEAR, CRECEIVEregression$residuals)
+print("Check for Correlation between Independent Variables and Residuals", quote = FALSE)
+CorrGYEAR <- cor.test(Sample90to95D$GYEAR, CRECEIVEregressionTrfm$residuals)
 summary(CorrGYEAR)
 
-CorrCAT <- cor.test(Sample90to95C$CAT, CRECEIVEregression$residuals)
+CorrCAT <- cor.test(Sample90to95D$CAT, CRECEIVEregressionTrfm$residuals)
 summary(CorrCAT)
 
-CorrCLAIMS <- cor.test(Sample90to95C$CLAIMS, CRECEIVEregression$residuals)
+CorrCLAIMS <- cor.test(Sample90to95D$CLAIMS, CRECEIVEregressionTrfm$residuals)
 summary(CorrCLAIMS)
 
-CorrORIGINAL <- cor.test(Sample90to95C$ORIGINAL, CRECEIVEregression$residuals)
+CorrORIGINAL <- cor.test(Sample90to95D$ORIGINAL, CRECEIVEregressionTrfm$residuals)
 summary(CorrORIGINAL)
 
-CorrGENERAL <- cor.test(Sample90to95C$GENERAL, CRECEIVEregression$residuals)
+CorrGENERAL <- cor.test(Sample90to95D$GENERAL, CRECEIVEregressionTrfm$residuals)
 summary(CorrGENERAL)
 
-CorrFWDAPLAG <- cor.test(Sample90to95C$FWDAPLAG, CRECEIVEregression$residuals)
+CorrFWDAPLAG <- cor.test(Sample90to95D$FWDAPLAG, CRECEIVEregressionTrfm$residuals)
 summary(CorrFWDAPLAG)
 
 # Check that the variability in independent variable values is positive
-VarRegression <- var(Sample90to95C)
+print("Check for Positive Variablity of Independent Variable Values", quote = FALSE)
+VarRegression <- var(Sample90to95D)
 summary(VarRegression)
 
 # Check for perfect multicollinearity among the variables
+print("Check for Multicollinearity Among Variables", quote = FALSE)
 VIFregression <- vif(CRECEIVEregressionTrfm)
 summary(VIFregression)
-#```
+```
 
 ## Save Data
 The following code chunk saves the final cleaned data that was used in the analysis.
