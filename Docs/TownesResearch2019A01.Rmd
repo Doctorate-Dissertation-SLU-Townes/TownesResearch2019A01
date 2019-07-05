@@ -381,12 +381,15 @@ summary(logitCRECEIVE)
 coefs <- coef(logitCRECEIVE)
 
 # Raise e to the coefficients
+print("Raise e to the Coefficients", quote = FALSE)
 exp(coefs)
 
 # Obtain the McFadden pseudo R2
+print("Obtain the McFadden Pseudo R-squared", quote = FALSE)
 pR2(logitCRECEIVE)
 
 # Confidence intervals for the coefficients
+print("Confidence Intervals for the Coefficients", quote = FALSE)
 confint(logitCRECEIVE, level = 0.95)
 ```
 
@@ -394,14 +397,20 @@ confint(logitCRECEIVE, level = 0.95)
 The following code chunk performs an ordinal logistic regression analysis on the data sample using `CRECEIVE` as the dependent variable. It then displays the results. It performs the analysis two different ways for comparison.
 ```{r ordinal-regression, echo = FALSE, warning = FALSE}
 CRECEIVEordinal <- clm(as.factor(CRECordinal) ~ GYEAR + as.factor(CAT) + CMADE + CLAIMS + ORIGINAL + GENERAL + FWDAPLAG + BCKGTLAG, data = Sample90to95C)
+print("Ordinal Logistic Regression Method 01", quote = FALSE)
 summary(CRECEIVEordinal)
 
 CRECEIVEordinal01 <- polr(as.factor(CRECordinal) ~ GYEAR + as.factor(CAT) + CMADE + CLAIMS + ORIGINAL + GENERAL + FWDAPLAG + BCKGTLAG, data = Sample90to95C, Hess = TRUE, model = TRUE, method = "logistic")
+print("Ordinal Logistic Regression Method 02")
 summary(CRECEIVEordinal01)
+
 coefsOrdinal <- coefficients(summary(CRECEIVEordinal))
 tvalues <- summary(CRECEIVEordinal01)$coefficients[, "t value"]
 pvalues <- pt(abs(tvalues),df.residual(CRECEIVEordinal01),lower.tail = FALSE)*2
+pv <- pnorm(abs(tvalues), df.residual(CRECEIVEordinal01),lower.tail = FALSE)*2
 coefsOrdinal <- cbind(coefsOrdinal, "p values" = round(pvalues, 5))
+coefsOrdinal <- cbind(coefsOrdinal, "p values (Normal)" = round(pv, 5))
+print("Ordinal Logistic Regression - P-value Calculations")
 summary(coefsOrdinal)
 ```
 
@@ -425,11 +434,13 @@ summary(CRECEIVEregression)
 The following code chunk performs various checks to verify that the model satisfies the assumptions of linear regression.
 ```{r assumptions-check-01, echo = FALSE, warning = FALSE}
 # Global check of linear regression assumptions
+print("Perform Global Check of Linear Regression Assumptions", quote = FALSE)
 par(mfrow=c(2,2))
 gvlma(CRECEIVEregression)
 
 # Residuals
 CRECEIVEresid <- residuals(CRECEIVEregression)
+print("Regression Residuals", quote = FALSE)
 summary(CRECEIVEresid)
 
 # Check for homoscedasticity of residuals or equal variance
@@ -441,9 +452,12 @@ dev.off()
 
 # Check for autocorrelation of residuals using Durbin-Watson test
 AutoCorr <- dwtest(CRECEIVEregression)
+print("Check for Autocorrelation of Residuals", quote = FALSE)
 summary(AutoCorr)
 
 # Check that the independent variables and the residuals are uncorrelated
+print("Check for Correlation Among Independent Variables and Residuals", quote = FALSE)
+
 CorrGYEAR <- cor.test(Sample90to95C$GYEAR, CRECEIVEregression$residuals)
 summary(CorrGYEAR)
 
@@ -464,10 +478,12 @@ summary(CorrFWDAPLAG)
 
 # Check that the variability in independent variable values is positive
 VarRegression <- var(Sample90to95C)
+print("Check for Positive Variablity in Values of Independent Variables", quote = FALSE)
 summary(VarRegression)
 
 # Check for perfect multicollinearity among the variables
 VIFregression <- vif(CRECEIVEregression)
+print("Check for Mulitcollinearity Among the Variables", quote = FALSE)
 summary(VIFregression)
 ```
 
