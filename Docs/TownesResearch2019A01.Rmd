@@ -39,6 +39,7 @@ library(leaps) # functions for regression subset selection
 library(car) # companion to applied regression
 library(aod) # functions to analyze overdispersed data counts and proportions
 library(pscl) # contains function for McFadden's Pseudo R2 for logistic regression
+library(ResourceSelection) # contains function for Hosmer-Lemdshow goodness of fit test
 ```
 
 ## Load Raw Data
@@ -391,6 +392,11 @@ pR2(logitCRECEIVE)
 # Confidence intervals for the coefficients
 print("Confidence Intervals for the Coefficients", quote = FALSE)
 confint(logitCRECEIVE, level = 0.95)
+
+# Hosemer-Lemeshow Goodness of Fit Test
+print("Hosemer-Lemeshow Goodness of Fit Test", quote = FALSE)
+GOF <- hoslem.test(logitCRECEIVE$CRECbinary, fitted(logitCRECEIVE), g=10)
+summary(GOF)
 ```
 
 ## Ordinal Logistic Regression Analysis
@@ -404,14 +410,13 @@ CRECEIVEordinal01 <- polr(as.factor(CRECordinal) ~ GYEAR + as.factor(CAT) + CMAD
 print("Ordinal Logistic Regression Method 02")
 summary(CRECEIVEordinal01)
 
-coefsOrdinal <- coefficients(summary(CRECEIVEordinal))
-tvalues <- summary(CRECEIVEordinal01)$coefficients[, "t value"]
-pvalues <- pt(abs(tvalues),df.residual(CRECEIVEordinal01),lower.tail = FALSE)*2
-pv <- pnorm(abs(tvalues), df.residual(CRECEIVEordinal01),lower.tail = FALSE)*2
-coefsOrdinal <- cbind(coefsOrdinal, "p values" = round(pvalues, 5))
-coefsOrdinal <- cbind(coefsOrdinal, "p values (Normal)" = round(pv, 5))
-print("Ordinal Logistic Regression - P-value Calculations")
-summary(coefsOrdinal)
+coefsOrdinal <- coefficients(summary(CRECEIVEordinal01))
+pvalues <- pt(abs(coefsOrdinal)[,"t value"], df=CRECEIVEordinal01$df,lower.tail = FALSE)*2
+pval <- pnorm(abs(coefsOrdinal)[,"t value"],lower.tail = FALSE)*2
+coefsOrdinal01 <- cbind(coefsOrdinal, "p values (t dist)" = round(pvalues, 5))
+coefsOrdinal01 <- cbind(coefsOrdinal01, "p values (Normal)" = round(pval, 5))
+print("Ordinal Logistic Regression with P-values")
+print(coefsOrdinal01)
 ```
 
 ## Multiple Regression Model Selection
@@ -491,7 +496,7 @@ summary(VIFregression)
 The following code chunk removes cases in which `CRECEIVE` is greater than or equal to 10 as outliers and applies a transformation to the `CRECEIVE` variable to better satisfy the assumptions of linear regression.
 ```{r clean-data-04, echo = FALSE, warning = FALSE}
 Sample90to95C %>% 
-  filter(CRECEIVE >= 10) %>%
+  filter(CRECEIVE <= 10) %>%
   mutate(CRECEIVEsqrt = sqrt(CRECEIVE)) -> Sample90to95D
 ```
 
