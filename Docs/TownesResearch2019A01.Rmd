@@ -395,8 +395,9 @@ confint(logitCRECEIVE, level = 0.95)
 
 # Hosemer-Lemeshow Goodness of Fit Test
 print("Hosemer-Lemeshow Goodness of Fit Test", quote = FALSE)
-GOF <- hoslem.test(logitCRECEIVE$CRECbinary, fitted(logitCRECEIVE), g=10)
+GOF <- hoslem.test(Sample90to95C$CRECbinary, fitted(logitCRECEIVE), g=10)
 summary(GOF)
+cbind(GOF$expected, GOF$observed)
 ```
 
 ## Ordinal Logistic Regression Analysis
@@ -576,5 +577,6 @@ summary(VIFregression)
 ## Save Data
 The following code chunk saves the final cleaned data that was used in the analysis.
 ```{r save-data}
-write.csv(Sample90to95C, here("Data/DataClean/NBERpatents1963to1999/NBERPatCit90to95Sample.csv"), append = FALSE)
+write.csv(Sample90to95C, here("Data","DataClean","NBERpatents1963to1999","NBERPatCit90to95SampleC.csv"), append = FALSE)
+write.csv(Sample90to95D, here("Data","DataClean","NBERpatents1963to1999","NBERPatCit90to95SampleD.csv"), append = FALSE)
 ```
