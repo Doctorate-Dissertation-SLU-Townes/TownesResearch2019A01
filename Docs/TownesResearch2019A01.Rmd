@@ -15,13 +15,13 @@ This is an R Notebook for an investigation of improving construct validity in st
 ## Project Set Up
 The following code chunk enables the R Notebook to integrate seemlessly with the project organization format. This is normally included in the R Notebook to simplify file calls and enable file portability but it has been causing an error. Per Dr. Christopher Prener of Saint Louis University, the error is generated because the `here::here()` function has not been tested with certain combinations of functions. To work around this problem, I've embedded the `here()` function where I enter a file path when necessary.
 
-```{r setup-project, echo=FALSE, warning=FALSE}
+```{r setup-project, message = FALSE, warning = FALSE}
 knitr::opts_knit$set(root.dir = here::here())
 ```
 
 ## Load Dependencies
 The following code chunk loads package dependencies required to perform the necessary tasks. Basic tasks include importing, reading, wrangling, and cleaning data; selecting a subset of the data; checking for unique observations, and analyzing missing data. 
-```{r load-dependencies, echo = FALSE, warning = FALSE}
+```{r load-dependencies, message = FALSE, warning = FALSE}
 library(tidyverse) # loads the basic R packages
 library(here) # enables file portability
 library(readr) # functions for reading data
@@ -44,13 +44,13 @@ library(ResourceSelection) # contains function for Hosmer-Lemdshow goodness of f
 
 ## Load Raw Data
 The following code chunk imports the raw data from the `txt` file for the NBER data set for the period 1963 to 1999.
-```{r import-data, echo = FALSE, warning = FALSE}
+```{r import-data, message = FALSE, warning = FALSE}
 DataRaw <- read.table(here("DataRaw","NBERpatents1963to1999/apat63_99.txt"), sep = ",", header = TRUE, fill = TRUE, dec = ".")
 ```
 
 ## Subset Data
 The following code chunk creates a subset of the data for the period 1990 through 1995.
-```{r subset-data-90-95, echo = FALSE, warning = FALSE}
+```{r subset-data-90-95, message = FALSE, warning = FALSE}
 DataRaw %>% # subset data
   filter(GYEAR>=1990) %>%
   filter(GYEAR<=1995) -> DataSubset90to95
@@ -59,7 +59,7 @@ DataSubset90to95 <- as_tibble(DataSubset90to95) # convert data frame to tibble
 
 ## Sample Data
 The following code chunk takes a sample of 2,000 cases from the data subset for the period 1990 through 1995.
-``` {r sample-90-95, echo = FALSE, warning = FALSE}
+``` {r sample-90-95, message = FALSE, warning = FALSE}
 set.seed(1972)
 Sample90to95 <- sample(1:nrow(DataSubset90to95), size = 2000, replace = TRUE, prob = NULL)
 Sample90to95 <- DataSubset90to95[Sample90to95,]
@@ -68,14 +68,14 @@ Sample90to95 <- as_tibble(Sample90to95)
 
 ## Clean Data Phase 1
 The following code chunk reorganizes the variables and eliminates variables not used in the analysis.
-```{r clean-data-01, echo = FALSE, warning = FALSE}
+```{r clean-data-01, message = FALSE, warning = FALSE}
 Sample90to95 %>%
   dplyr::select(PATENT, GYEAR, CRECEIVE, CAT, CLAIMS, CMADE, GENERAL, ORIGINAL, FWDAPLAG, BCKGTLAG) -> Sample90to95A # Another package also has a `select()` function
 ```
 
 ## Inspect Sample Data
 The following code chunk evaluates the data sample to determine if additional data cleaning is necessary.  It first checks for missing data for each variable.  It then checks for missing data for each variable in each case.  Then it checks for duplicate cases with the `PATENT` variable to determine if that variable can be used as a unique identifier for each case.  Finally, it checks for duplicate cases across all variables to ensure that each case is unique.
-```{r inspect-data-90-95, echo = FALSE, warning = FALSE}
+```{r inspect-data-90-95, message = FALSE, warning = FALSE}
 miss_var_summary(Sample90to95A, order = TRUE)
 miss_case_summary(Sample90to95A, order = TRUE)
 get_dupes(Sample90to95A, PATENT)
@@ -84,7 +84,7 @@ get_dupes(Sample90to95A)
 
 ## Adjust for Missing Data
 The following code chunk modifies cases with missing data, removes duplicate cases, and then evaluates the data sample to determine if additional cleaning is necessary. It first assigns a value of `0` to instances of `NA` in the data for the `GENERAL` variable. It then assigns a value of `1` to instances of `NA` in the data for the `ORIGINAL` variable. For the `FWDAPLAG` and `BCKGTLAG` variables it assigns the maximum value in the data for each variable to instances of missing data. It then removes duplicate cases. The code chunk then checks for missing data for each variable in each case and missing data for each case. Then it checks for duplicate cases with the `PATENT` variable to determine if that variable can be used as a unique identifier for each observation.  Finally, it checks for duplicate observations across all variables to ensure that each case is unique.
-```{r missing-data, echo = FALSE, warning = FALSE}
+```{r missing-data, message = FALSE, warning = FALSE}
 Sample90to95B <- Sample90to95A
 Sample90to95B$GENERAL[is.na(x=Sample90to95B$GENERAL)] <- 0
 Sample90to95B$ORIGINAL[is.na(x=Sample90to95B$ORIGINAL)] <- 1
@@ -102,13 +102,13 @@ get_dupes(Sample90to95B)
 
 ## Central Tendency
 The following code chunk calculates measures of central tendency in the sample data for each of the variables.
-```{r central-tendency, echo = FALSE, warning = FALSE}
+```{r central-tendency, message = FALSE, warning = FALSE}
 summary(Sample90to95B)
 ```
 
 ## Histograms
-The following code chunk displays histograms for the variables of primary interest to enable visual inspection of the data to evaluate whether or not they fit normal distributions.
-```{r histograms, echo = FALSE, warning = FALSE}
+The following code chunk displays histograms for the variables of primary interest to enable visual inspection of the data to evaluate whether or not they fit normal distributions. The code chunk generates separate `png` files that are saved in the `Results` folder.
+```{r histograms, message = FALSE, warning = FALSE}
 histoGYEAR <- ggplot() +
   geom_histogram(Sample90to95B, mapping = aes(GYEAR))
 ggsave(here("results", "histogramGYEAR.png"), dpi = 300)
@@ -147,8 +147,8 @@ ggsave(here("Results", "histogramBCKGTLAG.png"), dpi = 300)
 ```
 
 ## Scatter Plots
-The following code chunk displays scatter plots with `CRECEIVE` as the dependent variable against each of the the primary independent variables of interest to visually inspect for linear relationships between the dependent variable and each of the independent variables.
-```{r scatter-plots, echo = FALSE, warning = FALSE}
+The following code chunk displays scatter plots with `CRECEIVE` as the dependent variable against each of the the primary independent variables of interest to visually inspect for linear relationships between the dependent variable and each of the independent variables. The code chunk generates separate `png` files that are saved in the `Results` folder.
+```{r scatter-plots, message = FALSE, warning = FALSE}
 ggplot() +
   geom_point(Sample90to95B, mapping = aes(x = GYEAR, y = CRECEIVE))
 ggsave(here("results", "scatterCRECEIVEbyGYEAR.png"), dpi = 300)
@@ -183,8 +183,8 @@ ggsave(here("results", "scatterCRECEIVEbyBCKGTLAG.png"), dpi = 300)
 ```
 
 ## Q-Q Plots
-The following code chunk displays Quantile-Quantile (Q-Q) plots to check for normal distribution in the data sample for each variable of primary interest.
-```{r qq-plots, echo = FALSE, warning = FALSE}
+The following code chunk displays Quantile-Quantile (Q-Q) plots to check for normal distribution in the data sample for each variable of primary interest. The code chunk generates separate `png` files that are saved in the `Results` folder.
+```{r qq-plots, message = FALSE, warning = FALSE}
 png(filename = here("Results", "QQplotGYEAR.png"))
 qqnorm(Sample90to95B$GYEAR, pch = 1, frame = FALSE, 
        main = "Normal Q-Q Plot for GYEAR", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
@@ -236,14 +236,15 @@ dev.off()
 
 ## Pairwise Correlation Coefficients
 The following code chunk calculates the pairwise correlation coefficients for all variables in the sample data using the Pearson product-moment correlation function.
-```{r cor-matrix, echo = FALSE, warning = FALSE}
+```{r cor-matrix, message = FALSE, warning = FALSE}
 print("Correlation Coefficients", quote = FALSE)
 Sample90to95corrmatrix <- cor(Sample90to95B)
+summary(Sample90to95corrmatrix)
 ```
 
 ## Clean Data 2
 The following code chunk creates additional variables needed for the binary logistic regression, ordinal logistic regression, and multiple regression analyses and removes variables that will not be used.  It first creates a new variable called `CRECbinary` that converts the `CRECEIVE` variable into a dichotomous variable. It then creates a series of dummy variables for the nominal `CAT` variable to use in multiple regression analysis.
-```{r clean-data-02, echo = FALSE, warning = FALSE}
+```{r clean-data-02, message = FALSE, warning = FALSE}
 Sample90to95B %>%
   mutate(CRECbinary = ifelse(CRECEIVE == 0, 0, 1)) %>%
   mutate(CAT01 = ifelse(CAT == 1, 1, 0)) %>%
@@ -256,8 +257,8 @@ Sample90to95B %>%
 
 ## Observation Counts 1
 The following code chunk determines the number of observations for each outcome of each nominal and ordinal independent variable to determine if the sample size is large enough for logistic regression analysis, which requires at least 10 observations for the least frequent outcome for each independent variable.
-```{r sample-size-01, echo = FALSE, warning = FALSE}
-print("Count Observations for Each Outcome of Each Nominal and Ordinal Variable", quote = FALSE)
+```{r sample-size-01, message = FALSE, warning = FALSE}
+print("Count Observations for Each Outcome Level of Each Nominal and Ordinal Variable", quote = FALSE)
 
 Sample90to95C %>%
   group_by(GYEAR) %>%
@@ -310,73 +311,25 @@ Sample90to95C %>%
 
 ## Clean Data 3
 The following code chunk groups cases where the outcome level for `CRECEIVE` is greater than or equal to 15 citations cases for the logistic regression analysis because most of those outcome levels do not have enough cases individually for logistic regression analysis which requires at least 10 cases for the least frequent outcome level of each independent variable.
-```{r sample-data-90-95, echo = FALSE, warning = FALSE}
+```{r sample-data-90-95, message = FALSE, warning = FALSE}
 Sample90to95C %>% 
   mutate(CRECordinal = ifelse (CRECEIVE>=15,15,CRECEIVE)) -> Sample90to95C
 Sample90to95C <- as_tibble(Sample90to95C) # convert data frame to tibble
 ```
 
 ## Observation Counts 2
-The following code chunk re-checks the number of observations for each outcome level of each nominal and ordinal independent variable to determine if the sample size is large enough for logistic regression analysis, which requires at least 10 observations for the least frequent outcome for each independent variable.
-```{r sample-size-02, echo = FALSE, warning = FALSE}
-print("Count Observations for Each Outcome of Each Nominal and Ordinal Variable", quote = FALSE)
-
-Sample90to95C %>%
-  group_by(GYEAR) %>%
-  summarize(n())
-
-Sample90to95C %>%
-  group_by(CRECEIVE) %>%
-  summarize(n())
-
-Sample90to95C %>%
-  group_by(CRECbinary) %>%
-  summarize(n())
+The following code chunk checks the number of observations for each outcome level of the new `CRECordinal` variable.
+```{r sample-size-02, message = FALSE, warning = FALSE}
+print("Count Observations for Each Variable Outcome Level", quote = FALSE)
 
 Sample90to95C %>%
   group_by(CRECordinal) %>%
   summarize(n())
-
-Sample90to95C %>%  
-  group_by(CAT) %>%
-  summarize(n())
-
-Sample90to95C %>%  
-  group_by(CAT01) %>%
-  summarize(n())
-
-Sample90to95C %>%  
-  group_by(CAT02) %>%
-  summarize(n())
-
-Sample90to95C %>%  
-  group_by(CAT03) %>%
-  summarize(n())
-
-Sample90to95C %>%  
-  group_by(CAT04) %>%
-  summarize(n())
-
-Sample90to95C %>%  
-  group_by(CAT05) %>%
-  summarize(n())
-
-Sample90to95C %>%  
-  group_by(CAT06) %>%
-  summarize(n())
-
-Sample90to95C %>%  
-  group_by(CLAIMS) %>%
-  summarize(n())
-
-Sample90to95C %>%    
-  group_by(CMADE) %>%
-  summarize(n())
 ```
 
 ## Binary Logistic Regression Analysis
-The following code chunk uses the new dichotomous variable `CRECbinomial` as the dependent variable in the binary logistic regression. It then displays the results.
-```{r binary-regression, echo = FALSE, warning = FALSE}
+The following code chunk uses the new dichotomous variable `CRECbinomial` as the dependent variable in a binary logistic regression analysis. It then displays the results. It also calculates the odds ratio, McFadden pseudo R-squared, confidence intervals for the coefficients, and Hosemer-Lemeshow goodness of fit test.
+```{r binary-regression, message = FALSE, warning = FALSE}
 logitCRECEIVE <- glm(CRECbinary ~ GYEAR + as.factor(CAT) + CMADE + CLAIMS + ORIGINAL + GENERAL + FWDAPLAG + BCKGTLAG, data = Sample90to95C, family = binomial, na.action = na.omit)
 summary(logitCRECEIVE)
 coefs <- coef(logitCRECEIVE)
@@ -402,13 +355,13 @@ cbind(GOF$expected, GOF$observed)
 
 ## Ordinal Logistic Regression Analysis
 The following code chunk performs an ordinal logistic regression analysis on the data sample using `CRECEIVE` as the dependent variable. It then displays the results. It performs the analysis two different ways for comparison.
-```{r ordinal-regression, echo = FALSE, warning = FALSE}
+```{r ordinal-regression, message = FALSE, warning = FALSE}
 CRECEIVEordinal <- clm(as.factor(CRECordinal) ~ GYEAR + as.factor(CAT) + CMADE + CLAIMS + ORIGINAL + GENERAL + FWDAPLAG + BCKGTLAG, data = Sample90to95C)
-print("Ordinal Logistic Regression Method 01", quote = FALSE)
+print("Ordinal Logistic Regression Results - Method 01", quote = FALSE)
 summary(CRECEIVEordinal)
 
 CRECEIVEordinal01 <- polr(as.factor(CRECordinal) ~ GYEAR + as.factor(CAT) + CMADE + CLAIMS + ORIGINAL + GENERAL + FWDAPLAG + BCKGTLAG, data = Sample90to95C, Hess = TRUE, model = TRUE, method = "logistic")
-print("Ordinal Logistic Regression Method 02")
+print("Ordinal Logistic Regression Results - Method 02")
 summary(CRECEIVEordinal01)
 
 coefsOrdinal <- coefficients(summary(CRECEIVEordinal01))
@@ -416,13 +369,13 @@ pvalues <- pt(abs(coefsOrdinal)[,"t value"], df=CRECEIVEordinal01$df,lower.tail 
 pval <- pnorm(abs(coefsOrdinal)[,"t value"],lower.tail = FALSE)*2
 coefsOrdinal01 <- cbind(coefsOrdinal, "p values (t dist)" = round(pvalues, 5))
 coefsOrdinal01 <- cbind(coefsOrdinal01, "p values (Normal)" = round(pval, 5))
-print("Ordinal Logistic Regression with P-values")
-print(coefsOrdinal01)
+print("Ordinal Logistic Regression Results with P-values")
+summary(coefsOrdinal01)
 ```
 
 ## Multiple Regression Model Selection
-The following code chunk performs regressions using the sequential replacement method with `CRECEIVE` as the dependent variable and subsets of the independent variables.  It then displays the summary statistics to enable identification of the best regression model.
-```{r regression-subsets, echo = FALSE, warning = FALSE}
+The following code chunk creates regression subsets using the exhaustive method with `CRECEIVE` as the dependent variable.  It then displays the summary statistics to facilitate selection of the best regression model on which to focus.
+```{r regression-subsets, message = FALSE, warning = FALSE}
 CRECregsubsets <- regsubsets(CRECEIVE ~ GYEAR + as.factor(CAT) + CMADE + CLAIMS + ORIGINAL + GENERAL + FWDAPLAG + BCKGTLAG, data = Sample90to95C, nbest = 2, method = "exhaustive")
 summary(CRECregsubsets,all.best=TRUE, matrix=TRUE)
 plot(CRECregsubsets, scale = "adjr2")
@@ -430,15 +383,15 @@ plot(CRECregsubsets, scale = "adjr2")
 
 ## Multiple Regression Analysis
 The following code chunk performs a multiple regression analysis on the data sample using the selected model. It then displays the results.
-```{r multiple-regression, echo = FALSE, warning = FALSE}
+```{r multiple-regression, message = FALSE, warning = FALSE}
 # Regression
 CRECEIVEregression <- lm(CRECEIVE ~ GYEAR + CAT02 + CAT03 + CAT04 + CLAIMS + ORIGINAL + GENERAL + FWDAPLAG, data = Sample90to95C, na.action = na.omit)
 summary(CRECEIVEregression)
 ```
 
 ## Check Linear Regression Assumptions
-The following code chunk performs various checks to verify that the model satisfies the assumptions of linear regression.
-```{r assumptions-check-01, echo = FALSE, warning = FALSE}
+The following code chunk performs various checks to determine if the model satisfies the assumptions of linear regression.
+```{r assumptions-check-01, message = FALSE, warning = FALSE}
 # Global check of linear regression assumptions
 print("Perform Global Check of Linear Regression Assumptions", quote = FALSE)
 par(mfrow=c(2,2))
@@ -494,8 +447,8 @@ summary(VIFregression)
 ```
 
 ## Clean Data 4
-The following code chunk removes cases in which `CRECEIVE` is greater than or equal to 10 as outliers and applies a transformation to the `CRECEIVE` variable to better satisfy the assumptions of linear regression.
-```{r clean-data-04, echo = FALSE, warning = FALSE}
+The following code chunk removes cases in which `CRECEIVE` is greater than or equal to 10 as outliers and applies a transformation to the `CRECEIVE` variable in an effort to better satisfy the assumptions of linear regression and improve the model.
+```{r clean-data-04, message = FALSE, warning = FALSE}
 Sample90to95C %>% 
   filter(CRECEIVE <= 10) %>%
   mutate(CRECEIVEsqrt = sqrt(CRECEIVE)) -> Sample90to95D
@@ -503,7 +456,7 @@ Sample90to95C %>%
 
 ## Q-Q Plots for Transformed Variables
 The following code chunk displays Quantile-Quantile (Q-Q) plots for the transformed variables to check for suitability to use in multiple regression analysis.
-```{r qq-plots-transformed, echo = FALSE, warning = FALSE}
+```{r qq-plots-transformed, message = FALSE, warning = FALSE}
 png(filename = here("Results", "QQplotCRECEIVEsqrt.png"))
 qqnorm(Sample90to95D$CRECEIVEsqrt, pch = 1, frame = FALSE, 
        main = "Normal Q-Q Plot for CRECEIVEsqrt", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
@@ -512,15 +465,16 @@ dev.off()
 ```
 
 ## Multiple Regression Using Transformed Variables 
-```{r multiple-regression-trfm, echo = FALSE, warning = FALSE}
+The following code chunk performs a multiple regression analysis using the transformed dependent variable and displays the results.
+```{r multiple-regression-trfm, message = FALSE, warning = FALSE}
 # Regression
 CRECEIVEregressionTrfm <- lm(CRECEIVEsqrt ~ GYEAR + CAT02 + CAT03 + CAT04 + CLAIMS + ORIGINAL + GENERAL + FWDAPLAG, data = Sample90to95D, na.action = na.omit)
 summary(CRECEIVEregressionTrfm)
 ```
 
 ## Check Linear Regression Assumptions for Transformed Variables
-The following code chunk performs various checks to verify that the model satisfies the assumptions of linear regression.
-```{r assumptions-check-trfm, echo = FALSE, warning = FALSE}
+The following code chunk performs various checks to determine if the model satisfies the assumptions of linear regression.
+```{r assumptions-check-trfm, message = FALSE, warning = FALSE}
 # Global check of linear regression assumptions
 print("Perform Global Check of Linear Regression Assumptions")
 par(mfrow=c(2,2))
@@ -576,7 +530,7 @@ summary(VIFregression)
 
 ## Save Data
 The following code chunk saves the final cleaned data that was used in the analysis.
-```{r save-data}
-write.csv(Sample90to95C, here("Data","DataClean","NBERpatents1963to1999","NBERPatCit90to95SampleC.csv"), append = FALSE)
-write.csv(Sample90to95D, here("Data","DataClean","NBERpatents1963to1999","NBERPatCit90to95SampleD.csv"), append = FALSE)
+```{r save-data, message = FALSE, warning = FALSE}
+write.csv(Sample90to95C, here("DataClean","NBERpatents1963to1999","NBERPatCitSample90to95C.csv"), append = FALSE)
+write.csv(Sample90to95D, here("DataClean","NBERpatents1963to1999","NBERPatCitSample90to95D.csv"), append = FALSE)
 ```
