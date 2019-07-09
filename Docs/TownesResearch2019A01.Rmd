@@ -369,7 +369,7 @@ summary(coefsOrdinal01)
 The following code chunk creates regression subsets using the exhaustive method with `CRECEIVE` as the dependent variable.  It then displays the summary statistics to facilitate selection of the best regression model on which to focus.
 ```{r regression-subsets, message = FALSE, warning = FALSE}
 CRECregsubsets <- regsubsets(CRECEIVE ~ GYEAR + as.factor(CAT) + CMADE + CLAIMS + ORIGINAL + GENERAL + FWDAPLAG + BCKGTLAG, data = Sample90to95C, nbest = 2, method = "exhaustive")
-summary(CRECregsubsets,all.best=TRUE, matrix=TRUE)
+summary(CRECregsubsets,all.best=FALSE, matrix=TRUE)
 plot(CRECregsubsets, scale = "adjr2")
 ```
 
