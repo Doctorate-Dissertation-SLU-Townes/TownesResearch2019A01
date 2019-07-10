@@ -476,16 +476,24 @@ The following code chunk performs various checks to determine if the model satis
 par(mfrow=c(2,2))
 gvlma(CRECEIVEregression)
 
-# Residuals
-png(filename = here("Results","MultRegresPlotResiduals.png"))
+# View residuals
+png(filename = here("Results","MultRegres01ModelResidualsPlotA.png"))
 CRECEIVEresid <- residuals(CRECEIVEregression)
 plot(CRECEIVEresid)
 dev.off()
 
-# Check for homoscedasticity of residuals or equal variance
+ggplot(CRECEIVEregression)+
+  aes(x=.fitted, y=.resid)+
+  geom_point()
+ggsave(here("Results","MultRegres01ModelResidualsPlotB.png"))
+
+# Check that mean of residuals equals zero
+mean(CRECEIVEregression$residuals)
+
 # Check for normality of residuals
-png(filename = here("Results", "MultRegresQQplotModelResiduals01.png"))
-par(mfrow=c(2,2))
+# Check for homoscedasticity of residuals or equal variance
+png(filename = here("Results", "MultRegres01ModelResidualsDistribution.png"))
+par(mfrow=c(2,2)) # set 2 rows and 2 column layout for plot
 plot(CRECEIVEregression)
 dev.off()
 
@@ -513,10 +521,43 @@ CorrFWDAPLAG <- cor.test(Sample90to95C$FWDAPLAG, CRECEIVEregression$residuals)
 print(CorrFWDAPLAG)
 
 # Check that the variability in independent variable values is positive
-VarRegression <- var(Sample90to95C)
-print(VarRegression)
+varGYEAR <- var(Sample90to95C$GYEAR)
+print(varGYEAR)
 
-# Check for perfect multicollinearity among the variables
+varCAT02 <- var(Sample90to95C$CAT02)
+print(varCAT02)
+
+varCAT03 <- var(Sample90to95C$CAT03)
+print(varCAT03)
+
+varCAT04 <- var(Sample90to95C$CAT04)
+print(varCAT04)
+
+varCAT05 <- var(Sample90to95C$CAT05)
+print(varCAT05)
+
+varCAT06 <- var(Sample90to95C$CAT06)
+print(varCAT06)
+
+varCLAIMS <- var(Sample90to95C$CLAIMS)
+print(varCLAIMS)
+
+varCMADE <- var(Sample90to95C$CMADE)
+print(varCMADE)
+
+varGENERAL <- var(Sample90to95C$GENERAL)
+print(varGENERAL)
+
+varORIGINAL <- var(Sample90to95C$ORIGINAL)
+print(varORIGINAL)
+
+varFWDAPLAG <- var(Sample90to95C$FWDAPLAG)
+print(varFWDAPLAG)
+
+varBCKGTLAG <- var(Sample90to95C$BCKGTLAG)
+print(varBCKGTLAG)
+
+# Calculate Variance Inflation Factors to check for perfect multicollinearity among the variables
 VIFregression <- vif(CRECEIVEregression)
 print(VIFregression)
 ```
@@ -563,50 +604,53 @@ The following code chunk performs various checks to determine if the model satis
 par(mfrow=c(2,2))
 gvlma(CRECEIVEregressionTrfm)
 
-# Residuals
+# View residuals
 CRECEIVEresidTrfm <- residuals(CRECEIVEregressionTrfm)
-png(filename = here("Results","MultRegresPlotResidualsTrfm.png"))
+png(filename = here("Results","MultRegresTrfmModelResidualsPlotA.png"))
 plot(CRECEIVEresidTrfm)
 dev.off()
 
-# Check for homoscedasticity of residuals or equal variance
+ggplot(CRECEIVEregressionTrfm)+
+  aes(x=.fitted, y=.resid)+
+  geom_point()
+ggsave(here="Results","MultRegresTrfmModelResidualsPlotB.png")
+
 # Check for normality of residuals
-png(filename = here("Results", "MultRegresQQplotModelResidualsTrfm.png"))
-par(mfrow=c(2,2))
+# Check for homoscedasticity of residuals or equal variance
+png(filename = here("Results", "MultRegresTrfmModelResidualsDistribution.png"))
+par(mfrow=c(2,2)) # set 2 rows and 2 column layout for plot
 plot(CRECEIVEregressionTrfm)
 dev.off()
 
 # Check for autocorrelation of residuals using Durbin-Watson test
-AutoCorr <- dwtest(CRECEIVEregressionTrfm)
+AutoCorrTrfm <- dwtest(CRECEIVEregressionTrfm)
 print(AutoCorr)
 
 # Check that the independent variables and the residuals are uncorrelated
-CorrGYEAR <- cor.test(Sample90to95D$GYEAR, CRECEIVEregressionTrfm$residuals)
+CorrGYEARtrfm <- cor.test(Sample90to95D$GYEAR, CRECEIVEregressionTrfm$residuals)
 print(CorrGYEAR)
 
-CorrCAT <- cor.test(Sample90to95D$CAT, CRECEIVEregressionTrfm$residuals)
+CorrCATtrfm <- cor.test(Sample90to95D$CAT, CRECEIVEregressionTrfm$residuals)
 print(CorrCAT)
 
-CorrCLAIMS <- cor.test(Sample90to95D$CLAIMS, CRECEIVEregressionTrfm$residuals)
+CorrCLAIMStrfm <- cor.test(Sample90to95D$CLAIMS, CRECEIVEregressionTrfm$residuals)
 print(CorrCLAIMS)
 
-CorrORIGINAL <- cor.test(Sample90to95D$ORIGINAL, CRECEIVEregressionTrfm$residuals)
+CorrORIGINALtrfm <- cor.test(Sample90to95D$ORIGINAL, CRECEIVEregressionTrfm$residuals)
 print(CorrORIGINAL)
 
-CorrGENERAL <- cor.test(Sample90to95D$GENERAL, CRECEIVEregressionTrfm$residuals)
+CorrGENERALtrfm <- cor.test(Sample90to95D$GENERAL, CRECEIVEregressionTrfm$residuals)
 print(CorrGENERAL)
 
-CorrFWDAPLAG <- cor.test(Sample90to95D$FWDAPLAG, CRECEIVEregressionTrfm$residuals)
+CorrFWDAPLAGtrfm <- cor.test(Sample90to95D$FWDAPLAG, CRECEIVEregressionTrfm$residuals)
 print(CorrFWDAPLAG)
 
 # Check that the variability in independent variable values is positive
-VarRegression <- var(Sample90to95D)
-print(VarRegression)
+# See previous code chunk for check of linear regression assumptions
 
-# Check for perfect multicollinearity among the variables
-print("Check for Multicollinearity Among Variables", quote = FALSE)
-VIFregression <- vif(CRECEIVEregressionTrfm)
-print(VIFregression)
+# Calculate Variance Inflaction Factors to check for perfect multicollinearity among the variables
+VIFregressionTrfm <- vif(CRECEIVEregressionTrfm)
+print(VIFregressionTrfm)
 ```
 
 ## Save Data
