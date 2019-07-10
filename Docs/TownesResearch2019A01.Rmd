@@ -381,7 +381,7 @@ pvalues <- pt(abs(coefsOrdinal)[,"t value"], df=CRECEIVEordinal02$df,lower.tail 
 pval <- pnorm(abs(coefsOrdinal)[,"t value"],lower.tail = FALSE)*2
 coefsOrdinal01 <- cbind(coefsOrdinal, "p values (t dist)" = round(pvalues, 5))
 coefsOrdinal01 <- cbind(coefsOrdinal01, "p values (Normal)" = round(pval, 5))
-summary(coefsOrdinal01)
+print(coefsOrdinal01)
 
 # Raise e to the coefficients
 exp(coef(CRECEIVEordinal01))
