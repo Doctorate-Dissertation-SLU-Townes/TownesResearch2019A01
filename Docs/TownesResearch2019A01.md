@@ -562,38 +562,6 @@ ggplot(Sample90to95B)+
 ggsave(here("Results", "QQplotBCKGTLAG.png"))
 ```
 
-png(filename = here(“Results”, “QQplotGYEAR.png”))
-qqnorm(Sample90to95B\(GYEAR, pch = 1, frame = FALSE,  main = "Normal Q-Q Plot for GYEAR", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles") qqline(Sample90to95B\)GYEAR,
-col = “green”, lwd = 2) dev.off()
-
-png(filename = here(“Results”, “QQplotCReceive.png”))
-qqnorm(Sample90to95B\(CRECEIVE, pch = 1, frame = FALSE,  main = "Normal Q-Q Plot for CRECEIVE", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles") qqline(Sample90to95B\)CRECEIVE,
-col = “green”, lwd = 2, plot.it = TRUE) dev.off()
-
-png(filename = here(“Results”, “QQplotCLAIMS.png”))
-qqnorm(Sample90to95B\(CLAIMS, pch = 1, frame = FALSE,  main = "Normal Q-Q Plot for CLAIMS", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles") qqline(Sample90to95B\)CLAIMS,
-col = “green”, lwd = 2) dev.off()
-
-png(filename = here(“Results”, “QQplotCMADE.png”))
-qqnorm(Sample90to95B\(CMADE, pch = 1, frame = FALSE,  main = "Normal Q-Q Plot for CMADE", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles") qqline(Sample90to95B\)CMADE,
-col = “green”, lwd = 2) dev.off()
-
-png(filename = here(“Results”, “QQplotGENERAL.png”))
-qqnorm(Sample90to95B\(GENERAL, pch = 1, frame = FALSE,  main = "Normal Q-Q Plot for GENERAL", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles") qqline(Sample90to95B\)GENERAL,
-col = “green”, lwd = 2) dev.off()
-
-png(filename = here(“Results”, “QQplotORIGINAL.png”))
-qqnorm(Sample90to95B\(ORIGINAL, pch = 1, frame = FALSE,  main = "Normal Q-Q Plot for ORIGINAL", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles") qqline(Sample90to95B\)ORIGINAL,
-col = “green”, lwd = 2) dev.off()
-
-png(filename = here(“Results”, “QQplotFWDAPLAG.png”))
-qqnorm(Sample90to95B\(FWDAPLAG, pch = 1, frame = FALSE,  main = "Normal Q-Q Plot for FWDAPLAG", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles") qqline(Sample90to95B\)FWDAPLAG,
-col = “green”, lwd = 2) dev.off()
-
-png(filename = here(“Results”, “QQplotBCKGTLAG.png”))
-qqnorm(Sample90to95B\(BCKGTLAG, pch = 1, frame = FALSE,  main = "Normal Q-Q Plot for BCKGTALG", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles") qqline(Sample90to95B\)BCKGTLAG,
-col = “green”, lwd = 2) dev.off()
-
 ## Pairwise Correlation Coefficients
 
 The following code chunk calculates the pairwise correlation
@@ -948,7 +916,7 @@ exp(coef(logitCRECEIVE))
     ##    1.002789e+00
 
 ``` r
-# Obtain the McFadden pseudo R-squared
+# Obtain various pseudo R-squared measures
 pR2(logitCRECEIVE)
 ```
 
@@ -981,17 +949,14 @@ confint(logitCRECEIVE, level = 0.95)
 # Hosemer-Lemeshow Goodness of Fit Test
 HosLemBinomial <- hoslem.test(Sample90to95C$CRECbinary, 
                               fitted(logitCRECEIVE), g=10)
-summary(HosLemBinomial)
+print(HosLemBinomial)
 ```
 
-    ##           Length Class  Mode     
-    ## statistic 1      -none- numeric  
-    ## parameter 1      -none- numeric  
-    ## p.value   1      -none- numeric  
-    ## method    1      -none- character
-    ## data.name 1      -none- character
-    ## observed  4      xtabs  numeric  
-    ## expected  4      xtabs  numeric
+    ## 
+    ##  Hosmer and Lemeshow goodness of fit (GOF) test
+    ## 
+    ## data:  Sample90to95C$CRECbinary, fitted(logitCRECEIVE)
+    ## X-squared = 1.149e-09, df = 8, p-value = 1
 
 ``` r
 cbind(HosLemBinomial$expected, HosLemBinomial$observed)
@@ -1154,7 +1119,7 @@ exp(coef(CRECEIVEordinal01))
     ##    1.040018e+02    6.135317e-01    9.933467e-01
 
 ``` r
-# Obtain the McFadden pseudo R-squared
+# Obtain various pseudo R-squared measures
 pR2(CRECEIVEordinal02)
 ```
 
@@ -1186,17 +1151,14 @@ confint(CRECEIVEordinal01, level = 0.95)
 # Hosemer-Lemeshow Goodness of Fit Test
 HosLemOrdinal <- hoslem.test(Sample90to95C$CRECordinal,
                              fitted(CRECEIVEordinal01), g=10)
-summary(HosLemOrdinal)
+print(HosLemOrdinal)
 ```
 
-    ##           Length Class  Mode     
-    ## statistic  1     -none- numeric  
-    ## parameter  1     -none- numeric  
-    ## p.value    1     -none- numeric  
-    ## method     1     -none- character
-    ## data.name  1     -none- character
-    ## observed  20     xtabs  numeric  
-    ## expected  20     xtabs  numeric
+    ## 
+    ##  Hosmer and Lemeshow goodness of fit (GOF) test
+    ## 
+    ## data:  Sample90to95C$CRECordinal, fitted(CRECEIVEordinal01)
+    ## X-squared = 1626200, df = 8, p-value < 2.2e-16
 
 ``` r
 cbind(HosLemOrdinal$expected, HosLemOrdinal$observed)
