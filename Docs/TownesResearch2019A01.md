@@ -59,7 +59,8 @@ the NBER data set for the period 1963 to
 1999.
 
 ``` r
-DataRaw <- read.table(here("DataRaw","NBERpatents1963to1999/apat63_99.txt"), sep = ",", header = TRUE, fill = TRUE, dec = ".")
+DataRaw <- read.table(here("DataRaw","NBERpatents1963to1999/apat63_99.txt"), 
+                      sep = ",", header = TRUE, fill = TRUE, dec = ".")
 ```
 
 ## Subset Data
@@ -81,7 +82,8 @@ subset for the period 1990 through 1995.
 
 ``` r
 set.seed(1972)
-Sample90to95 <- sample(1:nrow(DataSubset90to95), size = 2000, replace = TRUE, prob = NULL)
+Sample90to95 <- sample(1:nrow(DataSubset90to95), size = 2000, 
+                       replace = TRUE, prob = NULL)
 Sample90to95 <- DataSubset90to95[Sample90to95,]
 Sample90to95 <- as_tibble(Sample90to95)
 ```
@@ -93,7 +95,9 @@ variables not used in the analysis.
 
 ``` r
 Sample90to95 %>%
-  dplyr::select(PATENT, GYEAR, CRECEIVE, CAT, CLAIMS, CMADE, GENERAL, ORIGINAL, FWDAPLAG, BCKGTLAG) -> Sample90to95A # Another package also has a `select()` function
+  dplyr::select(PATENT, GYEAR, CRECEIVE, CAT, CLAIMS, CMADE, GENERAL, 
+                ORIGINAL, FWDAPLAG, BCKGTLAG) -> Sample90to95A 
+# Another package also has a `select()` function
 ```
 
 ## Inspect Sample Data
@@ -289,40 +293,85 @@ whether or not they fit normal distributions. The code chunk generates
 separate `png` files that are saved in the `Results` folder.
 
 ``` r
-histoGYEAR <- ggplot() +
+ggplot() +
   geom_histogram(Sample90to95B, mapping = aes(GYEAR))
+```
+
+![](TownesResearch2019A01_files/figure-gfm/histograms-1.png)<!-- -->
+
+``` r
 ggsave(here("results", "histogramGYEAR.png"), dpi = 300)
 
-histoCRECEIVE <- ggplot() +
+ggplot() +
   geom_histogram(Sample90to95B, mapping = aes(CRECEIVE))
+```
+
+![](TownesResearch2019A01_files/figure-gfm/histograms-2.png)<!-- -->
+
+``` r
 ggsave(here("Results", "histogramCRECEIVE.png"), dpi = 300)
 
-histoCAT <- ggplot() +
+ggplot() +
   geom_histogram(Sample90to95B, mapping = aes(CAT))
+```
+
+![](TownesResearch2019A01_files/figure-gfm/histograms-3.png)<!-- -->
+
+``` r
 ggsave(here("Results", "histogramCAT.png"), dpi = 300)
 
-histoCLAIMS <- ggplot() +
+ggplot() +
   geom_histogram(Sample90to95B, mapping = aes(CLAIMS))
+```
+
+![](TownesResearch2019A01_files/figure-gfm/histograms-4.png)<!-- -->
+
+``` r
 ggsave(here("Results", "histogramCLAIMS.png"), dpi = 300)
 
-histoCMADE <- ggplot() +
+ggplot() +
   geom_histogram(Sample90to95B, mapping = aes(CMADE))
+```
+
+![](TownesResearch2019A01_files/figure-gfm/histograms-5.png)<!-- -->
+
+``` r
 ggsave(here("Results", "histogramCMADE.png"), dpi = 300)
 
-histoGENERAL <- ggplot() +
+ggplot() +
   geom_histogram(Sample90to95B, mapping = aes(GENERAL))
+```
+
+![](TownesResearch2019A01_files/figure-gfm/histograms-6.png)<!-- -->
+
+``` r
 ggsave(here("Results", "histogramGENERAL.png"), dpi = 300)
 
-histoORIGINAL <- ggplot() +
+ggplot() +
   geom_histogram(Sample90to95B, mapping = aes(ORIGINAL))
+```
+
+![](TownesResearch2019A01_files/figure-gfm/histograms-7.png)<!-- -->
+
+``` r
 ggsave(here("Results", "histogramORIGINAL.png"), dpi = 300)
 
-histoFWDAPLAG <- ggplot() +
+ggplot() +
   geom_histogram(Sample90to95B, mapping = aes(FWDAPLAG))
+```
+
+![](TownesResearch2019A01_files/figure-gfm/histograms-8.png)<!-- -->
+
+``` r
 ggsave(here("Results", "histogramFWDAPLAG.png"), dpi = 300)
 
-histoBCKGTLAG <- ggplot() +
+ggplot() +
   geom_histogram(Sample90to95B, mapping = aes(BCKGTLAG))
+```
+
+![](TownesResearch2019A01_files/figure-gfm/histograms-9.png)<!-- -->
+
+``` r
 ggsave(here("Results", "histogramBCKGTLAG.png"), dpi = 300)
 ```
 
@@ -416,92 +465,134 @@ interest. The code chunk generates separate `png` files that are saved
 in the `Results` folder.
 
 ``` r
-png(filename = here("Results", "QQplotGYEAR.png"))
-qqnorm(Sample90to95B$GYEAR, pch = 1, frame = FALSE, 
-       main = "Normal Q-Q Plot for GYEAR", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
-qqline(Sample90to95B$GYEAR, col = "green", lwd = 2)
-dev.off()
+ggplot(Sample90to95B)+
+  aes(sample = GYEAR)+
+  stat_qq()+
+  stat_qq_line()+
+  ggtitle("GYEAR Q-Q Plot")
 ```
 
-    ## png 
-    ##   2
+![](TownesResearch2019A01_files/figure-gfm/qq-plots-1.png)<!-- -->
 
 ``` r
-png(filename = here("Results", "QQplotCReceive.png"))
-qqnorm(Sample90to95B$CRECEIVE, pch = 1, frame = FALSE, 
-       main = "Normal Q-Q Plot for CRECEIVE", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
-qqline(Sample90to95B$CRECEIVE, col = "green", lwd = 2, plot.it = TRUE)
-dev.off()
+ggsave(here("Results", "QQplotGYEAR.png"))
+
+ggplot(Sample90to95B)+
+  aes(sample = CRECEIVE)+
+  stat_qq()+
+  stat_qq_line()+
+  ggtitle("CRECEIVE Q-Q Plot")
 ```
 
-    ## png 
-    ##   2
+![](TownesResearch2019A01_files/figure-gfm/qq-plots-2.png)<!-- -->
 
 ``` r
-png(filename = here("Results", "QQplotCLAIMS.png"))
-qqnorm(Sample90to95B$CLAIMS, pch = 1, frame = FALSE, 
-       main = "Normal Q-Q Plot for CLAIMS", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
-qqline(Sample90to95B$CLAIMS, col = "green", lwd = 2)
-dev.off()
+ggsave(here("Results", "QQplotCRECEIVE.png"))
+
+ggplot(Sample90to95B)+
+  aes(sample = CLAIMS)+
+  stat_qq()+
+  stat_qq_line()+
+  ggtitle("CLAIMS Q-Q Plot")
 ```
 
-    ## png 
-    ##   2
+![](TownesResearch2019A01_files/figure-gfm/qq-plots-3.png)<!-- -->
 
 ``` r
-png(filename = here("Results", "QQplotCMADE.png"))
-qqnorm(Sample90to95B$CMADE, pch = 1, frame = FALSE, 
-       main = "Normal Q-Q Plot for CMADE", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
-qqline(Sample90to95B$CMADE, col = "green", lwd = 2)
-dev.off()
+ggsave(here("Results", "QQplotCLAIMS.png"))
+
+ggplot(Sample90to95B)+
+  aes(sample = CMADE)+
+  stat_qq()+
+  stat_qq_line()+
+  ggtitle("CMADE Q-Q Plot")
 ```
 
-    ## png 
-    ##   2
+![](TownesResearch2019A01_files/figure-gfm/qq-plots-4.png)<!-- -->
 
 ``` r
-png(filename = here("Results", "QQplotGENERAL.png"))
-qqnorm(Sample90to95B$GENERAL, pch = 1, frame = FALSE, 
-       main = "Normal Q-Q Plot for GENERAL", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
-qqline(Sample90to95B$GENERAL, col = "green", lwd = 2)
-dev.off()
+ggsave(here("Results", "QQplotCMADE.png"))
+
+ggplot(Sample90to95B)+
+  aes(sample = GENERAL)+
+  stat_qq()+
+  stat_qq_line()+
+  ggtitle("GENERAL Q-Q Plot")
 ```
 
-    ## png 
-    ##   2
+![](TownesResearch2019A01_files/figure-gfm/qq-plots-5.png)<!-- -->
 
 ``` r
-png(filename = here("Results", "QQplotORIGINAL.png"))
-qqnorm(Sample90to95B$ORIGINAL, pch = 1, frame = FALSE, 
-       main = "Normal Q-Q Plot for ORIGINAL", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
-qqline(Sample90to95B$ORIGINAL, col = "green", lwd = 2)
-dev.off()
+ggsave(here("Results", "QQplotGENERAL.png"))
+
+ggplot(Sample90to95B)+
+  aes(sample = ORIGINAL)+
+  stat_qq()+
+  stat_qq_line()+
+  ggtitle("ORIGINAL Q-Q Plot")
 ```
 
-    ## png 
-    ##   2
+![](TownesResearch2019A01_files/figure-gfm/qq-plots-6.png)<!-- -->
 
 ``` r
-png(filename = here("Results", "QQplotFWDAPLAG.png"))
-qqnorm(Sample90to95B$FWDAPLAG, pch = 1, frame = FALSE, 
-       main = "Normal Q-Q Plot for FWDAPLAG", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
-qqline(Sample90to95B$FWDAPLAG, col = "green", lwd = 2)
-dev.off()
+ggsave(here("Results", "QQplotORIGINAL.png"))
+
+ggplot(Sample90to95B)+
+  aes(sample = FWDAPLAG)+
+  stat_qq()+
+  stat_qq_line()+
+  ggtitle("FWDAPLAG Q-Q Plot")
 ```
 
-    ## png 
-    ##   2
+![](TownesResearch2019A01_files/figure-gfm/qq-plots-7.png)<!-- -->
 
 ``` r
-png(filename = here("Results", "QQplotBCKGTLAG.png"))
-qqnorm(Sample90to95B$BCKGTLAG, pch = 1, frame = FALSE, 
-       main = "Normal Q-Q Plot for BCKGTALG", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
-qqline(Sample90to95B$BCKGTLAG, col = "green", lwd = 2)
-dev.off()
+ggsave(here("Results", "QQplotFWDAPLAG.png"))
+
+ggplot(Sample90to95B)+
+  aes(sample = BCKGTLAG)+
+  stat_qq()+
+  stat_qq_line()+
+  ggtitle("BCKGTLAG Q-Q Plot")
 ```
 
-    ## png 
-    ##   2
+![](TownesResearch2019A01_files/figure-gfm/qq-plots-8.png)<!-- -->
+
+``` r
+ggsave(here("Results", "QQplotBCKGTLAG.png"))
+```
+
+png(filename = here(“Results”, “QQplotGYEAR.png”))
+qqnorm(Sample90to95B\(GYEAR, pch = 1, frame = FALSE,  main = "Normal Q-Q Plot for GYEAR", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles") qqline(Sample90to95B\)GYEAR,
+col = “green”, lwd = 2) dev.off()
+
+png(filename = here(“Results”, “QQplotCReceive.png”))
+qqnorm(Sample90to95B\(CRECEIVE, pch = 1, frame = FALSE,  main = "Normal Q-Q Plot for CRECEIVE", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles") qqline(Sample90to95B\)CRECEIVE,
+col = “green”, lwd = 2, plot.it = TRUE) dev.off()
+
+png(filename = here(“Results”, “QQplotCLAIMS.png”))
+qqnorm(Sample90to95B\(CLAIMS, pch = 1, frame = FALSE,  main = "Normal Q-Q Plot for CLAIMS", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles") qqline(Sample90to95B\)CLAIMS,
+col = “green”, lwd = 2) dev.off()
+
+png(filename = here(“Results”, “QQplotCMADE.png”))
+qqnorm(Sample90to95B\(CMADE, pch = 1, frame = FALSE,  main = "Normal Q-Q Plot for CMADE", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles") qqline(Sample90to95B\)CMADE,
+col = “green”, lwd = 2) dev.off()
+
+png(filename = here(“Results”, “QQplotGENERAL.png”))
+qqnorm(Sample90to95B\(GENERAL, pch = 1, frame = FALSE,  main = "Normal Q-Q Plot for GENERAL", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles") qqline(Sample90to95B\)GENERAL,
+col = “green”, lwd = 2) dev.off()
+
+png(filename = here(“Results”, “QQplotORIGINAL.png”))
+qqnorm(Sample90to95B\(ORIGINAL, pch = 1, frame = FALSE,  main = "Normal Q-Q Plot for ORIGINAL", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles") qqline(Sample90to95B\)ORIGINAL,
+col = “green”, lwd = 2) dev.off()
+
+png(filename = here(“Results”, “QQplotFWDAPLAG.png”))
+qqnorm(Sample90to95B\(FWDAPLAG, pch = 1, frame = FALSE,  main = "Normal Q-Q Plot for FWDAPLAG", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles") qqline(Sample90to95B\)FWDAPLAG,
+col = “green”, lwd = 2) dev.off()
+
+png(filename = here(“Results”, “QQplotBCKGTLAG.png”))
+qqnorm(Sample90to95B\(BCKGTLAG, pch = 1, frame = FALSE,  main = "Normal Q-Q Plot for BCKGTALG", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles") qqline(Sample90to95B\)BCKGTLAG,
+col = “green”, lwd = 2) dev.off()
 
 ## Pairwise Correlation Coefficients
 
@@ -511,8 +602,31 @@ product-moment correlation function.
 
 ``` r
 Sample90to95corrmatrix <- cor(Sample90to95B)
-view(Sample90to95corrmatrix)
+print(Sample90to95corrmatrix)
 ```
+
+    ##               PATENT        GYEAR     CRECEIVE         CAT      CLAIMS
+    ## PATENT    1.00000000  0.985635583 -0.159041534 -0.03356222  0.04070183
+    ## GYEAR     0.98563558  1.000000000 -0.149458127 -0.02684555  0.04029299
+    ## CRECEIVE -0.15904153 -0.149458127  1.000000000 -0.09560927  0.13170051
+    ## CAT      -0.03356222 -0.026845547 -0.095609270  1.00000000 -0.01724595
+    ## CLAIMS    0.04070183  0.040292995  0.131700513 -0.01724595  1.00000000
+    ## CMADE     0.10233427  0.094237930  0.063242195  0.04021272  0.16558795
+    ## GENERAL  -0.12640786 -0.118898816  0.417511656 -0.10545725  0.12005496
+    ## ORIGINAL  0.08031646  0.080904546  0.001329185 -0.06068721  0.03499034
+    ## FWDAPLAG -0.11129042 -0.105161070 -0.198067341  0.01490230 -0.08333314
+    ## BCKGTLAG -0.01126732 -0.007455822 -0.135654022  0.17606285 -0.07141466
+    ##                CMADE     GENERAL     ORIGINAL     FWDAPLAG     BCKGTLAG
+    ## PATENT    0.10233427 -0.12640786  0.080316461 -0.111290419 -0.011267319
+    ## GYEAR     0.09423793 -0.11889882  0.080904546 -0.105161070 -0.007455822
+    ## CRECEIVE  0.06324219  0.41751166  0.001329185 -0.198067341 -0.135654022
+    ## CAT       0.04021272 -0.10545725 -0.060687208  0.014902300  0.176062850
+    ## CLAIMS    0.16558795  0.12005496  0.034990339 -0.083333140 -0.071414662
+    ## CMADE     1.00000000  0.08818194  0.253063640 -0.073355840  0.013103136
+    ## GENERAL   0.08818194  1.00000000  0.214772596 -0.296932164 -0.106377914
+    ## ORIGINAL  0.25306364  0.21477260  1.000000000 -0.009235051  0.235975356
+    ## FWDAPLAG -0.07335584 -0.29693216 -0.009235051  1.000000000  0.130915221
+    ## BCKGTLAG  0.01310314 -0.10637791  0.235975356  0.130915221  1.000000000
 
 ## Clean Data 2
 
@@ -778,7 +892,10 @@ coefficients, and Hosemer-Lemeshow goodness of fit
 test.
 
 ``` r
-logitCRECEIVE <- glm(CRECbinary ~ GYEAR + as.factor(CAT) + CMADE + CLAIMS + ORIGINAL + GENERAL + FWDAPLAG + BCKGTLAG, data = Sample90to95C, family = binomial, na.action = na.omit)
+logitCRECEIVE <- glm(CRECbinary ~ GYEAR + as.factor(CAT) + CMADE + CLAIMS + 
+                       ORIGINAL + GENERAL + FWDAPLAG + BCKGTLAG, 
+                     data = Sample90to95C, family = binomial, 
+                     na.action = na.omit)
 summary(logitCRECEIVE)
 ```
 
@@ -817,10 +934,8 @@ summary(logitCRECEIVE)
     ## Number of Fisher Scoring iterations: 25
 
 ``` r
-coefs <- coef(logitCRECEIVE)
-
 # Raise e to the coefficients
-exp(coefs)
+exp(coef(logitCRECEIVE))
 ```
 
     ##     (Intercept)           GYEAR as.factor(CAT)2 as.factor(CAT)3 
@@ -864,8 +979,9 @@ confint(logitCRECEIVE, level = 0.95)
 
 ``` r
 # Hosemer-Lemeshow Goodness of Fit Test
-GOF <- hoslem.test(Sample90to95C$CRECbinary, fitted(logitCRECEIVE), g=10)
-summary(GOF)
+HosLemBinomial <- hoslem.test(Sample90to95C$CRECbinary, 
+                              fitted(logitCRECEIVE), g=10)
+summary(HosLemBinomial)
 ```
 
     ##           Length Class  Mode     
@@ -878,7 +994,7 @@ summary(GOF)
     ## expected  4      xtabs  numeric
 
 ``` r
-cbind(GOF$expected, GOF$observed)
+cbind(HosLemBinomial$expected, HosLemBinomial$observed)
 ```
 
     ##                     yhat0        yhat1  y0   y1
@@ -894,8 +1010,10 @@ ways for comparison.
 
 ``` r
 # Ordinal Logistic Regression Results - Method 01
-CRECEIVEordinal <- clm(as.factor(CRECordinal) ~ GYEAR + as.factor(CAT) + CMADE + CLAIMS + ORIGINAL + GENERAL + FWDAPLAG + BCKGTLAG, data = Sample90to95C)
-summary(CRECEIVEordinal)
+CRECEIVEordinal01 <- clm(as.factor(CRECordinal) ~ GYEAR + as.factor(CAT) + 
+                           CMADE + CLAIMS + ORIGINAL + GENERAL + FWDAPLAG + 
+                           BCKGTLAG, data = Sample90to95C)
+summary(CRECEIVEordinal01)
 ```
 
     ## formula: 
@@ -942,8 +1060,11 @@ summary(CRECEIVEordinal)
 
 ``` r
 # Ordinal Logistic Regression Results - Method 02
-CRECEIVEordinal01 <- polr(as.factor(CRECordinal) ~ GYEAR + as.factor(CAT) + CMADE + CLAIMS + ORIGINAL + GENERAL + FWDAPLAG + BCKGTLAG, data = Sample90to95C, Hess = TRUE, model = TRUE, method = "logistic")
-summary(CRECEIVEordinal01)
+CRECEIVEordinal02 <- polr(as.factor(CRECordinal) ~ GYEAR + as.factor(CAT) +
+                            CMADE + CLAIMS + ORIGINAL + GENERAL + FWDAPLAG +
+                            BCKGTLAG, data = Sample90to95C, Hess = TRUE, 
+                          model = TRUE, method = "logistic")
+summary(CRECEIVEordinal02)
 ```
 
     ## Call:
@@ -989,17 +1110,11 @@ summary(CRECEIVEordinal01)
 
 ``` r
 # Calculate P-Values for Coefficients
-coefsOrdinal <- coefficients(summary(CRECEIVEordinal01))
-pvalues <- pt(abs(coefsOrdinal)[,"t value"], df=CRECEIVEordinal01$df,lower.tail = FALSE)*2
+coefsOrdinal <- coefficients(summary(CRECEIVEordinal02))
+pvalues <- pt(abs(coefsOrdinal)[,"t value"], df=CRECEIVEordinal02$df,lower.tail = FALSE)*2
 pval <- pnorm(abs(coefsOrdinal)[,"t value"],lower.tail = FALSE)*2
 coefsOrdinal01 <- cbind(coefsOrdinal, "p values (t dist)" = round(pvalues, 5))
 coefsOrdinal01 <- cbind(coefsOrdinal01, "p values (Normal)" = round(pval, 5))
-print("Ordinal Logistic Regression Results with P-values")
-```
-
-    ## [1] "Ordinal Logistic Regression Results with P-values"
-
-``` r
 summary(coefsOrdinal01)
 ```
 
@@ -1018,6 +1133,87 @@ summary(coefsOrdinal01)
     ##  3rd Qu.:0.00000   3rd Qu.:0.0000   
     ##  Max.   :0.69946   Max.   :0.6994
 
+``` r
+# Raise e to the coefficients
+exp(coef(CRECEIVEordinal01))
+```
+
+    ##             0|1             1|2             2|3             3|4 
+    ##   4.544663e-319   3.595172e-318   1.040850e-317   2.272788e-317 
+    ##             4|5             5|6             6|7             7|8 
+    ##   3.956714e-317   6.364810e-317   9.029007e-317   1.203245e-316 
+    ##             8|9            9|10           10|11           11|12 
+    ##   1.566508e-316   1.943268e-316   2.456352e-316   3.000083e-316 
+    ##           12|13           13|14           14|15           GYEAR 
+    ##   3.577103e-316   4.094518e-316   4.793246e-316    6.935552e-01 
+    ## as.factor(CAT)2 as.factor(CAT)3 as.factor(CAT)4 as.factor(CAT)5 
+    ##    2.566261e+00    2.530835e+00    1.637291e+00    1.035048e+00 
+    ## as.factor(CAT)6           CMADE          CLAIMS        ORIGINAL 
+    ##    1.346181e+00    1.024536e+00    1.017727e+00    4.265416e-01 
+    ##         GENERAL        FWDAPLAG        BCKGTLAG 
+    ##    1.040018e+02    6.135317e-01    9.933467e-01
+
+``` r
+# Obtain the McFadden pseudo R-squared
+pR2(CRECEIVEordinal02)
+```
+
+    ##           llh       llhNull            G2      McFadden          r2ML 
+    ## -3952.1016446 -4872.0634922  1839.9236952     0.1888239     0.6018326 
+    ##          r2CU 
+    ##     0.6064539
+
+``` r
+# Confidence intervals for the coefficients
+confint(CRECEIVEordinal01, level = 0.95)
+```
+
+    ##                        2.5 %       97.5 %
+    ## GYEAR           -0.365997128 -0.365852755
+    ## as.factor(CAT)2  0.622541343  1.263479941
+    ## as.factor(CAT)3  0.606266280  1.251584723
+    ## as.factor(CAT)4  0.225111743  0.761313953
+    ## as.factor(CAT)5 -0.229396378  0.298392510
+    ## as.factor(CAT)6  0.032398543  0.562495153
+    ## CMADE            0.014229969  0.034391696
+    ## CLAIMS           0.008670441  0.026509769
+    ## ORIGINAL        -1.160948707 -0.544099948
+    ## GENERAL          4.282220211  5.011102328
+    ## FWDAPLAG        -0.531385605 -0.446757498
+    ## BCKGTLAG        -0.013123932 -0.000315771
+
+``` r
+# Hosemer-Lemeshow Goodness of Fit Test
+HosLemOrdinal <- hoslem.test(Sample90to95C$CRECordinal,
+                             fitted(CRECEIVEordinal01), g=10)
+summary(HosLemOrdinal)
+```
+
+    ##           Length Class  Mode     
+    ## statistic  1     -none- numeric  
+    ## parameter  1     -none- numeric  
+    ## p.value    1     -none- numeric  
+    ## method     1     -none- character
+    ## data.name  1     -none- character
+    ## observed  20     xtabs  numeric  
+    ## expected  20     xtabs  numeric
+
+``` r
+cbind(HosLemOrdinal$expected, HosLemOrdinal$observed)
+```
+
+    ##                     yhat0      yhat1    y0   y1
+    ## [0.00154,0.032] 196.62033   3.379674 -1711 1911
+    ## (0.032,0.0542]  191.21231   8.787688 -1419 1619
+    ## (0.0542,0.0807] 186.71360  13.286396  -998 1198
+    ## (0.0807,0.112]  179.96381  19.036191  -703  902
+    ## (0.112,0.137]   175.35476  24.645237  -634  834
+    ## (0.137,0.187]   167.96449  32.035507  -516  716
+    ## (0.187,0.258]   155.15712  43.842879  -356  555
+    ## (0.258,0.444]   131.16791  68.832087  -439  639
+    ## (0.444,0.732]    87.33144 112.668564   -28  228
+    ## (0.732,0.956]    31.74051 168.259495   200    0
+
 ## Multiple Regression Model Selection
 
 The following code chunk creates regression subsets using the exhaustive
@@ -1027,8 +1223,11 @@ on which to
 focus.
 
 ``` r
-CRECregsubsets <- regsubsets(CRECEIVE ~ GYEAR + as.factor(CAT) + CMADE + CLAIMS + ORIGINAL + GENERAL + FWDAPLAG + BCKGTLAG, data = Sample90to95C, nbest = 2, method = "exhaustive")
-summary(CRECregsubsets,all.best=TRUE, matrix=TRUE)
+CRECregsubsets <- regsubsets(CRECEIVE ~ GYEAR + as.factor(CAT) + CMADE + 
+                               CLAIMS + ORIGINAL + GENERAL + FWDAPLAG + 
+                               BCKGTLAG, data = Sample90to95C, 
+                             nbest = 2, method = "exhaustive")
+summary(CRECregsubsets,all.best=FALSE, matrix=TRUE)
 ```
 
     ## Subset selection object
@@ -1053,55 +1252,31 @@ summary(CRECregsubsets,all.best=TRUE, matrix=TRUE)
     ## Selection Algorithm: exhaustive
     ##          GYEAR as.factor(CAT)2 as.factor(CAT)3 as.factor(CAT)4
     ## 1  ( 1 ) " "   " "             " "             " "            
-    ## 1  ( 2 ) " "   " "             " "             " "            
     ## 2  ( 1 ) " "   " "             "*"             " "            
-    ## 2  ( 2 ) " "   "*"             " "             " "            
     ## 3  ( 1 ) " "   "*"             "*"             " "            
-    ## 3  ( 2 ) "*"   " "             "*"             " "            
     ## 4  ( 1 ) "*"   "*"             "*"             " "            
-    ## 4  ( 2 ) " "   "*"             "*"             " "            
     ## 5  ( 1 ) "*"   "*"             "*"             " "            
-    ## 5  ( 2 ) "*"   "*"             "*"             " "            
     ## 6  ( 1 ) "*"   "*"             "*"             " "            
-    ## 6  ( 2 ) "*"   "*"             "*"             "*"            
     ## 7  ( 1 ) "*"   "*"             "*"             "*"            
-    ## 7  ( 2 ) "*"   "*"             "*"             " "            
     ## 8  ( 1 ) "*"   "*"             "*"             "*"            
-    ## 8  ( 2 ) "*"   "*"             "*"             "*"            
     ##          as.factor(CAT)5 as.factor(CAT)6 CMADE CLAIMS ORIGINAL GENERAL
     ## 1  ( 1 ) " "             " "             " "   " "    " "      "*"    
-    ## 1  ( 2 ) " "             " "             " "   " "    " "      " "    
     ## 2  ( 1 ) " "             " "             " "   " "    " "      "*"    
-    ## 2  ( 2 ) " "             " "             " "   " "    " "      "*"    
     ## 3  ( 1 ) " "             " "             " "   " "    " "      "*"    
-    ## 3  ( 2 ) " "             " "             " "   " "    " "      "*"    
     ## 4  ( 1 ) " "             " "             " "   " "    " "      "*"    
-    ## 4  ( 2 ) " "             " "             " "   " "    "*"      "*"    
     ## 5  ( 1 ) " "             " "             " "   " "    " "      "*"    
-    ## 5  ( 2 ) " "             " "             " "   "*"    " "      "*"    
     ## 6  ( 1 ) " "             " "             " "   "*"    " "      "*"    
-    ## 6  ( 2 ) " "             " "             " "   " "    " "      "*"    
     ## 7  ( 1 ) " "             " "             " "   "*"    " "      "*"    
-    ## 7  ( 2 ) " "             " "             " "   "*"    "*"      "*"    
     ## 8  ( 1 ) " "             " "             " "   "*"    "*"      "*"    
-    ## 8  ( 2 ) " "             " "             " "   "*"    " "      "*"    
     ##          FWDAPLAG BCKGTLAG
     ## 1  ( 1 ) " "      " "     
-    ## 1  ( 2 ) "*"      " "     
     ## 2  ( 1 ) " "      " "     
-    ## 2  ( 2 ) " "      " "     
     ## 3  ( 1 ) " "      " "     
-    ## 3  ( 2 ) " "      " "     
     ## 4  ( 1 ) " "      " "     
-    ## 4  ( 2 ) " "      " "     
     ## 5  ( 1 ) "*"      " "     
-    ## 5  ( 2 ) " "      " "     
     ## 6  ( 1 ) "*"      " "     
-    ## 6  ( 2 ) "*"      " "     
     ## 7  ( 1 ) "*"      " "     
-    ## 7  ( 2 ) "*"      " "     
-    ## 8  ( 1 ) "*"      " "     
-    ## 8  ( 2 ) "*"      "*"
+    ## 8  ( 1 ) "*"      " "
 
 ``` r
 plot(CRECregsubsets, scale = "adjr2")
@@ -1116,7 +1291,9 @@ data sample using the selected model. It then displays the results.
 
 ``` r
 # Multiple Regression
-CRECEIVEregression <- lm(CRECEIVE ~ GYEAR + CAT02 + CAT03 + CAT04 + CLAIMS + ORIGINAL + GENERAL + FWDAPLAG, data = Sample90to95C, na.action = na.omit)
+CRECEIVEregression <- lm(CRECEIVE ~ GYEAR + CAT02 + CAT03 + CAT04 + CLAIMS + 
+                           ORIGINAL + GENERAL + FWDAPLAG, 
+                         data = Sample90to95C, na.action = na.omit)
 summary(CRECEIVEregression)
 ```
 
@@ -1454,15 +1631,22 @@ transformed variables to check for suitability to use in multiple
 regression analysis.
 
 ``` r
-png(filename = here("Results", "QQplotCRECEIVEsqrt.png"))
-qqnorm(Sample90to95D$CRECEIVEsqrt, pch = 1, frame = FALSE, 
-       main = "Normal Q-Q Plot for CRECEIVEsqrt", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
-qqline(Sample90to95D$CRECEIVEsqrt, col = "green", lwd = 2)
-dev.off()
+ggplot(Sample90to95D)+
+  aes(sample = CRECEIVEsqrt)+
+  stat_qq()+
+  stat_qq_line()+
+  ggtitle("CRECEIVEsqrt Q-Q Plot")
 ```
 
-    ## png 
-    ##   2
+![](TownesResearch2019A01_files/figure-gfm/qq-plots-transformed-1.png)<!-- -->
+
+``` r
+ggsave(here("Results", "QQplotCRECEIVEsqrt.png"))
+```
+
+png(filename = here(“Results”, “QQplotCRECEIVEsqrt.png”))
+qqnorm(Sample90to95D\(CRECEIVEsqrt, pch = 1, frame = FALSE,  main = "Normal Q-Q Plot for CRECEIVEsqrt", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles") qqline(Sample90to95D\)CRECEIVEsqrt,
+col = “green”, lwd = 2) dev.off()
 
 ## Multiple Regression Using Transformed Variables
 
@@ -1471,7 +1655,9 @@ the transformed dependent variable and displays the results.
 
 ``` r
 # Multiple Regression with Transformed Dependent Variable
-CRECEIVEregressionTrfm <- lm(CRECEIVEsqrt ~ GYEAR + CAT02 + CAT03 + CAT04 + CLAIMS + ORIGINAL + GENERAL + FWDAPLAG, data = Sample90to95D, na.action = na.omit)
+CRECEIVEregressionTrfm <- lm(CRECEIVEsqrt ~ GYEAR + CAT02 + CAT03 + CAT04 + 
+                               CLAIMS + ORIGINAL + GENERAL + FWDAPLAG, 
+                             data = Sample90to95D, na.action = na.omit)
 summary(CRECEIVEregressionTrfm)
 ```
 

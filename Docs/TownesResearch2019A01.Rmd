@@ -45,7 +45,8 @@ library(ResourceSelection) # contains function for Hosmer-Lemdshow goodness of f
 ## Load Raw Data
 The following code chunk imports the raw data from the `txt` file for the NBER data set for the period 1963 to 1999.
 ```{r import-data, message = FALSE, warning = FALSE}
-DataRaw <- read.table(here("DataRaw","NBERpatents1963to1999/apat63_99.txt"), sep = ",", header = TRUE, fill = TRUE, dec = ".")
+DataRaw <- read.table(here("DataRaw","NBERpatents1963to1999/apat63_99.txt"), 
+                      sep = ",", header = TRUE, fill = TRUE, dec = ".")
 ```
 
 ## Subset Data
@@ -61,7 +62,8 @@ DataSubset90to95 <- as_tibble(DataSubset90to95) # convert data frame to tibble
 The following code chunk takes a sample of 2,000 cases from the data subset for the period 1990 through 1995.
 ``` {r sample-90-95, message = FALSE, warning = FALSE}
 set.seed(1972)
-Sample90to95 <- sample(1:nrow(DataSubset90to95), size = 2000, replace = TRUE, prob = NULL)
+Sample90to95 <- sample(1:nrow(DataSubset90to95), size = 2000, 
+                       replace = TRUE, prob = NULL)
 Sample90to95 <- DataSubset90to95[Sample90to95,]
 Sample90to95 <- as_tibble(Sample90to95)
 ```
@@ -70,7 +72,9 @@ Sample90to95 <- as_tibble(Sample90to95)
 The following code chunk reorganizes the variables and eliminates variables not used in the analysis.
 ```{r clean-data-01, message = FALSE, warning = FALSE}
 Sample90to95 %>%
-  dplyr::select(PATENT, GYEAR, CRECEIVE, CAT, CLAIMS, CMADE, GENERAL, ORIGINAL, FWDAPLAG, BCKGTLAG) -> Sample90to95A # Another package also has a `select()` function
+  dplyr::select(PATENT, GYEAR, CRECEIVE, CAT, CLAIMS, CMADE, GENERAL, 
+                ORIGINAL, FWDAPLAG, BCKGTLAG) -> Sample90to95A 
+# Another package also has a `select()` function
 ```
 
 ## Inspect Sample Data
@@ -109,39 +113,39 @@ summary(Sample90to95B)
 ## Histograms
 The following code chunk displays histograms for the variables of primary interest to enable visual inspection of the data to evaluate whether or not they fit normal distributions. The code chunk generates separate `png` files that are saved in the `Results` folder.
 ```{r histograms, message = FALSE, warning = FALSE}
-histoGYEAR <- ggplot() +
+ggplot() +
   geom_histogram(Sample90to95B, mapping = aes(GYEAR))
 ggsave(here("results", "histogramGYEAR.png"), dpi = 300)
 
-histoCRECEIVE <- ggplot() +
+ggplot() +
   geom_histogram(Sample90to95B, mapping = aes(CRECEIVE))
 ggsave(here("Results", "histogramCRECEIVE.png"), dpi = 300)
 
-histoCAT <- ggplot() +
+ggplot() +
   geom_histogram(Sample90to95B, mapping = aes(CAT))
 ggsave(here("Results", "histogramCAT.png"), dpi = 300)
 
-histoCLAIMS <- ggplot() +
+ggplot() +
   geom_histogram(Sample90to95B, mapping = aes(CLAIMS))
 ggsave(here("Results", "histogramCLAIMS.png"), dpi = 300)
 
-histoCMADE <- ggplot() +
+ggplot() +
   geom_histogram(Sample90to95B, mapping = aes(CMADE))
 ggsave(here("Results", "histogramCMADE.png"), dpi = 300)
 
-histoGENERAL <- ggplot() +
+ggplot() +
   geom_histogram(Sample90to95B, mapping = aes(GENERAL))
 ggsave(here("Results", "histogramGENERAL.png"), dpi = 300)
 
-histoORIGINAL <- ggplot() +
+ggplot() +
   geom_histogram(Sample90to95B, mapping = aes(ORIGINAL))
 ggsave(here("Results", "histogramORIGINAL.png"), dpi = 300)
 
-histoFWDAPLAG <- ggplot() +
+ggplot() +
   geom_histogram(Sample90to95B, mapping = aes(FWDAPLAG))
 ggsave(here("Results", "histogramFWDAPLAG.png"), dpi = 300)
 
-histoBCKGTLAG <- ggplot() +
+ggplot() +
   geom_histogram(Sample90to95B, mapping = aes(BCKGTLAG))
 ggsave(here("Results", "histogramBCKGTLAG.png"), dpi = 300)
 ```
@@ -185,6 +189,63 @@ ggsave(here("results", "scatterCRECEIVEbyBCKGTLAG.png"), dpi = 300)
 ## Q-Q Plots
 The following code chunk displays Quantile-Quantile (Q-Q) plots to check for normal distribution in the data sample for each variable of primary interest. The code chunk generates separate `png` files that are saved in the `Results` folder.
 ```{r qq-plots, message = FALSE, warning = FALSE}
+ggplot(Sample90to95B)+
+  aes(sample = GYEAR)+
+  stat_qq()+
+  stat_qq_line()+
+  ggtitle("GYEAR Q-Q Plot")
+ggsave(here("Results", "QQplotGYEAR.png"))
+
+ggplot(Sample90to95B)+
+  aes(sample = CRECEIVE)+
+  stat_qq()+
+  stat_qq_line()+
+  ggtitle("CRECEIVE Q-Q Plot")
+ggsave(here("Results", "QQplotCRECEIVE.png"))
+
+ggplot(Sample90to95B)+
+  aes(sample = CLAIMS)+
+  stat_qq()+
+  stat_qq_line()+
+  ggtitle("CLAIMS Q-Q Plot")
+ggsave(here("Results", "QQplotCLAIMS.png"))
+
+ggplot(Sample90to95B)+
+  aes(sample = CMADE)+
+  stat_qq()+
+  stat_qq_line()+
+  ggtitle("CMADE Q-Q Plot")
+ggsave(here("Results", "QQplotCMADE.png"))
+
+ggplot(Sample90to95B)+
+  aes(sample = GENERAL)+
+  stat_qq()+
+  stat_qq_line()+
+  ggtitle("GENERAL Q-Q Plot")
+ggsave(here("Results", "QQplotGENERAL.png"))
+
+ggplot(Sample90to95B)+
+  aes(sample = ORIGINAL)+
+  stat_qq()+
+  stat_qq_line()+
+  ggtitle("ORIGINAL Q-Q Plot")
+ggsave(here("Results", "QQplotORIGINAL.png"))
+
+ggplot(Sample90to95B)+
+  aes(sample = FWDAPLAG)+
+  stat_qq()+
+  stat_qq_line()+
+  ggtitle("FWDAPLAG Q-Q Plot")
+ggsave(here("Results", "QQplotFWDAPLAG.png"))
+
+ggplot(Sample90to95B)+
+  aes(sample = BCKGTLAG)+
+  stat_qq()+
+  stat_qq_line()+
+  ggtitle("BCKGTLAG Q-Q Plot")
+ggsave(here("Results", "QQplotBCKGTLAG.png"))
+```
+
 png(filename = here("Results", "QQplotGYEAR.png"))
 qqnorm(Sample90to95B$GYEAR, pch = 1, frame = FALSE, 
        main = "Normal Q-Q Plot for GYEAR", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
@@ -232,13 +293,13 @@ qqnorm(Sample90to95B$BCKGTLAG, pch = 1, frame = FALSE,
        main = "Normal Q-Q Plot for BCKGTALG", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
 qqline(Sample90to95B$BCKGTLAG, col = "green", lwd = 2)
 dev.off()
-```
+
 
 ## Pairwise Correlation Coefficients
 The following code chunk calculates the pairwise correlation coefficients for all variables in the sample data using the Pearson product-moment correlation function.
 ```{r cor-matrix, message = FALSE, warning = FALSE}
 Sample90to95corrmatrix <- cor(Sample90to95B)
-view(Sample90to95corrmatrix)
+print(Sample90to95corrmatrix)
 ```
 
 ## Clean Data 2
@@ -325,12 +386,14 @@ Sample90to95C %>%
 ## Binary Logistic Regression Analysis
 The following code chunk uses the new dichotomous variable `CRECbinomial` as the dependent variable in a binary logistic regression analysis. It then displays the results. It also calculates the odds ratio, McFadden pseudo R-squared, confidence intervals for the coefficients, and Hosemer-Lemeshow goodness of fit test.
 ```{r binary-regression, message = FALSE, warning = FALSE}
-logitCRECEIVE <- glm(CRECbinary ~ GYEAR + as.factor(CAT) + CMADE + CLAIMS + ORIGINAL + GENERAL + FWDAPLAG + BCKGTLAG, data = Sample90to95C, family = binomial, na.action = na.omit)
+logitCRECEIVE <- glm(CRECbinary ~ GYEAR + as.factor(CAT) + CMADE + CLAIMS + 
+                       ORIGINAL + GENERAL + FWDAPLAG + BCKGTLAG, 
+                     data = Sample90to95C, family = binomial, 
+                     na.action = na.omit)
 summary(logitCRECEIVE)
-coefs <- coef(logitCRECEIVE)
 
 # Raise e to the coefficients
-exp(coefs)
+exp(coef(logitCRECEIVE))
 
 # Obtain the McFadden pseudo R-squared
 pR2(logitCRECEIVE)
@@ -339,36 +402,59 @@ pR2(logitCRECEIVE)
 confint(logitCRECEIVE, level = 0.95)
 
 # Hosemer-Lemeshow Goodness of Fit Test
-GOF <- hoslem.test(Sample90to95C$CRECbinary, fitted(logitCRECEIVE), g=10)
-summary(GOF)
-cbind(GOF$expected, GOF$observed)
+HosLemBinomial <- hoslem.test(Sample90to95C$CRECbinary, 
+                              fitted(logitCRECEIVE), g=10)
+summary(HosLemBinomial)
+cbind(HosLemBinomial$expected, HosLemBinomial$observed)
 ```
 
 ## Ordinal Logistic Regression Analysis
 The following code chunk performs an ordinal logistic regression analysis on the data sample using `CRECEIVE` as the dependent variable. It then displays the results. It performs the analysis two different ways for comparison.
 ```{r ordinal-regression, message = FALSE, warning = FALSE}
 # Ordinal Logistic Regression Results - Method 01
-CRECEIVEordinal <- clm(as.factor(CRECordinal) ~ GYEAR + as.factor(CAT) + CMADE + CLAIMS + ORIGINAL + GENERAL + FWDAPLAG + BCKGTLAG, data = Sample90to95C)
-summary(CRECEIVEordinal)
-
-# Ordinal Logistic Regression Results - Method 02
-CRECEIVEordinal01 <- polr(as.factor(CRECordinal) ~ GYEAR + as.factor(CAT) + CMADE + CLAIMS + ORIGINAL + GENERAL + FWDAPLAG + BCKGTLAG, data = Sample90to95C, Hess = TRUE, model = TRUE, method = "logistic")
+CRECEIVEordinal01 <- clm(as.factor(CRECordinal) ~ GYEAR + as.factor(CAT) + 
+                           CMADE + CLAIMS + ORIGINAL + GENERAL + FWDAPLAG + 
+                           BCKGTLAG, data = Sample90to95C)
 summary(CRECEIVEordinal01)
 
+# Ordinal Logistic Regression Results - Method 02
+CRECEIVEordinal02 <- polr(as.factor(CRECordinal) ~ GYEAR + as.factor(CAT) +
+                            CMADE + CLAIMS + ORIGINAL + GENERAL + FWDAPLAG +
+                            BCKGTLAG, data = Sample90to95C, Hess = TRUE, 
+                          model = TRUE, method = "logistic")
+summary(CRECEIVEordinal02)
+
 # Calculate P-Values for Coefficients
-coefsOrdinal <- coefficients(summary(CRECEIVEordinal01))
-pvalues <- pt(abs(coefsOrdinal)[,"t value"], df=CRECEIVEordinal01$df,lower.tail = FALSE)*2
+coefsOrdinal <- coefficients(summary(CRECEIVEordinal02))
+pvalues <- pt(abs(coefsOrdinal)[,"t value"], df=CRECEIVEordinal02$df,lower.tail = FALSE)*2
 pval <- pnorm(abs(coefsOrdinal)[,"t value"],lower.tail = FALSE)*2
 coefsOrdinal01 <- cbind(coefsOrdinal, "p values (t dist)" = round(pvalues, 5))
 coefsOrdinal01 <- cbind(coefsOrdinal01, "p values (Normal)" = round(pval, 5))
-print("Ordinal Logistic Regression Results with P-values")
 summary(coefsOrdinal01)
+
+# Raise e to the coefficients
+exp(coef(CRECEIVEordinal01))
+
+# Obtain the McFadden pseudo R-squared
+pR2(CRECEIVEordinal02)
+
+# Confidence intervals for the coefficients
+confint(CRECEIVEordinal01, level = 0.95)
+
+# Hosemer-Lemeshow Goodness of Fit Test
+HosLemOrdinal <- hoslem.test(Sample90to95C$CRECordinal,
+                             fitted(CRECEIVEordinal01), g=10)
+summary(HosLemOrdinal)
+cbind(HosLemOrdinal$expected, HosLemOrdinal$observed)
 ```
 
 ## Multiple Regression Model Selection
 The following code chunk creates regression subsets using the exhaustive method with `CRECEIVE` as the dependent variable.  It then displays the summary statistics to facilitate selection of the best regression model on which to focus.
 ```{r regression-subsets, message = FALSE, warning = FALSE}
-CRECregsubsets <- regsubsets(CRECEIVE ~ GYEAR + as.factor(CAT) + CMADE + CLAIMS + ORIGINAL + GENERAL + FWDAPLAG + BCKGTLAG, data = Sample90to95C, nbest = 2, method = "exhaustive")
+CRECregsubsets <- regsubsets(CRECEIVE ~ GYEAR + as.factor(CAT) + CMADE + 
+                               CLAIMS + ORIGINAL + GENERAL + FWDAPLAG + 
+                               BCKGTLAG, data = Sample90to95C, 
+                             nbest = 2, method = "exhaustive")
 summary(CRECregsubsets,all.best=FALSE, matrix=TRUE)
 plot(CRECregsubsets, scale = "adjr2")
 ```
@@ -377,7 +463,9 @@ plot(CRECregsubsets, scale = "adjr2")
 The following code chunk performs a multiple regression analysis on the data sample using the selected model. It then displays the results.
 ```{r multiple-regression, message = FALSE, warning = FALSE}
 # Multiple Regression
-CRECEIVEregression <- lm(CRECEIVE ~ GYEAR + CAT02 + CAT03 + CAT04 + CLAIMS + ORIGINAL + GENERAL + FWDAPLAG, data = Sample90to95C, na.action = na.omit)
+CRECEIVEregression <- lm(CRECEIVE ~ GYEAR + CAT02 + CAT03 + CAT04 + CLAIMS + 
+                           ORIGINAL + GENERAL + FWDAPLAG, 
+                         data = Sample90to95C, na.action = na.omit)
 summary(CRECEIVEregression)
 ```
 
@@ -444,18 +532,27 @@ Sample90to95C %>%
 ## Q-Q Plots for Transformed Variables
 The following code chunk displays Quantile-Quantile (Q-Q) plots for the transformed variables to check for suitability to use in multiple regression analysis.
 ```{r qq-plots-transformed, message = FALSE, warning = FALSE}
+ggplot(Sample90to95D)+
+  aes(sample = CRECEIVEsqrt)+
+  stat_qq()+
+  stat_qq_line()+
+  ggtitle("CRECEIVEsqrt Q-Q Plot")
+ggsave(here("Results", "QQplotCRECEIVEsqrt.png"))
+```
+
 png(filename = here("Results", "QQplotCRECEIVEsqrt.png"))
 qqnorm(Sample90to95D$CRECEIVEsqrt, pch = 1, frame = FALSE, 
        main = "Normal Q-Q Plot for CRECEIVEsqrt", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
 qqline(Sample90to95D$CRECEIVEsqrt, col = "green", lwd = 2)
 dev.off()
-```
 
 ## Multiple Regression Using Transformed Variables 
 The following code chunk performs a multiple regression analysis using the transformed dependent variable and displays the results.
 ```{r multiple-regression-trfm, message = FALSE, warning = FALSE}
 # Multiple Regression with Transformed Dependent Variable
-CRECEIVEregressionTrfm <- lm(CRECEIVEsqrt ~ GYEAR + CAT02 + CAT03 + CAT04 + CLAIMS + ORIGINAL + GENERAL + FWDAPLAG, data = Sample90to95D, na.action = na.omit)
+CRECEIVEregressionTrfm <- lm(CRECEIVEsqrt ~ GYEAR + CAT02 + CAT03 + CAT04 + 
+                               CLAIMS + ORIGINAL + GENERAL + FWDAPLAG, 
+                             data = Sample90to95D, na.action = na.omit)
 summary(CRECEIVEregressionTrfm)
 ```
 
