@@ -2,7 +2,7 @@ R Notebook: Improving Construct Validity in Studies of Technology
 Transfer
 ================
 Malcolm S. Townes
-(July 09, 2019)
+(July 10, 2019)
 
 ## Introduction
 
@@ -1362,8 +1362,8 @@ gvlma(CRECEIVEregression)
     ## Heteroscedasticity     37.66 8.424e-10 Assumptions NOT satisfied!
 
 ``` r
-# Residuals
-png(filename = here("Results","MultRegresPlotResiduals.png"))
+# View residuals
+png(filename = here("Results","MultRegres01ModelResidualsPlotA.png"))
 CRECEIVEresid <- residuals(CRECEIVEregression)
 plot(CRECEIVEresid)
 dev.off()
@@ -1373,10 +1373,27 @@ dev.off()
     ##   2
 
 ``` r
-# Check for homoscedasticity of residuals or equal variance
+ggplot(CRECEIVEregression)+
+  aes(x=.fitted, y=.resid)+
+  geom_point()
+```
+
+![](TownesResearch2019A01_files/figure-gfm/assumptions-check-01-1.png)<!-- -->
+
+``` r
+ggsave(here("Results","MultRegres01ModelResidualsPlotB.png"))
+
+# Check that mean of residuals equals zero
+mean(CRECEIVEregression$residuals)
+```
+
+    ## [1] -3.595121e-16
+
+``` r
 # Check for normality of residuals
-png(filename = here("Results", "MultRegresQQplotModelResiduals01.png"))
-par(mfrow=c(2,2))
+# Check for homoscedasticity of residuals or equal variance
+png(filename = here("Results", "MultRegres01ModelResidualsDistribution.png"))
+par(mfrow=c(2,2)) # set 2 rows and 2 column layout for plot
 plot(CRECEIVEregression)
 dev.off()
 ```
@@ -1502,108 +1519,91 @@ print(CorrFWDAPLAG)
 
 ``` r
 # Check that the variability in independent variable values is positive
-VarRegression <- var(Sample90to95C)
-print(VarRegression)
+varGYEAR <- var(Sample90to95C$GYEAR)
+print(varGYEAR)
 ```
 
-    ##                    PATENT         GYEAR      CRECEIVE           CAT
-    ## PATENT       2.896022e+10  2.847921e+05 -1.966105e+05 -1.015111e+04
-    ## GYEAR        2.847921e+05  2.882845e+00 -1.843425e+00 -8.101116e-02
-    ## CRECEIVE    -1.966105e+05 -1.843425e+00  5.277040e+01 -1.234403e+00
-    ## CAT         -1.015111e+04 -8.101116e-02 -1.234403e+00  3.158813e+00
-    ## CLAIMS       6.520031e+04  6.439837e-01  9.005697e+00 -2.885251e-01
-    ## CMADE        1.404069e+05  1.290039e+00  3.703980e+00  5.762247e-01
-    ## GENERAL     -6.018177e+03 -5.647784e-02  8.485036e-01 -5.243584e-02
-    ## ORIGINAL     4.025316e+03  4.045554e-02  2.843642e-03 -3.176534e-02
-    ## FWDAPLAG    -5.388636e+04 -5.080258e-01 -4.093814e+00  7.535903e-02
-    ## BCKGTLAG    -2.778372e+04 -1.834319e-01 -1.427896e+01  4.534177e+00
-    ## CRECbinary  -7.390528e+03 -7.528986e-02  8.059825e-01 -1.317066e-02
-    ## CAT01        4.983723e+02  1.378444e-04 -1.562003e-01 -5.185706e-01
-    ## CAT02        1.795055e+03  1.904433e-02  3.279130e-01 -1.788291e-01
-    ## CAT03       -1.121108e+03 -1.163181e-02  2.779332e-01 -7.662620e-02
-    ## CAT04        2.923029e+03  2.780948e-02  9.007405e-02  5.173526e-02
-    ## CAT05       -2.003705e+03 -1.657892e-02 -3.101950e-01  2.757650e-01
-    ## CAT06       -2.091643e+03 -1.878092e-02 -2.295250e-01  4.465256e-01
-    ## CRECordinal -1.541875e+05 -1.487075e+00  2.561643e+01 -7.408049e-01
-    ##                    CLAIMS         CMADE       GENERAL      ORIGINAL
-    ## PATENT       6.520031e+04  1.404069e+05 -6.018177e+03  4.025316e+03
-    ## GYEAR        6.439837e-01  1.290039e+00 -5.647784e-02  4.045554e-02
-    ## CRECEIVE     9.005697e+00  3.703980e+00  8.485036e-01  2.843642e-03
-    ## CAT         -2.885251e-01  5.762247e-01 -5.243584e-02 -3.176534e-02
-    ## CLAIMS       8.860728e+01  1.256695e+01  3.161584e-01  9.700124e-02
-    ## CMADE        1.256695e+01  6.500294e+01  1.989006e-01  6.008840e-01
-    ## GENERAL      3.161584e-01  1.989006e-01  7.826721e-02  1.769552e-02
-    ## ORIGINAL     9.700124e-02  6.008840e-01  1.769552e-02  8.673389e-02
-    ## FWDAPLAG    -2.231889e+00 -1.682757e+00 -2.363563e-01 -7.738447e-03
-    ## BCKGTLAG    -9.740716e+00  1.530772e+00 -4.312312e-01  1.007001e+00
-    ## CRECbinary   3.153035e-01  2.180668e-01  4.194818e-02  8.232704e-04
-    ## CAT01       -5.634027e-02 -2.122754e-02  4.828916e-03  1.138813e-02
-    ## CAT02        9.992241e-02 -1.214164e-01  9.840877e-03 -1.327705e-03
-    ## CAT03        7.851392e-02  6.506657e-02  6.029517e-05 -3.258091e-03
-    ## CAT04        7.373122e-02 -5.197686e-02 -3.251499e-05 -2.326255e-03
-    ## CAT05       -2.124673e-01 -7.566756e-02 -1.118810e-02 -5.437690e-03
-    ## CAT06        1.664008e-02  2.052217e-01 -3.509474e-03  9.616145e-04
-    ## CRECordinal  6.480824e+00  3.460179e+00  6.450770e-01  1.308021e-02
-    ##                  FWDAPLAG      BCKGTLAG    CRECbinary         CAT01
-    ## PATENT      -5.388636e+04 -2.778372e+04 -7.390528e+03  4.983723e+02
-    ## GYEAR       -5.080258e-01 -1.834319e-01 -7.528986e-02  1.378444e-04
-    ## CRECEIVE    -4.093814e+00 -1.427896e+01  8.059825e-01 -1.562003e-01
-    ## CAT          7.535903e-02  4.534177e+00 -1.317066e-02 -5.185706e-01
-    ## CLAIMS      -2.231889e+00 -9.740716e+00  3.153035e-01 -5.634027e-02
-    ## CMADE       -1.682757e+00  1.530772e+00  2.180668e-01 -2.122754e-02
-    ## GENERAL     -2.363563e-01 -4.312312e-01  4.194818e-02  4.828916e-03
-    ## ORIGINAL    -7.738447e-03  1.007001e+00  8.232704e-04  1.138813e-02
-    ## FWDAPLAG     8.095435e+00  5.397331e+00 -9.017406e-01  5.343921e-02
-    ## BCKGTLAG     5.397331e+00  2.099605e+02 -6.525785e-01 -5.235270e-02
-    ## CRECbinary  -9.017406e-01 -6.525785e-01  1.362717e-01 -7.104751e-03
-    ## CAT01        5.343921e-02 -5.235270e-02 -7.104751e-03  1.540950e-01
-    ## CAT02       -7.777277e-02 -7.359594e-01  1.085186e-02 -1.971426e-02
-    ## CAT03        2.038181e-02 -1.840212e-01  6.619038e-04 -2.009521e-02
-    ## CAT04       -6.925563e-02 -6.170772e-01  6.590466e-03 -3.580947e-02
-    ## CAT05        4.590183e-02  4.576425e-01 -9.879684e-03 -4.114280e-02
-    ## CAT06        2.730555e-02  1.131768e+00 -1.119798e-03 -3.733328e-02
-    ## CRECordinal -3.831362e+00 -1.031416e+01  7.006631e-01 -9.965749e-02
-    ##                     CAT02         CAT03         CAT04         CAT05
-    ## PATENT       1.795055e+03 -1.121108e+03  2.923029e+03 -2.003705e+03
-    ## GYEAR        1.904433e-02 -1.163181e-02  2.780948e-02 -1.657892e-02
-    ## CRECEIVE     3.279130e-01  2.779332e-01  9.007405e-02 -3.101950e-01
-    ## CAT         -1.788291e-01 -7.662620e-02  5.173526e-02  2.757650e-01
-    ## CLAIMS       9.992241e-02  7.851392e-02  7.373122e-02 -2.124673e-01
-    ## CMADE       -1.214164e-01  6.506657e-02 -5.197686e-02 -7.566756e-02
-    ## GENERAL      9.840877e-03  6.029517e-05 -3.251499e-05 -1.118810e-02
-    ## ORIGINAL    -1.327705e-03 -3.258091e-03 -2.326255e-03 -5.437690e-03
-    ## FWDAPLAG    -7.777277e-02  2.038181e-02 -6.925563e-02  4.590183e-02
-    ## BCKGTLAG    -7.359594e-01 -1.840212e-01 -6.170772e-01  4.576425e-01
-    ## CRECbinary   1.085186e-02  6.619038e-04  6.590466e-03 -9.879684e-03
-    ## CAT01       -1.971426e-02 -2.009521e-02 -3.580947e-02 -4.114280e-02
-    ## CAT02        9.291640e-02 -1.094660e-02 -1.950674e-02 -2.241200e-02
-    ## CAT03       -1.094660e-02  9.450036e-02 -1.988368e-02 -2.284508e-02
-    ## CAT04       -1.950674e-02 -1.988368e-02  1.528499e-01 -4.070971e-02
-    ## CAT05       -2.241200e-02 -2.284508e-02 -4.070971e-02  1.695516e-01
-    ## CAT06       -2.033681e-02 -2.072979e-02 -3.694030e-02 -4.244204e-02
-    ## CRECordinal  2.277425e-01  1.425040e-01  5.518538e-02 -2.097606e-01
-    ##                     CAT06   CRECordinal
-    ## PATENT      -2.091643e+03 -1.541875e+05
-    ## GYEAR       -1.878092e-02 -1.487075e+00
-    ## CRECEIVE    -2.295250e-01  2.561643e+01
-    ## CAT          4.465256e-01 -7.408049e-01
-    ## CLAIMS       1.664008e-02  6.480824e+00
-    ## CMADE        2.052217e-01  3.460179e+00
-    ## GENERAL     -3.509474e-03  6.450770e-01
-    ## ORIGINAL     9.616145e-04  1.308021e-02
-    ## FWDAPLAG     2.730555e-02 -3.831362e+00
-    ## BCKGTLAG     1.131768e+00 -1.031416e+01
-    ## CRECbinary  -1.119798e-03  7.006631e-01
-    ## CAT01       -3.733328e-02 -9.965749e-02
-    ## CAT02       -2.033681e-02  2.277425e-01
-    ## CAT03       -2.072979e-02  1.425040e-01
-    ## CAT04       -3.694030e-02  5.518538e-02
-    ## CAT05       -4.244204e-02 -2.097606e-01
-    ## CAT06        1.577822e-01 -1.160139e-01
-    ## CRECordinal -1.160139e-01  1.869192e+01
+    ## [1] 2.882845
 
 ``` r
-# Check for perfect multicollinearity among the variables
+varCAT02 <- var(Sample90to95C$CAT02)
+print(varCAT02)
+```
+
+    ## [1] 0.0929164
+
+``` r
+varCAT03 <- var(Sample90to95C$CAT03)
+print(varCAT03)
+```
+
+    ## [1] 0.09450036
+
+``` r
+varCAT04 <- var(Sample90to95C$CAT04)
+print(varCAT04)
+```
+
+    ## [1] 0.1528499
+
+``` r
+varCAT05 <- var(Sample90to95C$CAT05)
+print(varCAT05)
+```
+
+    ## [1] 0.1695516
+
+``` r
+varCAT06 <- var(Sample90to95C$CAT06)
+print(varCAT06)
+```
+
+    ## [1] 0.1577822
+
+``` r
+varCLAIMS <- var(Sample90to95C$CLAIMS)
+print(varCLAIMS)
+```
+
+    ## [1] 88.60728
+
+``` r
+varCMADE <- var(Sample90to95C$CMADE)
+print(varCMADE)
+```
+
+    ## [1] 65.00294
+
+``` r
+varGENERAL <- var(Sample90to95C$GENERAL)
+print(varGENERAL)
+```
+
+    ## [1] 0.07826721
+
+``` r
+varORIGINAL <- var(Sample90to95C$ORIGINAL)
+print(varORIGINAL)
+```
+
+    ## [1] 0.08673389
+
+``` r
+varFWDAPLAG <- var(Sample90to95C$FWDAPLAG)
+print(varFWDAPLAG)
+```
+
+    ## [1] 8.095435
+
+``` r
+varBCKGTLAG <- var(Sample90to95C$BCKGTLAG)
+print(varBCKGTLAG)
+```
+
+    ## [1] 209.9605
+
+``` r
+# Calculate Variance Inflation Factors to check for perfect multicollinearity among the variables
 VIFregression <- vif(CRECEIVEregression)
 print(VIFregression)
 ```
@@ -1726,9 +1726,9 @@ gvlma(CRECEIVEregressionTrfm)
     ## Heteroscedasticity   0.05701 0.8112811    Assumptions acceptable.
 
 ``` r
-# Residuals
+# View residuals
 CRECEIVEresidTrfm <- residuals(CRECEIVEregressionTrfm)
-png(filename = here("Results","MultRegresPlotResidualsTrfm.png"))
+png(filename = here("Results","MultRegresTrfmModelResidualsPlotA.png"))
 plot(CRECEIVEresidTrfm)
 dev.off()
 ```
@@ -1737,10 +1737,20 @@ dev.off()
     ##   2
 
 ``` r
-# Check for homoscedasticity of residuals or equal variance
+ggplot(CRECEIVEregressionTrfm)+
+  aes(x=.fitted, y=.resid)+
+  geom_point()
+```
+
+![](TownesResearch2019A01_files/figure-gfm/assumptions-check-trfm-1.png)<!-- -->
+
+``` r
+ggsave(here("Results","MultRegresTrfmModelResidualsPlotB.png"))
+
 # Check for normality of residuals
-png(filename = here("Results", "MultRegresQQplotModelResidualsTrfm.png"))
-par(mfrow=c(2,2))
+# Check for homoscedasticity of residuals or equal variance
+png(filename = here("Results", "MultRegresTrfmModelResidualsDistribution.png"))
+par(mfrow=c(2,2)) # set 2 rows and 2 column layout for plot
 plot(CRECEIVEregressionTrfm)
 dev.off()
 ```
@@ -1750,237 +1760,127 @@ dev.off()
 
 ``` r
 # Check for autocorrelation of residuals using Durbin-Watson test
-AutoCorr <- dwtest(CRECEIVEregressionTrfm)
+AutoCorrTrfm <- dwtest(CRECEIVEregressionTrfm)
 print(AutoCorr)
 ```
 
     ## 
     ##  Durbin-Watson test
     ## 
-    ## data:  CRECEIVEregressionTrfm
-    ## DW = 2.0548, p-value = 0.8753
+    ## data:  CRECEIVEregression
+    ## DW = 1.9843, p-value = 0.3622
     ## alternative hypothesis: true autocorrelation is greater than 0
 
 ``` r
 # Check that the independent variables and the residuals are uncorrelated
-CorrGYEAR <- cor.test(Sample90to95D$GYEAR, CRECEIVEregressionTrfm$residuals)
+CorrGYEARtrfm <- cor.test(Sample90to95D$GYEAR, CRECEIVEregressionTrfm$residuals)
 print(CorrGYEAR)
 ```
 
     ## 
     ##  Pearson's product-moment correlation
     ## 
-    ## data:  Sample90to95D$GYEAR and CRECEIVEregressionTrfm$residuals
-    ## t = -1.396e-11, df = 1761, p-value = 1
+    ## data:  Sample90to95C$GYEAR and CRECEIVEregression$residuals
+    ## t = -1.598e-11, df = 1996, p-value = 1
     ## alternative hypothesis: true correlation is not equal to 0
     ## 95 percent confidence interval:
-    ##  -0.04668485  0.04668485
+    ##  -0.04385287  0.04385287
     ## sample estimates:
     ##           cor 
-    ## -3.326677e-13
+    ## -3.576716e-13
 
 ``` r
-CorrCAT <- cor.test(Sample90to95D$CAT, CRECEIVEregressionTrfm$residuals)
+CorrCATtrfm <- cor.test(Sample90to95D$CAT, CRECEIVEregressionTrfm$residuals)
 print(CorrCAT)
 ```
 
     ## 
     ##  Pearson's product-moment correlation
     ## 
-    ## data:  Sample90to95D$CAT and CRECEIVEregressionTrfm$residuals
-    ## t = 2.0335, df = 1761, p-value = 0.04216
+    ## data:  Sample90to95C$CAT and CRECEIVEregression$residuals
+    ## t = -0.19801, df = 1996, p-value = 0.8431
     ## alternative hypothesis: true correlation is not equal to 0
     ## 95 percent confidence interval:
-    ##  0.001719017 0.094870465
+    ##  -0.04827556  0.03942846
     ## sample estimates:
-    ##        cor 
-    ## 0.04839998
+    ##          cor 
+    ## -0.004432068
 
 ``` r
-CorrCLAIMS <- cor.test(Sample90to95D$CLAIMS, CRECEIVEregressionTrfm$residuals)
+CorrCLAIMStrfm <- cor.test(Sample90to95D$CLAIMS, CRECEIVEregressionTrfm$residuals)
 print(CorrCLAIMS)
 ```
 
     ## 
     ##  Pearson's product-moment correlation
     ## 
-    ## data:  Sample90to95D$CLAIMS and CRECEIVEregressionTrfm$residuals
-    ## t = -6.185e-16, df = 1761, p-value = 1
+    ## data:  Sample90to95C$CLAIMS and CRECEIVEregression$residuals
+    ## t = 1.4501e-17, df = 1996, p-value = 1
     ## alternative hypothesis: true correlation is not equal to 0
     ## 95 percent confidence interval:
-    ##  -0.04668485  0.04668485
+    ##  -0.04385287  0.04385287
     ## sample estimates:
-    ##           cor 
-    ## -1.473869e-17
+    ##          cor 
+    ## 3.245828e-19
 
 ``` r
-CorrORIGINAL <- cor.test(Sample90to95D$ORIGINAL, CRECEIVEregressionTrfm$residuals)
+CorrORIGINALtrfm <- cor.test(Sample90to95D$ORIGINAL, CRECEIVEregressionTrfm$residuals)
 print(CorrORIGINAL)
 ```
 
     ## 
     ##  Pearson's product-moment correlation
     ## 
-    ## data:  Sample90to95D$ORIGINAL and CRECEIVEregressionTrfm$residuals
-    ## t = -6.27e-16, df = 1761, p-value = 1
+    ## data:  Sample90to95C$ORIGINAL and CRECEIVEregression$residuals
+    ## t = 9.1473e-16, df = 1996, p-value = 1
     ## alternative hypothesis: true correlation is not equal to 0
     ## 95 percent confidence interval:
-    ##  -0.04668485  0.04668485
+    ##  -0.04385287  0.04385287
     ## sample estimates:
-    ##           cor 
-    ## -1.494128e-17
+    ##          cor 
+    ## 2.047445e-17
 
 ``` r
-CorrGENERAL <- cor.test(Sample90to95D$GENERAL, CRECEIVEregressionTrfm$residuals)
+CorrGENERALtrfm <- cor.test(Sample90to95D$GENERAL, CRECEIVEregressionTrfm$residuals)
 print(CorrGENERAL)
 ```
 
     ## 
     ##  Pearson's product-moment correlation
     ## 
-    ## data:  Sample90to95D$GENERAL and CRECEIVEregressionTrfm$residuals
-    ## t = 6.7906e-16, df = 1761, p-value = 1
+    ## data:  Sample90to95C$GENERAL and CRECEIVEregression$residuals
+    ## t = -1.1524e-15, df = 1996, p-value = 1
     ## alternative hypothesis: true correlation is not equal to 0
     ## 95 percent confidence interval:
-    ##  -0.04668485  0.04668485
+    ##  -0.04385287  0.04385287
     ## sample estimates:
-    ##         cor 
-    ## 1.61818e-17
+    ##           cor 
+    ## -2.579462e-17
 
 ``` r
-CorrFWDAPLAG <- cor.test(Sample90to95D$FWDAPLAG, CRECEIVEregressionTrfm$residuals)
+CorrFWDAPLAGtrfm <- cor.test(Sample90to95D$FWDAPLAG, CRECEIVEregressionTrfm$residuals)
 print(CorrFWDAPLAG)
 ```
 
     ## 
     ##  Pearson's product-moment correlation
     ## 
-    ## data:  Sample90to95D$FWDAPLAG and CRECEIVEregressionTrfm$residuals
-    ## t = -1.393e-14, df = 1761, p-value = 1
+    ## data:  Sample90to95C$FWDAPLAG and CRECEIVEregression$residuals
+    ## t = -3.946e-15, df = 1996, p-value = 1
     ## alternative hypothesis: true correlation is not equal to 0
     ## 95 percent confidence interval:
-    ##  -0.04668485  0.04668485
+    ##  -0.04385287  0.04385287
     ## sample estimates:
-    ##           cor 
-    ## -3.319594e-16
+    ##          cor 
+    ## -8.83242e-17
 
 ``` r
 # Check that the variability in independent variable values is positive
-VarRegression <- var(Sample90to95D)
-print(VarRegression)
-```
+# See previous code chunk for check of linear regression assumptions
 
-    ##                     PATENT         GYEAR      CRECEIVE           CAT
-    ## PATENT        2.897945e+10  2.844399e+05 -6.394538e+04 -1.409340e+04
-    ## GYEAR         2.844399e+05  2.873931e+00 -6.203989e-01 -1.129456e-01
-    ## CRECEIVE     -6.394538e+04 -6.203989e-01  7.035986e+00 -1.360708e-01
-    ## CAT          -1.409340e+04 -1.129456e-01 -1.360708e-01  3.233065e+00
-    ## CLAIMS        5.850349e+04  5.803343e-01  2.849743e+00 -2.348692e-01
-    ## CMADE         1.436694e+05  1.328579e+00  1.783319e+00  8.729612e-01
-    ## GENERAL      -3.844485e+03 -3.573770e-02  4.121609e-01 -3.989527e-02
-    ## ORIGINAL      4.473449e+03  4.426064e-02 -1.371130e-02 -2.993685e-02
-    ## FWDAPLAG     -5.356460e+04 -4.989136e-01 -3.488651e+00  5.564046e-02
-    ## BCKGTLAG     -5.850574e+04 -4.574621e-01 -5.960454e+00  4.789596e+00
-    ## CRECbinary   -6.485743e+03 -6.725360e-02  5.588935e-01 -3.373996e-03
-    ## CAT01        -7.769777e+01 -5.915840e-03 -4.449579e-02 -5.474461e-01
-    ## CAT02         3.024390e+03  3.077383e-02  8.078339e-02 -1.572750e-01
-    ## CAT03        -4.971487e+02 -6.474041e-03  2.499416e-02 -7.377819e-02
-    ## CAT04         3.412263e+03  3.188122e-02  3.301339e-02  3.936961e-02
-    ## CAT05        -2.948749e+03 -2.491078e-02 -1.055931e-01  2.758612e-01
-    ## CAT06        -2.913058e+03 -2.535438e-02  1.129794e-02  4.632685e-01
-    ## CRECordinal  -6.394538e+04 -6.203989e-01  7.035986e+00 -1.360708e-01
-    ## CRECEIVEsqrt -2.201821e+04 -2.177766e-01  2.268225e+00 -3.336931e-02
-    ##                     CLAIMS         CMADE       GENERAL      ORIGINAL
-    ## PATENT        5.850349e+04  1.436694e+05 -3.844485e+03  4.473449e+03
-    ## GYEAR         5.803343e-01  1.328579e+00 -3.573770e-02  4.426064e-02
-    ## CRECEIVE      2.849743e+00  1.783319e+00  4.121609e-01 -1.371130e-02
-    ## CAT          -2.348692e-01  8.729612e-01 -3.989527e-02 -2.993685e-02
-    ## CLAIMS        7.942126e+01  1.154727e+01  2.125823e-01  5.336925e-02
-    ## CMADE         1.154727e+01  6.115318e+01  1.370663e-01  5.835641e-01
-    ## GENERAL       2.125823e-01  1.370663e-01  7.338131e-02  1.528828e-02
-    ## ORIGINAL      5.336925e-02  5.835641e-01  1.528828e-02  8.781611e-02
-    ## FWDAPLAG     -2.062222e+00 -1.665009e+00 -2.516884e-01 -5.393524e-03
-    ## BCKGTLAG     -7.360544e+00  2.658216e+00 -3.332279e-01  1.029000e+00
-    ## CRECbinary    2.852422e-01  2.112258e-01  4.210633e-02  3.051156e-04
-    ## CAT01        -2.658249e-02 -4.679684e-02  5.639350e-03  1.155396e-02
-    ## CAT02         8.338865e-02 -1.314204e-01  6.924817e-03 -2.359691e-03
-    ## CAT03        -6.266406e-03 -1.623098e-02 -1.640910e-03 -3.879843e-03
-    ## CAT04         1.014806e-01 -1.054885e-02 -9.896274e-04 -2.952867e-04
-    ## CAT05        -1.499350e-01 -4.350494e-02 -9.098766e-03 -6.164084e-03
-    ## CAT06        -2.085368e-03  2.485020e-01 -8.348639e-04  1.144944e-03
-    ## CRECordinal   2.849743e+00  1.783319e+00  4.121609e-01 -1.371130e-02
-    ## CRECEIVEsqrt  9.463746e-01  6.424389e-01  1.488594e-01 -2.908575e-03
-    ##                   FWDAPLAG      BCKGTLAG    CRECbinary         CAT01
-    ## PATENT       -5.356460e+04 -5.850574e+04 -6.485743e+03 -77.697773569
-    ## GYEAR        -4.989136e-01 -4.574621e-01 -6.725360e-02  -0.005915840
-    ## CRECEIVE     -3.488651e+00 -5.960454e+00  5.588935e-01  -0.044495794
-    ## CAT           5.564046e-02  4.789596e+00 -3.373996e-03  -0.547446148
-    ## CLAIMS       -2.062222e+00 -7.360544e+00  2.852422e-01  -0.026582488
-    ## CMADE        -1.665009e+00  2.658216e+00  2.112258e-01  -0.046796845
-    ## GENERAL      -2.516884e-01 -3.332279e-01  4.210633e-02   0.005639350
-    ## ORIGINAL     -5.393524e-03  1.029000e+00  3.051156e-04   0.011553961
-    ## FWDAPLAG      8.919473e+00  5.417187e+00 -1.007187e+00   0.049840689
-    ## BCKGTLAG      5.417187e+00  2.171713e+02 -6.481510e-01  -0.136256012
-    ## CRECbinary   -1.007187e+00 -6.481510e-01  1.504472e-01  -0.006933414
-    ## CAT01         4.984069e-02 -1.362560e-01 -6.933414e-03   0.157829337
-    ## CAT02        -7.387552e-02 -6.645554e-01  9.406047e-03  -0.017264324
-    ## CAT03         3.014264e-02 -2.391907e-01 -1.466003e-03  -0.018378151
-    ## CAT04        -7.076579e-02 -6.007376e-01  6.969791e-03  -0.036422155
-    ## CAT05         4.176183e-02  4.689528e-01 -9.124693e-03  -0.044664477
-    ## CAT06         2.289615e-02  1.171787e+00  1.148272e-03  -0.041100230
-    ## CRECordinal  -3.488651e+00 -5.960454e+00  5.588935e-01  -0.044495794
-    ## CRECEIVEsqrt -1.763840e+00 -2.088974e+00  2.740546e-01  -0.017451405
-    ##                      CAT02         CAT03         CAT04         CAT05
-    ## PATENT        3.024390e+03 -4.971487e+02  3.412263e+03 -2.948749e+03
-    ## GYEAR         3.077383e-02 -6.474041e-03  3.188122e-02 -2.491078e-02
-    ## CRECEIVE      8.078339e-02  2.499416e-02  3.301339e-02 -1.055931e-01
-    ## CAT          -1.572750e-01 -7.377819e-02  3.936961e-02  2.758612e-01
-    ## CLAIMS        8.338865e-02 -6.266406e-03  1.014806e-01 -1.499350e-01
-    ## CMADE        -1.314204e-01 -1.623098e-02 -1.054885e-02 -4.350494e-02
-    ## GENERAL       6.924817e-03 -1.640910e-03 -9.896274e-04 -9.098766e-03
-    ## ORIGINAL     -2.359691e-03 -3.879843e-03 -2.952867e-04 -6.164084e-03
-    ## FWDAPLAG     -7.387552e-02  3.014264e-02 -7.076579e-02  4.176183e-02
-    ## BCKGTLAG     -6.645554e-01 -2.391907e-01 -6.007376e-01  4.689528e-01
-    ## CRECbinary    9.406047e-03 -1.466003e-03  6.969791e-03 -9.124693e-03
-    ## CAT01        -1.726432e-02 -1.837815e-02 -3.642215e-02 -4.466448e-02
-    ## CAT02         8.023420e-02 -8.232987e-03 -1.631628e-02 -2.000865e-02
-    ## CAT03        -8.232987e-03  8.487944e-02 -1.736895e-02 -2.129953e-02
-    ## CAT04        -1.631628e-02 -1.736895e-02  1.511625e-01 -4.221180e-02
-    ## CAT05        -2.000865e-02 -2.129953e-02 -4.221180e-02  1.758180e-01
-    ## CAT06        -1.841195e-02 -1.959982e-02 -3.884328e-02 -4.763350e-02
-    ## CRECordinal   8.078339e-02  2.499416e-02  3.301339e-02 -1.055931e-01
-    ## CRECEIVEsqrt  2.882500e-02  3.944614e-03  1.396083e-02 -3.442918e-02
-    ##                      CAT06   CRECordinal  CRECEIVEsqrt
-    ## PATENT       -2.913058e+03 -6.394538e+04 -2.201821e+04
-    ## GYEAR        -2.535438e-02 -6.203989e-01 -2.177766e-01
-    ## CRECEIVE      1.129794e-02  7.035986e+00  2.268225e+00
-    ## CAT           4.632685e-01 -1.360708e-01 -3.336931e-02
-    ## CLAIMS       -2.085368e-03  2.849743e+00  9.463746e-01
-    ## CMADE         2.485020e-01  1.783319e+00  6.424389e-01
-    ## GENERAL      -8.348639e-04  4.121609e-01  1.488594e-01
-    ## ORIGINAL      1.144944e-03 -1.371130e-02 -2.908575e-03
-    ## FWDAPLAG      2.289615e-02 -3.488651e+00 -1.763840e+00
-    ## BCKGTLAG      1.171787e+00 -5.960454e+00 -2.088974e+00
-    ## CRECbinary    1.148272e-03  5.588935e-01  2.740546e-01
-    ## CAT01        -4.110023e-02 -4.449579e-02 -1.745141e-02
-    ## CAT02        -1.841195e-02  8.078339e-02  2.882500e-02
-    ## CAT03        -1.959982e-02  2.499416e-02  3.944614e-03
-    ## CAT04        -3.884328e-02  3.301339e-02  1.396083e-02
-    ## CAT05        -4.763350e-02 -1.055931e-01 -3.442918e-02
-    ## CAT06         1.655888e-01  1.129794e-02  5.150137e-03
-    ## CRECordinal   1.129794e-02  7.035986e+00  2.268225e+00
-    ## CRECEIVEsqrt  5.150137e-03  2.268225e+00  8.229340e-01
-
-``` r
-# Check for perfect multicollinearity among the variables
-print("Check for Multicollinearity Among Variables", quote = FALSE)
-```
-
-    ## [1] Check for Multicollinearity Among Variables
-
-``` r
-VIFregression <- vif(CRECEIVEregressionTrfm)
-print(VIFregression)
+# Calculate Variance Inflaction Factors to check for perfect multicollinearity among the variables
+VIFregressionTrfm <- vif(CRECEIVEregressionTrfm)
+print(VIFregressionTrfm)
 ```
 
     ##    GYEAR    CAT02    CAT03    CAT04   CLAIMS ORIGINAL  GENERAL FWDAPLAG 
