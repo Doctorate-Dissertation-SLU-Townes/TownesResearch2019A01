@@ -2,23 +2,20 @@ R Notebook: Improving Construct Validity in Studies of Technology
 Transfer
 ================
 Malcolm S. Townes
-(July 10, 2019)
+(July 11, 2019)
 
 ## Introduction
 
-This is an R Notebook for an investigation of improving construct
-validity in studies of technology transfer.
+This is an R Notebook for an investigation that explores possiblities
+for improving construct validity in studies of technology transfer.
 
 ## Project Set Up
 
 The following code chunk enables the R Notebook to integrate seemlessly
 with the project organization format. This is normally included in the R
 Notebook to simplify file calls and enable file portability but it has
-been causing an error. Per Dr. Christopher Prener of Saint Louis
-University, the error is generated because the `here::here()` function
-has not been tested with certain combinations of functions. To work
-around this problem, I’ve embedded the `here()` function where I enter a
-file path when necessary.
+been causing an error. To work around this problem, I’ve embedded the
+`here()` function where I enter a file path when necessary.
 
 ``` r
 knitr::opts_knit$set(root.dir = here::here())
@@ -29,7 +26,8 @@ knitr::opts_knit$set(root.dir = here::here())
 The following code chunk loads package dependencies required to perform
 the necessary tasks. Basic tasks include importing, reading, wrangling,
 and cleaning data; selecting a subset of the data; checking for unique
-observations, and analyzing missing data.
+observations; analyzing missing data; and performing various types of
+regression analyses.
 
 ``` r
 library(tidyverse) # loads the basic R packages
@@ -48,8 +46,8 @@ library(lmtest) # functions for testing linear regression models
 library(leaps) # functions for regression subset selection
 library(car) # companion to applied regression
 library(aod) # functions to analyze overdispersed data counts and proportions
-library(pscl) # contains function for McFadden's Pseudo R2 for logistic regression
-library(ResourceSelection) # contains function for Hosmer-Lemdshow goodness of fit test
+library(pscl) # contains function for pseudo R2 measures for logistic regression
+library(ResourceSelection) # contains function for Hosmer-Lemeshow goodness of fit test
 ```
 
 ## Load Raw Data
@@ -75,7 +73,7 @@ DataRaw %>% # subset data
 DataSubset90to95 <- as_tibble(DataSubset90to95) # convert data frame to tibble
 ```
 
-## Sample Data
+## Extract Sample Data
 
 The following code chunk takes a sample of 2,000 cases from the data
 subset for the period 1990 through 1995.
@@ -88,7 +86,7 @@ Sample90to95 <- DataSubset90to95[Sample90to95,]
 Sample90to95 <- as_tibble(Sample90to95)
 ```
 
-## Clean Data Phase 1
+## Clean Data 01
 
 The following code chunk reorganizes the variables and eliminates
 variables not used in the analysis.
@@ -186,8 +184,8 @@ missing data. It then removes duplicate cases. The code chunk then
 checks for missing data for each variable in each case and missing data
 for each case. Then it checks for duplicate cases with the `PATENT`
 variable to determine if that variable can be used as a unique
-identifier for each observation. Finally, it checks for duplicate
-observations across all variables to ensure that each case is unique.
+identifier for each case. Finally, it checks for duplicate observations
+across all variables to ensure that each case is unique.
 
 ``` r
 Sample90to95B <- Sample90to95A
@@ -253,7 +251,7 @@ get_dupes(Sample90to95B)
     ## #   CAT <int>, CLAIMS <int>, CMADE <int>, GENERAL <dbl>, ORIGINAL <dbl>,
     ## #   FWDAPLAG <dbl>, BCKGTLAG <dbl>, dupe_count <int>
 
-## Central Tendency
+## Calculate Measures of Central Tendency
 
 The following code chunk calculates measures of central tendency in the
 sample data for each of the
@@ -285,12 +283,12 @@ summary(Sample90to95B)
     ##  3rd Qu.: 6.000   3rd Qu.:18.50  
     ##  Max.   :10.500   Max.   :85.14
 
-## Histograms
+## Prepare Histograms
 
-The following code chunk displays histograms for the variables of
-primary interest to enable visual inspection of the data to evaluate
-whether or not they fit normal distributions. The code chunk generates
-separate `png` files that are saved in the `Results` folder.
+The following code chunk displays histograms for the variables to enable
+visual inspection of the data to evaluate whether or not they fit normal
+distributions. The code chunk generates separate `png` files for each
+histogram, which are saved in the `Results` folder.
 
 ``` r
 ggplot() +
@@ -375,13 +373,14 @@ ggplot() +
 ggsave(here("Results", "histogramBCKGTLAG.png"), dpi = 300)
 ```
 
-## Scatter Plots
+## Prepare Scatter Plots
 
 The following code chunk displays scatter plots with `CRECEIVE` as the
-dependent variable against each of the the primary independent variables
-of interest to visually inspect for linear relationships between the
-dependent variable and each of the independent variables. The code chunk
-generates separate `png` files that are saved in the `Results` folder.
+dependent variable against each of the the independent variables to
+visually inspect for linear relationships between the dependent variable
+and each of the independent variables. The code chunk generates separate
+`png` files for each scatter plot, which are saved in the `Results`
+folder.
 
 ``` r
 ggplot() +
@@ -457,11 +456,11 @@ ggplot() +
 ggsave(here("results", "scatterCRECEIVEbyBCKGTLAG.png"), dpi = 300)
 ```
 
-## Q-Q Plots
+## Prepare Q-Q Plots
 
 The following code chunk displays Quantile-Quantile (Q-Q) plots to check
-for normal distribution in the data sample for each variable of primary
-interest. The code chunk generates separate `png` files that are saved
+for normal distribution in the data sample for each variable. The code
+chunk generates separate `png` files for each Q-Q plot, which are saved
 in the `Results` folder.
 
 ``` r
@@ -562,7 +561,7 @@ ggplot(Sample90to95B)+
 ggsave(here("Results", "QQplotBCKGTLAG.png"))
 ```
 
-## Pairwise Correlation Coefficients
+## Calculate Pairwise Correlation Coefficients
 
 The following code chunk calculates the pairwise correlation
 coefficients for all variables in the sample data using the Pearson
@@ -596,15 +595,14 @@ print(Sample90to95corrmatrix)
     ## FWDAPLAG -0.07335584 -0.29693216 -0.009235051  1.000000000  0.130915221
     ## BCKGTLAG  0.01310314 -0.10637791  0.235975356  0.130915221  1.000000000
 
-## Clean Data 2
+## Modify Data 01
 
 The following code chunk creates additional variables needed for the
 binary logistic regression, ordinal logistic regression, and multiple
-regression analyses and removes variables that will not be used. It
-first creates a new variable called `CRECbinary` that converts the
-`CRECEIVE` variable into a dichotomous variable. It then creates a
-series of dummy variables for the nominal `CAT` variable to use in
-multiple regression analysis.
+regression analyses. It first creates a new variable called `CRECbinary`
+that converts the `CRECEIVE` variable into a dichotomous variable. It
+then creates a series of dummy variables for the nominal `CAT` variable
+to use in multiple regression analysis.
 
 ``` r
 Sample90to95B %>%
@@ -617,13 +615,12 @@ Sample90to95B %>%
   mutate(CAT06 = ifelse(CAT == 6, 1, 0)) -> Sample90to95C
 ```
 
-## Observation Counts 1
+## Count Observations 01
 
-The following code chunk determines the number of observations for each
-outcome of each nominal and ordinal independent variable to determine if
-the sample size is large enough for logistic regression analysis, which
-requires at least 10 observations for the least frequent outcome for
-each independent variable.
+The following code chunk calculates the number of observations for each
+outcome of each nominal and ordinal variable to determine if the sample
+size is large enough for logistic regression analysis, which requires at
+least 10 observations for the least frequent outcome for each variable.
 
 ``` r
 Sample90to95C %>%
@@ -804,14 +801,14 @@ Sample90to95C %>%
     ## 10     9   118
     ## # ... with 39 more rows
 
-## Clean Data 3
+## Modify Data 02
 
 The following code chunk groups cases where the outcome level for
-`CRECEIVE` is greater than or equal to 15 citations cases for the
-logistic regression analysis because most of those outcome levels do not
-have enough cases individually for logistic regression analysis which
-requires at least 10 cases for the least frequent outcome level of each
-independent variable.
+`CRECEIVE` is greater than or equal to 15 citations because most outcome
+levels above 15 citations do not have enough cases individually for
+logistic regression analysis, which requires at least 10 cases for the
+least frequent outcome level of each variable. This was also done to
+simplify the ordinal logistic regression analysis.
 
 ``` r
 Sample90to95C %>% 
@@ -819,9 +816,9 @@ Sample90to95C %>%
 Sample90to95C <- as_tibble(Sample90to95C) # convert data frame to tibble
 ```
 
-## Observation Counts 2
+## Count Observations 02
 
-The following code chunk checks the number of observations for each
+The following code chunk calculates the number of observations for each
 outcome level of the new `CRECordinal` variable.
 
 ``` r
@@ -852,11 +849,11 @@ Sample90to95C %>%
 
 ## Binary Logistic Regression Analysis
 
-The following code chunk uses the new dichotomous variable
-`CRECbinomial` as the dependent variable in a binary logistic regression
-analysis. It then displays the results. It also calculates the odds
-ratio, McFadden pseudo R-squared, confidence intervals for the
-coefficients, and Hosemer-Lemeshow goodness of fit
+The following code chunk uses the new dichotomous variable `CRECbinary`
+as the dependent variable in a binary logistic regression analysis. It
+then displays the results. It also calculates the odds ratio, various
+pseudo R-squared measures, confidence intervals for the coefficients,
+and Hosemer-Lemeshow goodness of fit
 test.
 
 ``` r
@@ -966,12 +963,173 @@ cbind(HosLemBinomial$expected, HosLemBinomial$observed)
     ## [2.22e-16,1.25e-10]   200 1.148984e-09 200    0
     ## (1.25e-10,1]          125 1.673000e+03 125 1673
 
+## Modify Data 03
+
+The following code chunk creates a new variable called `CRECmdnSplt`
+using a median split of the `CRECEIVE` values. It then calculates the
+number of observations for each outcome level of the new variable.
+
+``` r
+Sample90to95C %>%
+  mutate(CRECmdnSplt = ifelse(CRECEIVE <= median(CRECEIVE),0,1)) -> Sample90to95C
+
+Sample90to95C %>%
+  group_by(CRECordinal) %>%
+  summarize(n())
+```
+
+    ## # A tibble: 16 x 2
+    ##    CRECordinal `n()`
+    ##          <dbl> <int>
+    ##  1           0   325
+    ##  2           1   307
+    ##  3           2   265
+    ##  4           3   234
+    ##  5           4   172
+    ##  6           5   142
+    ##  7           6    98
+    ##  8           7    73
+    ##  9           8    60
+    ## 10           9    44
+    ## 11          10    43
+    ## 12          11    33
+    ## 13          12    26
+    ## 14          13    18
+    ## 15          14    19
+    ## 16          15   139
+
+## Binomial Logistic Regression 02
+
+The following code chunk uses the new dichotomous variable `CRECmdnSplt`
+as the dependent variable in a binary logistic regression analysis. It
+then displays the results. It also calculates the odds ratio, various
+pseudo R-squared measures, confidence intervals for the coefficients,
+and Hosemer-Lemeshow goodness of fit
+test.
+
+``` r
+logitCRECEIVE02 <- glm(CRECmdnSplt ~ GYEAR + as.factor(CAT) + CMADE + CLAIMS + 
+                       ORIGINAL + GENERAL + FWDAPLAG + BCKGTLAG, 
+                     data = Sample90to95C, family = binomial, 
+                     na.action = na.omit)
+summary(logitCRECEIVE02)
+```
+
+    ## 
+    ## Call:
+    ## glm(formula = CRECmdnSplt ~ GYEAR + as.factor(CAT) + CMADE + 
+    ##     CLAIMS + ORIGINAL + GENERAL + FWDAPLAG + BCKGTLAG, family = binomial, 
+    ##     data = Sample90to95C, na.action = na.omit)
+    ## 
+    ## Deviance Residuals: 
+    ##     Min       1Q   Median       3Q      Max  
+    ## -2.4878  -0.7198  -0.2807   0.7900   2.2788  
+    ## 
+    ## Coefficients:
+    ##                   Estimate Std. Error z value Pr(>|z|)    
+    ## (Intercept)     530.049130  71.396218   7.424 1.14e-13 ***
+    ## GYEAR            -0.266350   0.035824  -7.435 1.05e-13 ***
+    ## as.factor(CAT)2   1.001504   0.222754   4.496 6.92e-06 ***
+    ## as.factor(CAT)3   0.724961   0.218178   3.323 0.000891 ***
+    ## as.factor(CAT)4   0.401390   0.184315   2.178 0.029425 *  
+    ## as.factor(CAT)5   0.115214   0.181788   0.634 0.526222    
+    ## as.factor(CAT)6   0.349511   0.186079   1.878 0.060342 .  
+    ## CMADE             0.024088   0.007466   3.226 0.001254 ** 
+    ## CLAIMS            0.014959   0.006127   2.441 0.014634 *  
+    ## ORIGINAL         -1.101033   0.221183  -4.978 6.43e-07 ***
+    ## GENERAL           4.277086   0.231356  18.487  < 2e-16 ***
+    ## FWDAPLAG         -0.199317   0.027395  -7.276 3.45e-13 ***
+    ## BCKGTLAG         -0.014514   0.004839  -2.999 0.002707 ** 
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## (Dispersion parameter for binomial family taken to be 1)
+    ## 
+    ##     Null deviance: 2734.8  on 1997  degrees of freedom
+    ## Residual deviance: 1927.5  on 1985  degrees of freedom
+    ## AIC: 1953.5
+    ## 
+    ## Number of Fisher Scoring iterations: 5
+
+``` r
+# Raise e to the coefficients
+exp(coef(logitCRECEIVE02))
+```
+
+    ##     (Intercept)           GYEAR as.factor(CAT)2 as.factor(CAT)3 
+    ##   1.575478e+230    7.661711e-01    2.722374e+00    2.064650e+00 
+    ## as.factor(CAT)4 as.factor(CAT)5 as.factor(CAT)6           CMADE 
+    ##    1.493900e+00    1.122114e+00    1.418373e+00    1.024380e+00 
+    ##          CLAIMS        ORIGINAL         GENERAL        FWDAPLAG 
+    ##    1.015072e+00    3.325274e-01    7.203026e+01    8.192905e-01 
+    ##        BCKGTLAG 
+    ##    9.855905e-01
+
+``` r
+# Obtain various pseudo R-squared measures
+pR2(logitCRECEIVE02)
+```
+
+    ##           llh       llhNull            G2      McFadden          r2ML 
+    ##  -963.7701190 -1367.4155161   807.2907942     0.2951885     0.3323889 
+    ##          r2CU 
+    ##     0.4458102
+
+``` r
+# Confidence intervals for the coefficients
+confint(logitCRECEIVE02, level = 0.95)
+```
+
+    ##                         2.5 %        97.5 %
+    ## (Intercept)     391.073793803 671.087874003
+    ## GYEAR            -0.337118070  -0.196617860
+    ## as.factor(CAT)2   0.567854360   1.441666434
+    ## as.factor(CAT)3   0.298812304   1.154626357
+    ## as.factor(CAT)4   0.040892175   0.763794014
+    ## as.factor(CAT)5  -0.240815919   0.472184516
+    ## as.factor(CAT)6  -0.014495946   0.715336476
+    ## CMADE             0.009997771   0.039406928
+    ## CLAIMS            0.003043646   0.027084072
+    ## ORIGINAL         -1.538150917  -0.670628626
+    ## GENERAL           3.829929593   4.737274993
+    ## FWDAPLAG         -0.254298531  -0.146799712
+    ## BCKGTLAG         -0.024240990  -0.005233893
+
+``` r
+# Hosemer-Lemeshow Goodness of Fit Test
+HosLemBinomial02 <- hoslem.test(Sample90to95C$CRECmdnSplt, 
+                              fitted(logitCRECEIVE02), g=10)
+print(HosLemBinomial02)
+```
+
+    ## 
+    ##  Hosmer and Lemeshow goodness of fit (GOF) test
+    ## 
+    ## data:  Sample90to95C$CRECmdnSplt, fitted(logitCRECEIVE02)
+    ## X-squared = 30.913, df = 8, p-value = 0.0001456
+
+``` r
+cbind(HosLemBinomial02$expected, HosLemBinomial02$observed)
+```
+
+    ##                      yhat0      yhat1  y0  y1
+    ## [0.00453,0.0533] 193.47787   6.522134 200   0
+    ## (0.0533,0.119]   182.51013  17.489868 191   9
+    ## (0.119,0.189]    169.43856  30.561440 172  28
+    ## (0.189,0.279]    152.73414  46.265862 141  58
+    ## (0.279,0.414]    132.08743  67.912568 120  80
+    ## (0.414,0.55]     103.11823  96.881768  86 114
+    ## (0.55,0.659]      78.16828 120.831722  81 118
+    ## (0.659,0.75]      58.66664 141.333359  74 126
+    ## (0.75,0.849]      40.15402 159.845977  44 156
+    ## (0.849,0.978]     20.64470 179.355303  22 178
+
 ## Ordinal Logistic Regression Analysis
 
 The following code chunk performs an ordinal logistic regression
-analysis on the data sample using `CRECEIVE` as the dependent variable.
-It then displays the results. It performs the analysis two different
-ways for comparison.
+analysis on the data sample using `CRECordinal` as the dependent
+variable. It then displays the results. It performs the analysis two
+different ways for comparison.
 
 ``` r
 # Ordinal Logistic Regression Results - Method 01
@@ -1221,9 +1379,9 @@ cbind(HosLemOrdinal$expected, HosLemOrdinal$observed)
 ## Multiple Regression Model Selection
 
 The following code chunk creates regression subsets using the exhaustive
-method with `CRECEIVE` as the dependent variable. It then displays the
-summary statistics to facilitate selection of the best regression model
-on which to
+algorithm with `CRECEIVE` as the dependent variable. It then displays
+the summary statistics to facilitate selection of the best regression
+model on which to
 focus.
 
 ``` r
@@ -1291,7 +1449,7 @@ plot(CRECregsubsets, scale = "adjr2")
 ## Multiple Regression Analysis
 
 The following code chunk performs a multiple regression analysis on the
-data sample using the selected model. It then displays the results.
+data sample using the selected variables. It then displays the results.
 
 ``` r
 # Multiple Regression
@@ -1615,7 +1773,7 @@ print(VIFregression)
     ##    GYEAR    CAT02    CAT03    CAT04   CLAIMS ORIGINAL  GENERAL FWDAPLAG 
     ## 1.058934 1.076779 1.055360 1.075535 1.021614 1.072760 1.219227 1.137526
 
-## Clean Data 4
+## Modify Data 04
 
 The following code chunk removes cases in which `CRECEIVE` is greater
 than or equal to 10 as outliers and applies a transformation to the
@@ -1628,11 +1786,11 @@ Sample90to95C %>%
   mutate(CRECEIVEsqrt = sqrt(CRECEIVE)) -> Sample90to95D
 ```
 
-## Q-Q Plots for Transformed Variables
+## Q-Q Plots for Transformed Dependent Variable
 
-The following code chunk displays Quantile-Quantile (Q-Q) plots for the
-transformed variables to check for suitability to use in multiple
-regression analysis.
+The following code chunk creates a Quantile-Quantile (Q-Q) plot for the
+transformed dependent variable to check for suitability to use in
+multiple regression analysis.
 
 ``` r
 ggplot(Sample90to95D)+
@@ -1648,11 +1806,7 @@ ggplot(Sample90to95D)+
 ggsave(here("Results", "QQplotCRECEIVEsqrt.png"))
 ```
 
-png(filename = here(“Results”, “QQplotCRECEIVEsqrt.png”))
-qqnorm(Sample90to95D\(CRECEIVEsqrt, pch = 1, frame = FALSE,  main = "Normal Q-Q Plot for CRECEIVEsqrt", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles") qqline(Sample90to95D\)CRECEIVEsqrt,
-col = “green”, lwd = 2) dev.off()
-
-## Multiple Regression Using Transformed Variables
+## Multiple Regression Using Transformed Dependent Variable
 
 The following code chunk performs a multiple regression analysis using
 the transformed dependent variable and displays the results.
@@ -1892,8 +2046,8 @@ print(VIFregressionTrfm)
 
 ## Save Data
 
-The following code chunk saves the final cleaned data that was used in
-the
+The following code chunk saves the final cleaned and modified data that
+was used in the
 analysis.
 
 ``` r

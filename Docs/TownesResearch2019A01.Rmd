@@ -3,24 +3,24 @@ title: "R Notebook: Improving Construct Validity in Studies of Technology Transf
 author: "Malcolm S. Townes"
 date: '(`r format(Sys.time(), "%B %d, %Y")`)'
 output: 
-    word_document: default
-    html_notebook: default
     github_document: default
+    html_notebook: default
+    word_document: default
     always_allow_html: yes
 ---
 
 ## Introduction
-This is an R Notebook for an investigation of improving construct validity in studies of technology transfer.
+This is an R Notebook for an investigation that explores possiblities for improving construct validity in studies of technology transfer.
 
 ## Project Set Up
-The following code chunk enables the R Notebook to integrate seemlessly with the project organization format. This is normally included in the R Notebook to simplify file calls and enable file portability but it has been causing an error. Per Dr. Christopher Prener of Saint Louis University, the error is generated because the `here::here()` function has not been tested with certain combinations of functions. To work around this problem, I've embedded the `here()` function where I enter a file path when necessary.
+The following code chunk enables the R Notebook to integrate seemlessly with the project organization format. This is normally included in the R Notebook to simplify file calls and enable file portability but it has been causing an error. To work around this problem, I've embedded the `here()` function where I enter a file path when necessary.
 
 ```{r setup-project, message = FALSE, warning = FALSE}
 knitr::opts_knit$set(root.dir = here::here())
 ```
 
 ## Load Dependencies
-The following code chunk loads package dependencies required to perform the necessary tasks. Basic tasks include importing, reading, wrangling, and cleaning data; selecting a subset of the data; checking for unique observations, and analyzing missing data. 
+The following code chunk loads package dependencies required to perform the necessary tasks. Basic tasks include importing, reading, wrangling, and cleaning data; selecting a subset of the data; checking for unique observations; analyzing missing data; and performing various types of regression analyses. 
 ```{r load-dependencies, message = FALSE, warning = FALSE}
 library(tidyverse) # loads the basic R packages
 library(here) # enables file portability
@@ -38,8 +38,8 @@ library(lmtest) # functions for testing linear regression models
 library(leaps) # functions for regression subset selection
 library(car) # companion to applied regression
 library(aod) # functions to analyze overdispersed data counts and proportions
-library(pscl) # contains function for McFadden's Pseudo R2 for logistic regression
-library(ResourceSelection) # contains function for Hosmer-Lemdshow goodness of fit test
+library(pscl) # contains function for pseudo R2 measures for logistic regression
+library(ResourceSelection) # contains function for Hosmer-Lemeshow goodness of fit test
 ```
 
 ## Load Raw Data
@@ -87,7 +87,7 @@ get_dupes(Sample90to95A)
 ```
 
 ## Adjust for Missing Data
-The following code chunk modifies cases with missing data, removes duplicate cases, and then evaluates the data sample to determine if additional cleaning is necessary. It first assigns a value of `0` to instances of `NA` in the data for the `GENERAL` variable. It then assigns a value of `1` to instances of `NA` in the data for the `ORIGINAL` variable. For the `FWDAPLAG` and `BCKGTLAG` variables it assigns the maximum value in the data for each variable to instances of missing data. It then removes duplicate cases. The code chunk then checks for missing data for each variable in each case and missing data for each case. Then it checks for duplicate cases with the `PATENT` variable to determine if that variable can be used as a unique identifier for each observation.  Finally, it checks for duplicate observations across all variables to ensure that each case is unique.
+The following code chunk modifies cases with missing data, removes duplicate cases, and then evaluates the data sample to determine if additional cleaning is necessary. It first assigns a value of `0` to instances of `NA` in the data for the `GENERAL` variable. It then assigns a value of `1` to instances of `NA` in the data for the `ORIGINAL` variable. For the `FWDAPLAG` and `BCKGTLAG` variables it assigns the maximum value in the data for each variable to instances of missing data. It then removes duplicate cases. The code chunk then checks for missing data for each variable in each case and missing data for each case. Then it checks for duplicate cases with the `PATENT` variable to determine if that variable can be used as a unique identifier for each case.  Finally, it checks for duplicate observations across all variables to ensure that each case is unique.
 ```{r missing-data, message = FALSE, warning = FALSE}
 Sample90to95B <- Sample90to95A
 Sample90to95B$GENERAL[is.na(x=Sample90to95B$GENERAL)] <- 0
@@ -111,7 +111,7 @@ summary(Sample90to95B)
 ```
 
 ## Prepare Histograms
-The following code chunk displays histograms for the variables of primary interest to enable visual inspection of the data to evaluate whether or not they fit normal distributions. The code chunk generates separate `png` files that are saved in the `Results` folder.
+The following code chunk displays histograms for the variables to enable visual inspection of the data to evaluate whether or not they fit normal distributions. The code chunk generates separate `png` files for each histogram, which are saved in the `Results` folder.
 ```{r histograms, message = FALSE, warning = FALSE}
 ggplot() +
   geom_histogram(Sample90to95B, mapping = aes(GYEAR))
@@ -151,7 +151,7 @@ ggsave(here("Results", "histogramBCKGTLAG.png"), dpi = 300)
 ```
 
 ## Prepare Scatter Plots
-The following code chunk displays scatter plots with `CRECEIVE` as the dependent variable against each of the the primary independent variables of interest to visually inspect for linear relationships between the dependent variable and each of the independent variables. The code chunk generates separate `png` files that are saved in the `Results` folder.
+The following code chunk displays scatter plots with `CRECEIVE` as the dependent variable against each of the the independent variables to visually inspect for linear relationships between the dependent variable and each of the independent variables. The code chunk generates separate `png` files for each scatter plot, which are saved in the `Results` folder.
 ```{r scatter-plots, message = FALSE, warning = FALSE}
 ggplot() +
   geom_point(Sample90to95B, mapping = aes(x = GYEAR, y = CRECEIVE))
@@ -187,7 +187,7 @@ ggsave(here("results", "scatterCRECEIVEbyBCKGTLAG.png"), dpi = 300)
 ```
 
 ## Prepare Q-Q Plots
-The following code chunk displays Quantile-Quantile (Q-Q) plots to check for normal distribution in the data sample for each variable of primary interest. The code chunk generates separate `png` files that are saved in the `Results` folder.
+The following code chunk displays Quantile-Quantile (Q-Q) plots to check for normal distribution in the data sample for each variable. The code chunk generates separate `png` files for each Q-Q plot, which are saved in the `Results` folder.
 ```{r qq-plots, message = FALSE, warning = FALSE}
 ggplot(Sample90to95B)+
   aes(sample = GYEAR)+
@@ -254,7 +254,7 @@ print(Sample90to95corrmatrix)
 ```
 
 ## Modify Data 01
-The following code chunk creates additional variables needed for the binary logistic regression, ordinal logistic regression, and multiple regression analyses and removes variables that will not be used.  It first creates a new variable called `CRECbinary` that converts the `CRECEIVE` variable into a dichotomous variable. It then creates a series of dummy variables for the nominal `CAT` variable to use in multiple regression analysis.
+The following code chunk creates additional variables needed for the binary logistic regression, ordinal logistic regression, and multiple regression analyses. It first creates a new variable called `CRECbinary` that converts the `CRECEIVE` variable into a dichotomous variable. It then creates a series of dummy variables for the nominal `CAT` variable to use in multiple regression analysis.
 ```{r modify-data-01, message = FALSE, warning = FALSE}
 Sample90to95B %>%
   mutate(CRECbinary = ifelse(CRECEIVE == 0, 0, 1)) %>%
@@ -267,7 +267,7 @@ Sample90to95B %>%
 ```
 
 ## Count Observations 01
-The following code chunk determines the number of observations for each outcome of each nominal and ordinal independent variable to determine if the sample size is large enough for logistic regression analysis, which requires at least 10 observations for the least frequent outcome for each independent variable.
+The following code chunk calculates the number of observations for each outcome of each nominal and ordinal variable to determine if the sample size is large enough for logistic regression analysis, which requires at least 10 observations for the least frequent outcome for each variable.
 ```{r count-obs-01, message = FALSE, warning = FALSE}
 Sample90to95C %>%
   group_by(GYEAR) %>%
@@ -319,7 +319,7 @@ Sample90to95C %>%
 ```
 
 ## Modify Data 02
-The following code chunk groups cases where the outcome level for `CRECEIVE` is greater than or equal to 15 citations because most outcome levels above 15 citations do not have enough cases individually for logistic regression analysis which requires at least 10 cases for the least frequent outcome level of each variable. This was also done to simplify the ordinal logistic regression analysis.
+The following code chunk groups cases where the outcome level for `CRECEIVE` is greater than or equal to 15 citations because most outcome levels above 15 citations do not have enough cases individually for logistic regression analysis, which requires at least 10 cases for the least frequent outcome level of each variable. This was also done to simplify the ordinal logistic regression analysis.
 ```{r modify-data-02, message = FALSE, warning = FALSE}
 Sample90to95C %>% 
   mutate(CRECordinal = ifelse (CRECEIVE>=15,15,CRECEIVE)) -> Sample90to95C
@@ -327,7 +327,7 @@ Sample90to95C <- as_tibble(Sample90to95C) # convert data frame to tibble
 ```
 
 ## Count Observations 02
-The following code chunk checks the number of observations for each outcome level of the new `CRECordinal` variable.
+The following code chunk calculates the number of observations for each outcome level of the new `CRECordinal` variable.
 ```{r count-obs-02, message = FALSE, warning = FALSE}
 Sample90to95C %>%
   group_by(CRECordinal) %>%
@@ -335,7 +335,7 @@ Sample90to95C %>%
 ```
 
 ## Binary Logistic Regression Analysis
-The following code chunk uses the new dichotomous variable `CRECbinomial` as the dependent variable in a binary logistic regression analysis. It then displays the results. It also calculates the odds ratio, McFadden pseudo R-squared, confidence intervals for the coefficients, and Hosemer-Lemeshow goodness of fit test.
+The following code chunk uses the new dichotomous variable `CRECbinary` as the dependent variable in a binary logistic regression analysis. It then displays the results. It also calculates the odds ratio, various pseudo R-squared measures, confidence intervals for the coefficients, and Hosemer-Lemeshow goodness of fit test.
 ```{r binary-regression, message = FALSE, warning = FALSE}
 logitCRECEIVE <- glm(CRECbinary ~ GYEAR + as.factor(CAT) + CMADE + CLAIMS + 
                        ORIGINAL + GENERAL + FWDAPLAG + BCKGTLAG, 
@@ -360,7 +360,7 @@ cbind(HosLemBinomial$expected, HosLemBinomial$observed)
 ```
 
 ## Modify Data 03
-The following code chunk creates a new variable called `CRECmdnSplt` using a median split of the `CRECEIVE` values. It then counts the number of observations for each outcome level of the new variable.
+The following code chunk creates a new variable called `CRECmdnSplt` using a median split of the `CRECEIVE` values. It then calculates the number of observations for each outcome level of the new variable.
 ```{r modify-data-03}
 Sample90to95C %>%
   mutate(CRECmdnSplt = ifelse(CRECEIVE <= median(CRECEIVE),0,1)) -> Sample90to95C
@@ -371,7 +371,7 @@ Sample90to95C %>%
 ```
 
 ## Binomial Logistic Regression 02
-The following code chunk uses the new dichotomous variable `CRECmdnSplt` as the dependent variable in a binary logistic regression analysis. It then displays the results. It also calculates the odds ratio, pseudo R-squared values, confidence intervals for the coefficients, and Hosemer-Lemeshow goodness of fit test.
+The following code chunk uses the new dichotomous variable `CRECmdnSplt` as the dependent variable in a binary logistic regression analysis. It then displays the results. It also calculates the odds ratio, various pseudo R-squared measures, confidence intervals for the coefficients, and Hosemer-Lemeshow goodness of fit test.
 ```{r binary-regression-02, message = FALSE, warning = FALSE}
 logitCRECEIVE02 <- glm(CRECmdnSplt ~ GYEAR + as.factor(CAT) + CMADE + CLAIMS + 
                        ORIGINAL + GENERAL + FWDAPLAG + BCKGTLAG, 
@@ -436,7 +436,7 @@ cbind(HosLemOrdinal$expected, HosLemOrdinal$observed)
 ```
 
 ## Multiple Regression Model Selection
-The following code chunk creates regression subsets using the exhaustive method with `CRECEIVE` as the dependent variable.  It then displays the summary statistics to facilitate selection of the best regression model on which to focus.
+The following code chunk creates regression subsets using the exhaustive algorithm with `CRECEIVE` as the dependent variable.  It then displays the summary statistics to facilitate selection of the best regression model on which to focus.
 ```{r regression-subsets, message = FALSE, warning = FALSE}
 CRECregsubsets <- regsubsets(CRECEIVE ~ GYEAR + as.factor(CAT) + CMADE + 
                                CLAIMS + ORIGINAL + GENERAL + FWDAPLAG + 
@@ -447,7 +447,7 @@ plot(CRECregsubsets, scale = "adjr2")
 ```
 
 ## Multiple Regression Analysis
-The following code chunk performs a multiple regression analysis on the data sample using the selected model. It then displays the results.
+The following code chunk performs a multiple regression analysis on the data sample using the selected variables. It then displays the results.
 ```{r multiple-regression, message = FALSE, warning = FALSE}
 # Multiple Regression
 CRECEIVEregression <- lm(CRECEIVE ~ GYEAR + CAT02 + CAT03 + CAT04 + CLAIMS + 
@@ -558,7 +558,7 @@ Sample90to95C %>%
 ```
 
 ## Q-Q Plots for Transformed Dependent Variable
-The following code chunk displays Quantile-Quantile (Q-Q) plots for the transformed variables to check for suitability to use in multiple regression analysis.
+The following code chunk creates a Quantile-Quantile (Q-Q) plot for the transformed dependent variable to check for suitability to use in multiple regression analysis.
 ```{r qq-plots-transformed, message = FALSE, warning = FALSE}
 ggplot(Sample90to95D)+
   aes(sample = CRECEIVEsqrt)+
@@ -567,12 +567,6 @@ ggplot(Sample90to95D)+
   ggtitle("CRECEIVEsqrt Q-Q Plot")
 ggsave(here("Results", "QQplotCRECEIVEsqrt.png"))
 ```
-
-png(filename = here("Results", "QQplotCRECEIVEsqrt.png"))
-qqnorm(Sample90to95D$CRECEIVEsqrt, pch = 1, frame = FALSE, 
-       main = "Normal Q-Q Plot for CRECEIVEsqrt", xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
-qqline(Sample90to95D$CRECEIVEsqrt, col = "green", lwd = 2)
-dev.off()
 
 ## Multiple Regression Using Transformed Dependent Variable 
 The following code chunk performs a multiple regression analysis using the transformed dependent variable and displays the results.
