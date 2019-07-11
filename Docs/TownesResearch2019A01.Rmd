@@ -58,7 +58,7 @@ DataRaw %>% # subset data
 DataSubset90to95 <- as_tibble(DataSubset90to95) # convert data frame to tibble
 ```
 
-## Sample Data
+## Extract Sample Data
 The following code chunk takes a sample of 2,000 cases from the data subset for the period 1990 through 1995.
 ``` {r sample-90-95, message = FALSE, warning = FALSE}
 set.seed(1972)
@@ -68,7 +68,7 @@ Sample90to95 <- DataSubset90to95[Sample90to95,]
 Sample90to95 <- as_tibble(Sample90to95)
 ```
 
-## Clean Data Phase 1
+## Clean Data 01
 The following code chunk reorganizes the variables and eliminates variables not used in the analysis.
 ```{r clean-data-01, message = FALSE, warning = FALSE}
 Sample90to95 %>%
@@ -79,7 +79,7 @@ Sample90to95 %>%
 
 ## Inspect Sample Data
 The following code chunk evaluates the data sample to determine if additional data cleaning is necessary.  It first checks for missing data for each variable.  It then checks for missing data for each variable in each case.  Then it checks for duplicate cases with the `PATENT` variable to determine if that variable can be used as a unique identifier for each case.  Finally, it checks for duplicate cases across all variables to ensure that each case is unique.
-```{r inspect-data-90-95, message = FALSE, warning = FALSE}
+```{r inspect-data, message = FALSE, warning = FALSE}
 miss_var_summary(Sample90to95A, order = TRUE)
 miss_case_summary(Sample90to95A, order = TRUE)
 get_dupes(Sample90to95A, PATENT)
@@ -104,13 +104,13 @@ get_dupes(Sample90to95B, PATENT)
 get_dupes(Sample90to95B)
 ```
 
-## Central Tendency
+## Calculate Measures of Central Tendency
 The following code chunk calculates measures of central tendency in the sample data for each of the variables.
 ```{r central-tendency, message = FALSE, warning = FALSE}
 summary(Sample90to95B)
 ```
 
-## Histograms
+## Prepare Histograms
 The following code chunk displays histograms for the variables of primary interest to enable visual inspection of the data to evaluate whether or not they fit normal distributions. The code chunk generates separate `png` files that are saved in the `Results` folder.
 ```{r histograms, message = FALSE, warning = FALSE}
 ggplot() +
@@ -150,7 +150,7 @@ ggplot() +
 ggsave(here("Results", "histogramBCKGTLAG.png"), dpi = 300)
 ```
 
-## Scatter Plots
+## Prepare Scatter Plots
 The following code chunk displays scatter plots with `CRECEIVE` as the dependent variable against each of the the primary independent variables of interest to visually inspect for linear relationships between the dependent variable and each of the independent variables. The code chunk generates separate `png` files that are saved in the `Results` folder.
 ```{r scatter-plots, message = FALSE, warning = FALSE}
 ggplot() +
@@ -186,7 +186,7 @@ ggplot() +
 ggsave(here("results", "scatterCRECEIVEbyBCKGTLAG.png"), dpi = 300)
 ```
 
-## Q-Q Plots
+## Prepare Q-Q Plots
 The following code chunk displays Quantile-Quantile (Q-Q) plots to check for normal distribution in the data sample for each variable of primary interest. The code chunk generates separate `png` files that are saved in the `Results` folder.
 ```{r qq-plots, message = FALSE, warning = FALSE}
 ggplot(Sample90to95B)+
@@ -246,16 +246,16 @@ ggplot(Sample90to95B)+
 ggsave(here("Results", "QQplotBCKGTLAG.png"))
 ```
 
-## Pairwise Correlation Coefficients
+## Calculate Pairwise Correlation Coefficients
 The following code chunk calculates the pairwise correlation coefficients for all variables in the sample data using the Pearson product-moment correlation function.
 ```{r cor-matrix, message = FALSE, warning = FALSE}
 Sample90to95corrmatrix <- cor(Sample90to95B)
 print(Sample90to95corrmatrix)
 ```
 
-## Clean Data 2
+## Modify Data 01
 The following code chunk creates additional variables needed for the binary logistic regression, ordinal logistic regression, and multiple regression analyses and removes variables that will not be used.  It first creates a new variable called `CRECbinary` that converts the `CRECEIVE` variable into a dichotomous variable. It then creates a series of dummy variables for the nominal `CAT` variable to use in multiple regression analysis.
-```{r clean-data-02, message = FALSE, warning = FALSE}
+```{r modify-data-01, message = FALSE, warning = FALSE}
 Sample90to95B %>%
   mutate(CRECbinary = ifelse(CRECEIVE == 0, 0, 1)) %>%
   mutate(CAT01 = ifelse(CAT == 1, 1, 0)) %>%
@@ -266,9 +266,9 @@ Sample90to95B %>%
   mutate(CAT06 = ifelse(CAT == 6, 1, 0)) -> Sample90to95C
 ```
 
-## Observation Counts 1
+## Count Observations 01
 The following code chunk determines the number of observations for each outcome of each nominal and ordinal independent variable to determine if the sample size is large enough for logistic regression analysis, which requires at least 10 observations for the least frequent outcome for each independent variable.
-```{r sample-size-01, message = FALSE, warning = FALSE}
+```{r count-obs-01, message = FALSE, warning = FALSE}
 Sample90to95C %>%
   group_by(GYEAR) %>%
   summarize(n())
@@ -318,17 +318,17 @@ Sample90to95C %>%
   summarize(n())
 ```
 
-## Clean Data 3
-The following code chunk groups cases where the outcome level for `CRECEIVE` is greater than or equal to 15 citations cases for the logistic regression analysis because most of those outcome levels do not have enough cases individually for logistic regression analysis which requires at least 10 cases for the least frequent outcome level of each independent variable.
-```{r sample-data-90-95, message = FALSE, warning = FALSE}
+## Modify Data 02
+The following code chunk groups cases where the outcome level for `CRECEIVE` is greater than or equal to 15 citations because most outcome levels above 15 citations do not have enough cases individually for logistic regression analysis which requires at least 10 cases for the least frequent outcome level of each variable. This was also done to simplify the ordinal logistic regression analysis.
+```{r modify-data-02, message = FALSE, warning = FALSE}
 Sample90to95C %>% 
   mutate(CRECordinal = ifelse (CRECEIVE>=15,15,CRECEIVE)) -> Sample90to95C
 Sample90to95C <- as_tibble(Sample90to95C) # convert data frame to tibble
 ```
 
-## Observation Counts 2
+## Count Observations 02
 The following code chunk checks the number of observations for each outcome level of the new `CRECordinal` variable.
-```{r sample-size-02, message = FALSE, warning = FALSE}
+```{r count-obs-02, message = FALSE, warning = FALSE}
 Sample90to95C %>%
   group_by(CRECordinal) %>%
   summarize(n())
@@ -359,8 +359,44 @@ print(HosLemBinomial)
 cbind(HosLemBinomial$expected, HosLemBinomial$observed)
 ```
 
+## Modify Data 03
+The following code chunk creates a new variable called `CRECmdnSplt` using a median split of the `CRECEIVE` values. It then counts the number of observations for each outcome level of the new variable.
+```{r modify-data-03}
+Sample90to95C %>%
+  mutate(CRECmdnSplt = ifelse(CRECEIVE <= median(CRECEIVE),0,1)) -> Sample90to95C
+
+Sample90to95C %>%
+  group_by(CRECordinal) %>%
+  summarize(n())
+```
+
+## Binomial Logistic Regression 02
+The following code chunk uses the new dichotomous variable `CRECmdnSplt` as the dependent variable in a binary logistic regression analysis. It then displays the results. It also calculates the odds ratio, pseudo R-squared values, confidence intervals for the coefficients, and Hosemer-Lemeshow goodness of fit test.
+```{r binary-regression-02, message = FALSE, warning = FALSE}
+logitCRECEIVE02 <- glm(CRECmdnSplt ~ GYEAR + as.factor(CAT) + CMADE + CLAIMS + 
+                       ORIGINAL + GENERAL + FWDAPLAG + BCKGTLAG, 
+                     data = Sample90to95C, family = binomial, 
+                     na.action = na.omit)
+summary(logitCRECEIVE02)
+
+# Raise e to the coefficients
+exp(coef(logitCRECEIVE02))
+
+# Obtain various pseudo R-squared measures
+pR2(logitCRECEIVE02)
+
+# Confidence intervals for the coefficients
+confint(logitCRECEIVE02, level = 0.95)
+
+# Hosemer-Lemeshow Goodness of Fit Test
+HosLemBinomial02 <- hoslem.test(Sample90to95C$CRECmdnSplt, 
+                              fitted(logitCRECEIVE02), g=10)
+print(HosLemBinomial02)
+cbind(HosLemBinomial02$expected, HosLemBinomial02$observed)
+```
+
 ## Ordinal Logistic Regression Analysis
-The following code chunk performs an ordinal logistic regression analysis on the data sample using `CRECEIVE` as the dependent variable. It then displays the results. It performs the analysis two different ways for comparison.
+The following code chunk performs an ordinal logistic regression analysis on the data sample using `CRECordinal` as the dependent variable. It then displays the results. It performs the analysis two different ways for comparison.
 ```{r ordinal-regression, message = FALSE, warning = FALSE}
 # Ordinal Logistic Regression Results - Method 01
 CRECEIVEordinal01 <- clm(as.factor(CRECordinal) ~ GYEAR + as.factor(CAT) + 
@@ -513,15 +549,15 @@ VIFregression <- vif(CRECEIVEregression)
 print(VIFregression)
 ```
 
-## Clean Data 4
+## Modify Data 04
 The following code chunk removes cases in which `CRECEIVE` is greater than or equal to 10 as outliers and applies a transformation to the `CRECEIVE` variable in an effort to better satisfy the assumptions of linear regression and improve the model.
-```{r clean-data-04, message = FALSE, warning = FALSE}
+```{r modify-data-04, message = FALSE, warning = FALSE}
 Sample90to95C %>% 
   filter(CRECEIVE <= 10) %>%
   mutate(CRECEIVEsqrt = sqrt(CRECEIVE)) -> Sample90to95D
 ```
 
-## Q-Q Plots for Transformed Variables
+## Q-Q Plots for Transformed Dependent Variable
 The following code chunk displays Quantile-Quantile (Q-Q) plots for the transformed variables to check for suitability to use in multiple regression analysis.
 ```{r qq-plots-transformed, message = FALSE, warning = FALSE}
 ggplot(Sample90to95D)+
@@ -538,7 +574,7 @@ qqnorm(Sample90to95D$CRECEIVEsqrt, pch = 1, frame = FALSE,
 qqline(Sample90to95D$CRECEIVEsqrt, col = "green", lwd = 2)
 dev.off()
 
-## Multiple Regression Using Transformed Variables 
+## Multiple Regression Using Transformed Dependent Variable 
 The following code chunk performs a multiple regression analysis using the transformed dependent variable and displays the results.
 ```{r multiple-regression-trfm, message = FALSE, warning = FALSE}
 # Multiple Regression with Transformed Dependent Variable
@@ -605,7 +641,7 @@ print(VIFregressionTrfm)
 ```
 
 ## Save Data
-The following code chunk saves the final cleaned data that was used in the analysis.
+The following code chunk saves the final cleaned and modified data that was used in the analysis.
 ```{r save-data, message = FALSE, warning = FALSE}
 write.csv(Sample90to95C, here("DataClean","NBERpatents1963to1999","NBERPatCitSample90to95C.csv"), append = FALSE)
 write.csv(Sample90to95D, here("DataClean","NBERpatents1963to1999","NBERPatCitSample90to95D.csv"), append = FALSE)
