@@ -602,6 +602,9 @@ ggplot(CRECEIVEregressionTrfm)+
   geom_point()
 ggsave(here("Results","MultRegresTrfmModelResidualsPlotB.png"))
 
+# Check that mean of residuals equals zero
+mean(CRECEIVEregressionTrfm$residuals)
+
 # Check for normality of residuals
 # Check for homoscedasticity of residuals or equal variance
 png(filename = here("Results", "MultRegresTrfmModelResidualsDistribution.png"))
@@ -635,7 +638,41 @@ CorrFWDAPLAGtrfm <- cor.test(Sample90to95D$FWDAPLAG, CRECEIVEregressionTrfm$resi
 print(CorrFWDAPLAG)
 
 # Check that the variability in independent variable values is positive
-# See previous code chunk for check of linear regression assumptions
+varGYEAR <- var(Sample90to95D$GYEAR)
+print(varGYEAR)
+
+varCAT02 <- var(Sample90to95D$CAT02)
+print(varCAT02)
+
+varCAT03 <- var(Sample90to95D$CAT03)
+print(varCAT03)
+
+varCAT04 <- var(Sample90to95D$CAT04)
+print(varCAT04)
+
+varCAT05 <- var(Sample90to95D$CAT05)
+print(varCAT05)
+
+varCAT06 <- var(Sample90to95D$CAT06)
+print(varCAT06)
+
+varCLAIMS <- var(Sample90to95D$CLAIMS)
+print(varCLAIMS)
+
+varCMADE <- var(Sample90to95D$CMADE)
+print(varCMADE)
+
+varGENERAL <- var(Sample90to95D$GENERAL)
+print(varGENERAL)
+
+varORIGINAL <- var(Sample90to95D$ORIGINAL)
+print(varORIGINAL)
+
+varFWDAPLAG <- var(Sample90to95D$FWDAPLAG)
+print(varFWDAPLAG)
+
+varBCKGTLAG <- var(Sample90to95D$BCKGTLAG)
+print(varBCKGTLAG)
 
 # Calculate Variance Inflaction Factors to check for perfect multicollinearity among the variables
 VIFregressionTrfm <- vif(CRECEIVEregressionTrfm)
