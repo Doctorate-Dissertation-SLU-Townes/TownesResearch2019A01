@@ -3,10 +3,10 @@ title: "R Notebook: Improving Construct Validity in Studies of Technology Transf
 author: "Malcolm S. Townes"
 date: '(`r format(Sys.time(), "%B %d, %Y")`)'
 output: 
-    word_document: default
+    github_document: default
     html_notebook: default
     html_document: default
-    github_document: default
+    word_document: default
     always_allow_html: yes
 ---
 

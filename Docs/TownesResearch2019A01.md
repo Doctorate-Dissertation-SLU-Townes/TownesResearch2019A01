@@ -900,7 +900,7 @@ summary(logitCRECEIVE)
 
 ``` r
 # Raise e to the coefficients
-exp(coef(logitCRECEIVE))
+print(exp(coef(logitCRECEIVE)))
 ```
 
     ##     (Intercept)           GYEAR as.factor(CAT)2 as.factor(CAT)3 
@@ -914,7 +914,7 @@ exp(coef(logitCRECEIVE))
 
 ``` r
 # Obtain various pseudo R-squared measures
-pR2(logitCRECEIVE)
+print(pR2(logitCRECEIVE))
 ```
 
     ##          llh      llhNull           G2     McFadden         r2ML 
@@ -924,7 +924,7 @@ pR2(logitCRECEIVE)
 
 ``` r
 # Confidence intervals for the coefficients
-exp(confint(logitCRECEIVE, level = 0.95))
+print(exp(confint(logitCRECEIVE, level = 0.95)))
 ```
 
     ##                         2.5 %       97.5 %
@@ -956,7 +956,7 @@ print(HosLemBinomial)
     ## X-squared = 1.149e-09, df = 8, p-value = 1
 
 ``` r
-cbind(HosLemBinomial$expected, HosLemBinomial$observed)
+print(cbind(HosLemBinomial$expected, HosLemBinomial$observed))
 ```
 
     ##                     yhat0        yhat1  y0   y1
@@ -1053,7 +1053,7 @@ summary(logitCRECEIVE02)
 
 ``` r
 # Raise e to the coefficients
-exp(coef(logitCRECEIVE02))
+print(exp(coef(logitCRECEIVE02)))
 ```
 
     ##     (Intercept)           GYEAR as.factor(CAT)2 as.factor(CAT)3 
@@ -1067,7 +1067,7 @@ exp(coef(logitCRECEIVE02))
 
 ``` r
 # Obtain various pseudo R-squared measures
-pR2(logitCRECEIVE02)
+print(pR2(logitCRECEIVE02))
 ```
 
     ##           llh       llhNull            G2      McFadden          r2ML 
@@ -1077,7 +1077,7 @@ pR2(logitCRECEIVE02)
 
 ``` r
 # Confidence intervals for the coefficients
-exp(confint(logitCRECEIVE02, level = 0.95))
+print(exp(confint(logitCRECEIVE02, level = 0.95)))
 ```
 
     ##                         2.5 %        97.5 %
@@ -1111,7 +1111,7 @@ print(HosLemBinomial02)
     ## X-squared = 30.913, df = 8, p-value = 0.0001456
 
 ``` r
-cbind(HosLemBinomial02$expected, HosLemBinomial02$observed)
+print(cbind(HosLemBinomial02$expected, HosLemBinomial02$observed))
 ```
 
     ##                      yhat0      yhat1  y0  y1
@@ -1302,7 +1302,7 @@ print(coefsOrdinal01)
 
 ``` r
 # Raise e to the coefficients
-exp(coef(CRECEIVEordinal01))
+print(exp(coef(CRECEIVEordinal01)))
 ```
 
     ##             0|1             1|2             2|3             3|4 
@@ -1322,7 +1322,7 @@ exp(coef(CRECEIVEordinal01))
 
 ``` r
 # Obtain various pseudo R-squared measures
-pR2(CRECEIVEordinal02)
+print(pR2(CRECEIVEordinal02))
 ```
 
     ##           llh       llhNull            G2      McFadden          r2ML 
@@ -1332,7 +1332,7 @@ pR2(CRECEIVEordinal02)
 
 ``` r
 # Confidence intervals for the coefficients
-exp(confint(CRECEIVEordinal01, level = 0.95))
+print(exp(confint(CRECEIVEordinal01, level = 0.95)))
 ```
 
     ##                      2.5 %      97.5 %
@@ -1365,7 +1365,7 @@ print(HosLemOrdinal)
     ## X-squared = 1626200, df = 8, p-value < 2.2e-16
 
 ``` r
-cbind(HosLemOrdinal$expected, HosLemOrdinal$observed)
+print(cbind(HosLemOrdinal$expected, HosLemOrdinal$observed))
 ```
 
     ##                     yhat0      yhat1    y0   y1
