@@ -2,7 +2,7 @@ R Notebook: Improving Construct Validity in Studies of Technology
 Transfer
 ================
 Malcolm S. Townes
-(July 11, 2019)
+(July 21, 2019)
 
 ## Introduction
 
@@ -853,7 +853,7 @@ The following code chunk uses the new dichotomous variable `CRECbinary`
 as the dependent variable in a binary logistic regression analysis. It
 then displays the results. It also calculates the odds ratio, various
 pseudo R-squared measures, confidence intervals for the coefficients,
-and Hosemer-Lemeshow goodness of fit
+and Hosmer-Lemeshow goodness of fit
 test.
 
 ``` r
@@ -924,26 +924,26 @@ pR2(logitCRECEIVE)
 
 ``` r
 # Confidence intervals for the coefficients
-confint(logitCRECEIVE, level = 0.95)
+exp(confint(logitCRECEIVE, level = 0.95))
 ```
 
-    ##                         2.5 %        97.5 %
-    ## (Intercept)     -1.826634e+03  1863.8768502
-    ## GYEAR           -1.172910e+00     3.1238384
-    ## as.factor(CAT)2 -1.318477e+04 12167.4434610
-    ## as.factor(CAT)3 -1.931872e+03  1946.4876791
-    ## as.factor(CAT)4 -1.497483e+03  1650.0673202
-    ## as.factor(CAT)5 -1.713920e+03  2004.7750073
-    ## as.factor(CAT)6 -1.609277e+03  1805.9906612
-    ## CMADE           -6.494402e-01     0.2746325
-    ## CLAIMS          -5.800099e-01     0.2256378
-    ## ORIGINAL        -6.365958e+00    14.7947578
-    ## GENERAL         -1.362734e+03  1526.2734452
-    ## FWDAPLAG        -5.237472e+02 -1119.5494180
-    ## BCKGTLAG        -1.688275e-01     0.1194676
+    ##                         2.5 %       97.5 %
+    ## (Intercept)      0.000000e+00          Inf
+    ## GYEAR            3.094650e-01 2.273347e+01
+    ## as.factor(CAT)2  0.000000e+00          Inf
+    ## as.factor(CAT)3  0.000000e+00          Inf
+    ## as.factor(CAT)4  0.000000e+00          Inf
+    ## as.factor(CAT)5  0.000000e+00          Inf
+    ## as.factor(CAT)6  0.000000e+00          Inf
+    ## CMADE            5.223381e-01 1.316047e+00
+    ## CLAIMS           5.598928e-01 1.253122e+00
+    ## ORIGINAL         1.719095e-03 2.662451e+06
+    ## GENERAL          0.000000e+00          Inf
+    ## FWDAPLAG        3.463248e-228 0.000000e+00
+    ## BCKGTLAG         8.446546e-01 1.126897e+00
 
 ``` r
-# Hosemer-Lemeshow Goodness of Fit Test
+# Hosmer-Lemeshow Goodness of Fit Test
 HosLemBinomial <- hoslem.test(Sample90to95C$CRECbinary, 
                               fitted(logitCRECEIVE), g=10)
 print(HosLemBinomial)
@@ -1004,7 +1004,7 @@ The following code chunk uses the new dichotomous variable `CRECmdnSplt`
 as the dependent variable in a binary logistic regression analysis. It
 then displays the results. It also calculates the odds ratio, various
 pseudo R-squared measures, confidence intervals for the coefficients,
-and Hosemer-Lemeshow goodness of fit
+and Hosmer-Lemeshow goodness of fit
 test.
 
 ``` r
@@ -1077,26 +1077,28 @@ pR2(logitCRECEIVE02)
 
 ``` r
 # Confidence intervals for the coefficients
-confint(logitCRECEIVE02, level = 0.95)
+exp(confint(logitCRECEIVE02, level = 0.95))
 ```
 
     ##                         2.5 %        97.5 %
-    ## (Intercept)     391.073793803 671.087874003
-    ## GYEAR            -0.337118070  -0.196617860
-    ## as.factor(CAT)2   0.567854360   1.441666434
-    ## as.factor(CAT)3   0.298812304   1.154626357
-    ## as.factor(CAT)4   0.040892175   0.763794014
-    ## as.factor(CAT)5  -0.240815919   0.472184516
-    ## as.factor(CAT)6  -0.014495946   0.715336476
-    ## CMADE             0.009997771   0.039406928
-    ## CLAIMS            0.003043646   0.027084072
-    ## ORIGINAL         -1.538150917  -0.670628626
-    ## GENERAL           3.829929593   4.737274993
-    ## FWDAPLAG         -0.254298531  -0.146799712
-    ## BCKGTLAG         -0.024240990  -0.005233893
+    ## (Intercept)     6.937303e+169 2.816829e+291
+    ## GYEAR            7.138246e-01  8.215045e-01
+    ## as.factor(CAT)2  1.764477e+00  4.227735e+00
+    ## as.factor(CAT)3  1.348257e+00  3.172838e+00
+    ## as.factor(CAT)4  1.041740e+00  2.146404e+00
+    ## as.factor(CAT)5  7.859863e-01  1.603493e+00
+    ## as.factor(CAT)6  9.856086e-01  2.044875e+00
+    ## CMADE            1.010048e+00  1.040194e+00
+    ## CLAIMS           1.003048e+00  1.027454e+00
+    ## ORIGINAL         2.147779e-01  5.113870e-01
+    ## GENERAL          4.605930e+01  1.141228e+02
+    ## FWDAPLAG         7.754603e-01  8.634669e-01
+    ## BCKGTLAG         9.760505e-01  9.947798e-01
 
 ``` r
-# Hosemer-Lemeshow Goodness of Fit Test
+# Hosmer-Lemeshow Goodness of Fit Test
+# Null hypothesis: the model is a good fit for the data
+# Alternative hypothesis: the model is NOT a good fit for the data
 HosLemBinomial02 <- hoslem.test(Sample90to95C$CRECmdnSplt, 
                               fitted(logitCRECEIVE02), g=10)
 print(HosLemBinomial02)
@@ -1330,25 +1332,27 @@ pR2(CRECEIVEordinal02)
 
 ``` r
 # Confidence intervals for the coefficients
-confint(CRECEIVEordinal01, level = 0.95)
+exp(confint(CRECEIVEordinal01, level = 0.95))
 ```
 
-    ##                        2.5 %       97.5 %
-    ## GYEAR           -0.365997128 -0.365852755
-    ## as.factor(CAT)2  0.622541343  1.263479941
-    ## as.factor(CAT)3  0.606266280  1.251584723
-    ## as.factor(CAT)4  0.225111743  0.761313953
-    ## as.factor(CAT)5 -0.229396378  0.298392510
-    ## as.factor(CAT)6  0.032398543  0.562495153
-    ## CMADE            0.014229969  0.034391696
-    ## CLAIMS           0.008670441  0.026509769
-    ## ORIGINAL        -1.160948707 -0.544099948
-    ## GENERAL          4.282220211  5.011102328
-    ## FWDAPLAG        -0.531385605 -0.446757498
-    ## BCKGTLAG        -0.013123932 -0.000315771
+    ##                      2.5 %      97.5 %
+    ## GYEAR            0.6935048   0.6936049
+    ## as.factor(CAT)2  1.8636582   3.5377111
+    ## as.factor(CAT)3  1.8335726   3.4958786
+    ## as.factor(CAT)4  1.2524627   2.1410877
+    ## as.factor(CAT)5  0.7950133   1.3476907
+    ## as.factor(CAT)6  1.0329291   1.7550461
+    ## CMADE            1.0143317   1.0349899
+    ## CLAIMS           1.0087081   1.0268643
+    ## ORIGINAL         0.3131889   0.5803639
+    ## GENERAL         72.4010072 150.0700715
+    ## FWDAPLAG         0.5877900   0.6396990
+    ## BCKGTLAG         0.9869618   0.9996843
 
 ``` r
 # Hosemer-Lemeshow Goodness of Fit Test
+# Null hypothesis: the model is a good fit for the data
+# Alternative hypothesis: the model is NOT a good fit for the data
 HosLemOrdinal <- hoslem.test(Sample90to95C$CRECordinal,
                              fitted(CRECEIVEordinal01), g=10)
 print(HosLemOrdinal)
@@ -1565,6 +1569,8 @@ dev.off()
 
 ``` r
 # Check for autocorrelation of residuals using Durbin-Watson test
+# Null hypothesis: true autocorrelation is zero
+# Alternative hypothesis: true autocorrelation is greater than zero
 AutoCorr <- dwtest(CRECEIVEregression)
 print(AutoCorr)
 ```
@@ -1905,6 +1911,13 @@ ggplot(CRECEIVEregressionTrfm)+
 ``` r
 ggsave(here("Results","MultRegresTrfmModelResidualsPlotB.png"))
 
+# Check that mean of residuals equals zero
+mean(CRECEIVEregressionTrfm$residuals)
+```
+
+    ## [1] -4.023402e-18
+
+``` r
 # Check for normality of residuals
 # Check for homoscedasticity of residuals or equal variance
 png(filename = here("Results", "MultRegresTrfmModelResidualsDistribution.png"))
@@ -1918,124 +1931,208 @@ dev.off()
 
 ``` r
 # Check for autocorrelation of residuals using Durbin-Watson test
+# Null hypothesis: true autocorrelation is zero
+# Alternative hypothesis: true autocorrelation is greater than zero
 AutoCorrTrfm <- dwtest(CRECEIVEregressionTrfm)
-print(AutoCorr)
+print(AutoCorrTrfm)
 ```
 
     ## 
     ##  Durbin-Watson test
     ## 
-    ## data:  CRECEIVEregression
-    ## DW = 1.9843, p-value = 0.3622
+    ## data:  CRECEIVEregressionTrfm
+    ## DW = 2.0548, p-value = 0.8753
     ## alternative hypothesis: true autocorrelation is greater than 0
 
 ``` r
 # Check that the independent variables and the residuals are uncorrelated
 CorrGYEARtrfm <- cor.test(Sample90to95D$GYEAR, CRECEIVEregressionTrfm$residuals)
-print(CorrGYEAR)
+print(CorrGYEARtrfm)
 ```
 
     ## 
     ##  Pearson's product-moment correlation
     ## 
-    ## data:  Sample90to95C$GYEAR and CRECEIVEregression$residuals
-    ## t = -1.598e-11, df = 1996, p-value = 1
+    ## data:  Sample90to95D$GYEAR and CRECEIVEregressionTrfm$residuals
+    ## t = -1.396e-11, df = 1761, p-value = 1
     ## alternative hypothesis: true correlation is not equal to 0
     ## 95 percent confidence interval:
-    ##  -0.04385287  0.04385287
+    ##  -0.04668485  0.04668485
     ## sample estimates:
     ##           cor 
-    ## -3.576716e-13
+    ## -3.326677e-13
 
 ``` r
 CorrCATtrfm <- cor.test(Sample90to95D$CAT, CRECEIVEregressionTrfm$residuals)
-print(CorrCAT)
+print(CorrCATtrfm)
 ```
 
     ## 
     ##  Pearson's product-moment correlation
     ## 
-    ## data:  Sample90to95C$CAT and CRECEIVEregression$residuals
-    ## t = -0.19801, df = 1996, p-value = 0.8431
+    ## data:  Sample90to95D$CAT and CRECEIVEregressionTrfm$residuals
+    ## t = 2.0335, df = 1761, p-value = 0.04216
     ## alternative hypothesis: true correlation is not equal to 0
     ## 95 percent confidence interval:
-    ##  -0.04827556  0.03942846
+    ##  0.001719017 0.094870465
     ## sample estimates:
-    ##          cor 
-    ## -0.004432068
+    ##        cor 
+    ## 0.04839998
 
 ``` r
 CorrCLAIMStrfm <- cor.test(Sample90to95D$CLAIMS, CRECEIVEregressionTrfm$residuals)
-print(CorrCLAIMS)
+print(CorrCLAIMStrfm)
 ```
 
     ## 
     ##  Pearson's product-moment correlation
     ## 
-    ## data:  Sample90to95C$CLAIMS and CRECEIVEregression$residuals
-    ## t = 1.4501e-17, df = 1996, p-value = 1
+    ## data:  Sample90to95D$CLAIMS and CRECEIVEregressionTrfm$residuals
+    ## t = -6.185e-16, df = 1761, p-value = 1
     ## alternative hypothesis: true correlation is not equal to 0
     ## 95 percent confidence interval:
-    ##  -0.04385287  0.04385287
+    ##  -0.04668485  0.04668485
     ## sample estimates:
-    ##          cor 
-    ## 3.245828e-19
+    ##           cor 
+    ## -1.473869e-17
 
 ``` r
 CorrORIGINALtrfm <- cor.test(Sample90to95D$ORIGINAL, CRECEIVEregressionTrfm$residuals)
-print(CorrORIGINAL)
+print(CorrORIGINALtrfm)
 ```
 
     ## 
     ##  Pearson's product-moment correlation
     ## 
-    ## data:  Sample90to95C$ORIGINAL and CRECEIVEregression$residuals
-    ## t = 9.1473e-16, df = 1996, p-value = 1
+    ## data:  Sample90to95D$ORIGINAL and CRECEIVEregressionTrfm$residuals
+    ## t = -6.27e-16, df = 1761, p-value = 1
     ## alternative hypothesis: true correlation is not equal to 0
     ## 95 percent confidence interval:
-    ##  -0.04385287  0.04385287
+    ##  -0.04668485  0.04668485
     ## sample estimates:
-    ##          cor 
-    ## 2.047445e-17
+    ##           cor 
+    ## -1.494128e-17
 
 ``` r
 CorrGENERALtrfm <- cor.test(Sample90to95D$GENERAL, CRECEIVEregressionTrfm$residuals)
-print(CorrGENERAL)
+print(CorrGENERALtrfm)
 ```
 
     ## 
     ##  Pearson's product-moment correlation
     ## 
-    ## data:  Sample90to95C$GENERAL and CRECEIVEregression$residuals
-    ## t = -1.1524e-15, df = 1996, p-value = 1
+    ## data:  Sample90to95D$GENERAL and CRECEIVEregressionTrfm$residuals
+    ## t = 6.7906e-16, df = 1761, p-value = 1
     ## alternative hypothesis: true correlation is not equal to 0
     ## 95 percent confidence interval:
-    ##  -0.04385287  0.04385287
+    ##  -0.04668485  0.04668485
     ## sample estimates:
-    ##           cor 
-    ## -2.579462e-17
+    ##         cor 
+    ## 1.61818e-17
 
 ``` r
 CorrFWDAPLAGtrfm <- cor.test(Sample90to95D$FWDAPLAG, CRECEIVEregressionTrfm$residuals)
-print(CorrFWDAPLAG)
+print(CorrFWDAPLAGtrfm)
 ```
 
     ## 
     ##  Pearson's product-moment correlation
     ## 
-    ## data:  Sample90to95C$FWDAPLAG and CRECEIVEregression$residuals
-    ## t = -3.946e-15, df = 1996, p-value = 1
+    ## data:  Sample90to95D$FWDAPLAG and CRECEIVEregressionTrfm$residuals
+    ## t = -1.393e-14, df = 1761, p-value = 1
     ## alternative hypothesis: true correlation is not equal to 0
     ## 95 percent confidence interval:
-    ##  -0.04385287  0.04385287
+    ##  -0.04668485  0.04668485
     ## sample estimates:
-    ##          cor 
-    ## -8.83242e-17
+    ##           cor 
+    ## -3.319594e-16
 
 ``` r
 # Check that the variability in independent variable values is positive
-# See previous code chunk for check of linear regression assumptions
+varGYEARtrfm <- var(Sample90to95D$GYEAR)
+print(varGYEARtrfm)
+```
 
+    ## [1] 2.873931
+
+``` r
+varCAT02trfm <- var(Sample90to95D$CAT02)
+print(varCAT02trfm)
+```
+
+    ## [1] 0.0802342
+
+``` r
+varCAT03trfm <- var(Sample90to95D$CAT03)
+print(varCAT03trfm)
+```
+
+    ## [1] 0.08487944
+
+``` r
+varCAT04trfm <- var(Sample90to95D$CAT04)
+print(varCAT04trfm)
+```
+
+    ## [1] 0.1511625
+
+``` r
+varCAT05trfm <- var(Sample90to95D$CAT05)
+print(varCAT05trfm)
+```
+
+    ## [1] 0.175818
+
+``` r
+varCAT06trfm <- var(Sample90to95D$CAT06)
+print(varCAT06trfm)
+```
+
+    ## [1] 0.1655888
+
+``` r
+varCLAIMStrfm <- var(Sample90to95D$CLAIMS)
+print(varCLAIMStrfm)
+```
+
+    ## [1] 79.42126
+
+``` r
+varCMADEtrfm <- var(Sample90to95D$CMADE)
+print(varCMADEtrfm)
+```
+
+    ## [1] 61.15318
+
+``` r
+varGENERALtrfm <- var(Sample90to95D$GENERAL)
+print(varGENERALtrfm)
+```
+
+    ## [1] 0.07338131
+
+``` r
+varORIGINALtrfm <- var(Sample90to95D$ORIGINAL)
+print(varORIGINALtrfm)
+```
+
+    ## [1] 0.08781611
+
+``` r
+varFWDAPLAGtrfm <- var(Sample90to95D$FWDAPLAG)
+print(varFWDAPLAGtrfm)
+```
+
+    ## [1] 8.919473
+
+``` r
+varBCKGTLAGtrfm <- var(Sample90to95D$BCKGTLAG)
+print(varBCKGTLAGtrfm)
+```
+
+    ## [1] 217.1713
+
+``` r
 # Calculate Variance Inflaction Factors to check for perfect multicollinearity among the variables
 VIFregressionTrfm <- vif(CRECEIVEregressionTrfm)
 print(VIFregressionTrfm)
