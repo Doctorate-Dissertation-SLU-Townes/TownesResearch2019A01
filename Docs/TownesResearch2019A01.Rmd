@@ -3,10 +3,10 @@ title: "R Notebook: Improving Construct Validity in Studies of Technology Transf
 author: "Malcolm S. Townes"
 date: '(`r format(Sys.time(), "%B %d, %Y")`)'
 output: 
-    github_document: default
+    word_document: default
     html_notebook: default
     html_document: default
-    word_document: default
+    github_document: default
     always_allow_html: yes
 ---
 
@@ -508,7 +508,7 @@ CRECEIVEresid <- residuals(CRECEIVEregression)
 plot(CRECEIVEresid)
 dev.off()
 
-jpg(filename = here("Results","MultRegres01ModelResidualsPlotA.jpg"))
+jpeg(filename = here("Results","MultRegres01ModelResidualsPlotA.jpg"))
 CRECEIVEresid <- residuals(CRECEIVEregression)
 plot(CRECEIVEresid)
 dev.off()
@@ -529,7 +529,7 @@ par(mfrow=c(2,2)) # set 2 rows and 2 column layout for plot
 plot(CRECEIVEregression)
 dev.off()
 
-jpg(filename = here("Results", "MultRegres01ModelResidualsDistribution.jpg"))
+jpeg(filename = here("Results", "MultRegres01ModelResidualsDistribution.jpg"))
 par(mfrow=c(2,2)) # set 2 rows and 2 column layout for plot
 plot(CRECEIVEregression)
 dev.off()
@@ -645,7 +645,7 @@ plot(CRECEIVEresidTrfm)
 dev.off()
 
 CRECEIVEresidTrfm <- residuals(CRECEIVEregressionTrfm)
-jpg(filename = here("Results","MultRegresTrfmModelResidualsPlotA.jpg"))
+jpeg(filename = here("Results","MultRegresTrfmModelResidualsPlotA.jpg"))
 plot(CRECEIVEresidTrfm)
 dev.off()
 
@@ -665,7 +665,7 @@ par(mfrow=c(2,2)) # set 2 rows and 2 column layout for plot
 plot(CRECEIVEregressionTrfm)
 dev.off()
 
-jpg(filename = here("Results", "MultRegresTrfmModelResidualsDistribution.jpg"))
+jpeg(filename = here("Results", "MultRegresTrfmModelResidualsDistribution.jpg"))
 par(mfrow=c(2,2)) # set 2 rows and 2 column layout for plot
 plot(CRECEIVEregressionTrfm)
 dev.off()

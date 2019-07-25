@@ -1,5 +1,5 @@
 {
-    "cursorPosition" : "12,15",
+    "cursorPosition" : "10,0",
     "ignored_words" : "DataRaw,NBERpatents,apat,txt,histogramGYEAR,png,jpg,histogramCRECEIVE,histogramCAT,histogramCLAIMS,histogramCMADE,histogramGENERAL,histogramORIGINAL,histogramFWDAPLAG,histogramBCKGTLAG,scatterCRECEIVEbyGYEAR,scatterCRECEIVEbyCAT,scatterCRECEIVEbyCLAIMS,scatterCRECEIVEbyCMADE,scatterCRECEIVEbyGENERAL,scatterCRECEIVEbyORIGINAL,scatterCRECEIVEbyFWDAPLAG,scatterCRECEIVEbyBCKGTLAG,Quantile,QQplotGYEAR,QQplotCRECEIVE,QQplotCLAIMS,QQplotCMADE,QQplotGENERAL,QQplotORIGINAL,QQplotFWDAPLAG,QQplotBCKGTLAG,Hosmer,Lemeshow,adjr,MultRegres,ModelResidualsPlotA,ModelResidualsPlotB,ModelResidualsDistribution,outliers,CRECEIVEsqrt,QQplotCRECEIVEsqrt,MultRegresTrfmModelResidualsPlotA,MultRegresTrfmModelResidualsPlotB,MultRegresTrfmModelResidualsDistribution,DataClean,NBERPatCitSample,csv,Sys\n",
-    "scrollLine" : "6"
+    "scrollLine" : "0"
 }
