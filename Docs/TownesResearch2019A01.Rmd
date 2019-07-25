@@ -11,10 +11,10 @@ output:
 ---
 
 ## Introduction
-This is an R Notebook for an investigation that explores possiblities for improving construct validity in studies of technology transfer.
+This is an R Notebook for an investigation that explores possibilities for improving construct validity in studies of technology transfer.
 
 ## Project Set Up
-The following code chunk enables the R Notebook to integrate seemlessly with the project organization format. This is normally included in the R Notebook to simplify file calls and enable file portability but it has been causing an error. To work around this problem, I've embedded the `here()` function where I enter a file path when necessary.
+The following code chunk enables the R Notebook to integrate seamlessly with the project organization format. This is normally included in the R Notebook to simplify file calls and enable file portability but it has been causing an error. To work around this problem, I've embedded the `here()` function where I enter a file path when necessary.
 
 ```{r setup-project, message = FALSE, warning = FALSE}
 knitr::opts_knit$set(root.dir = here::here())
@@ -29,6 +29,7 @@ library(readr) # functions for reading data
 library(dplyr) # functions for data wrangling
 library(janitor) # functions for data cleaning
 library(naniar) # functions for analyzing missing data
+library(expss) # functions for calculating on values
 library(ggplot2) # functions for data visualizations
 library(boot) # functions for regression analysis
 library(ordinal) # functions for regression models for ordinal data
@@ -67,6 +68,14 @@ Sample90to95 <- sample(1:nrow(DataSubset90to95), size = 2000,
                        replace = TRUE, prob = NULL)
 Sample90to95 <- DataSubset90to95[Sample90to95,]
 Sample90to95 <- as_tibble(Sample90to95)
+```
+
+## Inspect Self-Citation Variables
+```{r self-citation-vars}
+print(count_if(gt(0),Sample90to95$SELFCTUB))
+print(count_if(gt(0),Sample90to95$SELFCTLB))
+print(count_if(gt(0),Sample90to95$SECDUPBD))
+print(count_if(gt(0),Sample90to95$SECDLWBD))
 ```
 
 ## Clean Data 01
@@ -117,38 +126,47 @@ The following code chunk displays histograms for the variables to enable visual 
 ggplot() +
   geom_histogram(Sample90to95B, mapping = aes(GYEAR))
 ggsave(here("results", "histogramGYEAR.png"), dpi = 300)
+ggsave(here("results", "histogramGYEAR.jpg"), dpi = 300)
 
 ggplot() +
   geom_histogram(Sample90to95B, mapping = aes(CRECEIVE))
 ggsave(here("Results", "histogramCRECEIVE.png"), dpi = 300)
+ggsave(here("Results", "histogramCRECEIVE.jpg"), dpi = 300)
 
 ggplot() +
   geom_histogram(Sample90to95B, mapping = aes(CAT))
 ggsave(here("Results", "histogramCAT.png"), dpi = 300)
+ggsave(here("Results", "histogramCAT.jpg"), dpi = 300)
 
 ggplot() +
   geom_histogram(Sample90to95B, mapping = aes(CLAIMS))
 ggsave(here("Results", "histogramCLAIMS.png"), dpi = 300)
+ggsave(here("Results", "histogramCLAIMS.jpg"), dpi = 300)
 
 ggplot() +
   geom_histogram(Sample90to95B, mapping = aes(CMADE))
 ggsave(here("Results", "histogramCMADE.png"), dpi = 300)
+ggsave(here("Results", "histogramCMADE.jpg"), dpi = 300)
 
 ggplot() +
   geom_histogram(Sample90to95B, mapping = aes(GENERAL))
 ggsave(here("Results", "histogramGENERAL.png"), dpi = 300)
+ggsave(here("Results", "histogramGENERAL.jpg"), dpi = 300)
 
 ggplot() +
   geom_histogram(Sample90to95B, mapping = aes(ORIGINAL))
 ggsave(here("Results", "histogramORIGINAL.png"), dpi = 300)
+ggsave(here("Results", "histogramORIGINAL.jpg"), dpi = 300)
 
 ggplot() +
   geom_histogram(Sample90to95B, mapping = aes(FWDAPLAG))
 ggsave(here("Results", "histogramFWDAPLAG.png"), dpi = 300)
+ggsave(here("Results", "histogramFWDAPLAG.jpg"), dpi = 300)
 
 ggplot() +
   geom_histogram(Sample90to95B, mapping = aes(BCKGTLAG))
 ggsave(here("Results", "histogramBCKGTLAG.png"), dpi = 300)
+ggsave(here("Results", "histogramBCKGTLAG.jpg"), dpi = 300)
 ```
 
 ## Prepare Scatter Plots
@@ -157,34 +175,42 @@ The following code chunk displays scatter plots with `CRECEIVE` as the dependent
 ggplot() +
   geom_point(Sample90to95B, mapping = aes(x = GYEAR, y = CRECEIVE))
 ggsave(here("results", "scatterCRECEIVEbyGYEAR.png"), dpi = 300)
+ggsave(here("results", "scatterCRECEIVEbyGYEAR.jpg"), dpi = 300)
 
 ggplot() +
   geom_point(Sample90to95B, mapping = aes(x = CAT, y = CRECEIVE))
 ggsave(here("results", "scatterCRECEIVEbyCAT.png"), dpi = 300)
+ggsave(here("results", "scatterCRECEIVEbyCAT.jpg"), dpi = 300)
 
 ggplot() +
   geom_point(Sample90to95B, mapping = aes(x = CLAIMS, y = CRECEIVE))
 ggsave(here("results", "scatterCRECEIVEbyCLAIMS.png"), dpi = 300)
+ggsave(here("results", "scatterCRECEIVEbyCLAIMS.jpg"), dpi = 300)
 
 ggplot() +
   geom_point(Sample90to95B, mapping = aes(x = CMADE, y = CRECEIVE))
 ggsave(here("results", "scatterCRECEIVEbyCMADE.png"), dpi = 300)
+ggsave(here("results", "scatterCRECEIVEbyCMADE.jpg"), dpi = 300)
 
 ggplot() +
   geom_point(Sample90to95B, mapping = aes(x = GENERAL, y = CRECEIVE))
 ggsave(here("results", "scatterCRECEIVEbyGENERAL.png"), dpi = 300)
+ggsave(here("results", "scatterCRECEIVEbyGENERAL.jpg"), dpi = 300)
 
 ggplot() +
   geom_point(Sample90to95B, mapping = aes(x = ORIGINAL, y = CRECEIVE))
-ggsave(here("results", "scatterCRECEIVEbyORIGINAL.png"), dpi = 300)
+ggsave(here("results", "scatterCRECEIVEbyORIGINAL.jpg"), dpi = 300)
+ggsave(here("results", "scatterCRECEIVEbyORIGINAL.jpg"), dpi = 300)
 
 ggplot() +
   geom_point(Sample90to95B, mapping = aes(x = FWDAPLAG, y = CRECEIVE))
 ggsave(here("results", "scatterCRECEIVEbyFWDAPLAG.png"), dpi = 300)
+ggsave(here("results", "scatterCRECEIVEbyFWDAPLAG.jpg"), dpi = 300)
 
 ggplot() +
   geom_point(Sample90to95B, mapping = aes(x = BCKGTLAG, y = CRECEIVE))
 ggsave(here("results", "scatterCRECEIVEbyBCKGTLAG.png"), dpi = 300)
+ggsave(here("results", "scatterCRECEIVEbyBCKGTLAG.jpg"), dpi = 300)
 ```
 
 ## Prepare Q-Q Plots
@@ -196,6 +222,7 @@ ggplot(Sample90to95B)+
   stat_qq_line()+
   ggtitle("GYEAR Q-Q Plot")
 ggsave(here("Results", "QQplotGYEAR.png"))
+ggsave(here("Results", "QQplotGYEAR.jpg"))
 
 ggplot(Sample90to95B)+
   aes(sample = CRECEIVE)+
@@ -203,6 +230,7 @@ ggplot(Sample90to95B)+
   stat_qq_line()+
   ggtitle("CRECEIVE Q-Q Plot")
 ggsave(here("Results", "QQplotCRECEIVE.png"))
+ggsave(here("Results", "QQplotCRECEIVE.jpg"))
 
 ggplot(Sample90to95B)+
   aes(sample = CLAIMS)+
@@ -210,6 +238,7 @@ ggplot(Sample90to95B)+
   stat_qq_line()+
   ggtitle("CLAIMS Q-Q Plot")
 ggsave(here("Results", "QQplotCLAIMS.png"))
+ggsave(here("Results", "QQplotCLAIMS.jpg"))
 
 ggplot(Sample90to95B)+
   aes(sample = CMADE)+
@@ -217,6 +246,7 @@ ggplot(Sample90to95B)+
   stat_qq_line()+
   ggtitle("CMADE Q-Q Plot")
 ggsave(here("Results", "QQplotCMADE.png"))
+ggsave(here("Results", "QQplotCMADE.jpg"))
 
 ggplot(Sample90to95B)+
   aes(sample = GENERAL)+
@@ -224,6 +254,7 @@ ggplot(Sample90to95B)+
   stat_qq_line()+
   ggtitle("GENERAL Q-Q Plot")
 ggsave(here("Results", "QQplotGENERAL.png"))
+ggsave(here("Results", "QQplotGENERAL.jpg"))
 
 ggplot(Sample90to95B)+
   aes(sample = ORIGINAL)+
@@ -231,6 +262,7 @@ ggplot(Sample90to95B)+
   stat_qq_line()+
   ggtitle("ORIGINAL Q-Q Plot")
 ggsave(here("Results", "QQplotORIGINAL.png"))
+ggsave(here("Results", "QQplotORIGINAL.jpg"))
 
 ggplot(Sample90to95B)+
   aes(sample = FWDAPLAG)+
@@ -238,6 +270,7 @@ ggplot(Sample90to95B)+
   stat_qq_line()+
   ggtitle("FWDAPLAG Q-Q Plot")
 ggsave(here("Results", "QQplotFWDAPLAG.png"))
+ggsave(here("Results", "QQplotFWDAPLAG.jpg"))
 
 ggplot(Sample90to95B)+
   aes(sample = BCKGTLAG)+
@@ -245,6 +278,7 @@ ggplot(Sample90to95B)+
   stat_qq_line()+
   ggtitle("BCKGTLAG Q-Q Plot")
 ggsave(here("Results", "QQplotBCKGTLAG.png"))
+ggsave(here("Results", "QQplotBCKGTLAG.jpg"))
 ```
 
 ## Calculate Pairwise Correlation Coefficients
@@ -474,10 +508,16 @@ CRECEIVEresid <- residuals(CRECEIVEregression)
 plot(CRECEIVEresid)
 dev.off()
 
+jpg(filename = here("Results","MultRegres01ModelResidualsPlotA.jpg"))
+CRECEIVEresid <- residuals(CRECEIVEregression)
+plot(CRECEIVEresid)
+dev.off()
+
 ggplot(CRECEIVEregression)+
   aes(x=.fitted, y=.resid)+
   geom_point()
 ggsave(here("Results","MultRegres01ModelResidualsPlotB.png"))
+ggsave(here("Results","MultRegres01ModelResidualsPlotB.jpg"))
 
 # Check that mean of residuals equals zero
 mean(CRECEIVEregression$residuals)
@@ -485,6 +525,11 @@ mean(CRECEIVEregression$residuals)
 # Check for normality of residuals
 # Check for homoscedasticity of residuals or equal variance
 png(filename = here("Results", "MultRegres01ModelResidualsDistribution.png"))
+par(mfrow=c(2,2)) # set 2 rows and 2 column layout for plot
+plot(CRECEIVEregression)
+dev.off()
+
+jpg(filename = here("Results", "MultRegres01ModelResidualsDistribution.jpg"))
 par(mfrow=c(2,2)) # set 2 rows and 2 column layout for plot
 plot(CRECEIVEregression)
 dev.off()
@@ -573,6 +618,7 @@ ggplot(Sample90to95D)+
   stat_qq_line()+
   ggtitle("CRECEIVEsqrt Q-Q Plot")
 ggsave(here("Results", "QQplotCRECEIVEsqrt.png"))
+ggsave(here("Results", "QQplotCRECEIVEsqrt.jpg"))
 ```
 
 ## Multiple Regression Using Transformed Dependent Variable 
@@ -598,10 +644,16 @@ png(filename = here("Results","MultRegresTrfmModelResidualsPlotA.png"))
 plot(CRECEIVEresidTrfm)
 dev.off()
 
+CRECEIVEresidTrfm <- residuals(CRECEIVEregressionTrfm)
+jpg(filename = here("Results","MultRegresTrfmModelResidualsPlotA.jpg"))
+plot(CRECEIVEresidTrfm)
+dev.off()
+
 ggplot(CRECEIVEregressionTrfm)+
   aes(x=.fitted, y=.resid)+
   geom_point()
 ggsave(here("Results","MultRegresTrfmModelResidualsPlotB.png"))
+ggsave(here("Results","MultRegresTrfmModelResidualsPlotB.jpg"))
 
 # Check that mean of residuals equals zero
 mean(CRECEIVEregressionTrfm$residuals)
@@ -609,6 +661,11 @@ mean(CRECEIVEregressionTrfm$residuals)
 # Check for normality of residuals
 # Check for homoscedasticity of residuals or equal variance
 png(filename = here("Results", "MultRegresTrfmModelResidualsDistribution.png"))
+par(mfrow=c(2,2)) # set 2 rows and 2 column layout for plot
+plot(CRECEIVEregressionTrfm)
+dev.off()
+
+jpg(filename = here("Results", "MultRegresTrfmModelResidualsDistribution.jpg"))
 par(mfrow=c(2,2)) # set 2 rows and 2 column layout for plot
 plot(CRECEIVEregressionTrfm)
 dev.off()
